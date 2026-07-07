@@ -7,6 +7,17 @@
 > **未了: OpeOrder.exe 実バイナリでの参照検証（リリース前必須）とフェーズ2。**
 > 注意: ビルドにより C:\Shinseikai\MedicalLibrary.dll は削減版に置き換わっている。
 
+> **フェーズ2実施済み（2026-07-07）** — コミット `ede25fc`〜`ff8cd00`。
+> ① 再解析（入れ子型を参照解決から除外）で孤立17ファイル追加削除（MWM残存・FormPos・StdMsgBox等）
+> ② IJI運用終了の確認を受け、AnyCPU構成を削除し `#if INNO` 265ブロック(59ファイル、5,509行)をフラット化。
+>    StdEntity.Db=DB.Db3 / @INNO.WORLD 側を無条件化、INNOシンボルもDefineConstantsから除去
+> ③ IJIパス削除で孤立した MacsProgram.cs / SoapProblem.cs を削除
+> ④ Launcher.cs の未使用メソッド(InternetExplorer/BringDrug)と孤立した Agent/BringDrug.cs を削除。
+>    csproj参照DLLはすべて使用中と確認し変更なし
+> 最終状態: .cs 335ファイル（当初460から27%削減、行数ベースで約7万行削減）。
+> 検証: Release|x86 Rebuild成功 / 3アプリRebuild成功 / 配備済みEyeCenter.exe起動スモークテストOK。
+> **残る未了事項は OpeOrder.exe 実バイナリでの参照検証のみ。**
+
 次回の電子カルテ移行に備え、MedicalLibrary.dll の利用アプリを
 **EyeCenter.exe / OpeOrder.exe / NidekARK1.exe / CanonRKF1.exe** の4本に絞り、
 それ以外のコード・ファイルを削除する。

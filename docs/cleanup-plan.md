@@ -18,6 +18,25 @@
 > 検証: Release|x86 Rebuild成功 / 3アプリRebuild成功 / 配備済みEyeCenter.exe起動スモークテストOK。
 > **残る未了事項は OpeOrder.exe 実バイナリでの参照検証のみ。**
 
+> **フェーズ3実施済み（2026-07-07）— OpeOrder.exe 廃止に伴う専用コードの削除。**
+> OpeOrder.exe は今後使用しないことが確定したため、実バイナリ検証は不要となり、
+> OpeOrder.exe 専用（3アプリから到達不能）のコード・ファイルを削除した。
+> - 削除 27ファイル（.cs 21 + .resx 6）:
+>   フォーム6組（OpeOrderDayListForm / OpeOrderWeekListForm / FormOpeNursingList /
+>   FormOpeNursingPat / FormOpeNursingAs / FormOpeNursingSchema）、
+>   OpeOrderExcelPlan / OpeOrderExcelWeekPlan / OpeOrderSettings、
+>   OpeNursingData / OpeNursingAs / OpeNursingSchema / OpeNursingSettings、
+>   PatOpeOrder / PatOpeOrder2
+> - FormControl から FormOpeOrderWeekList_Show / FormOpeOrderDayList_Show とフィールドを削除、
+>   Launcher から OpeOrder() を削除
+> - **保持**: EyeCenter から到達可能な手術指示UI（FormPat→FormOpeOrder、OpeOrderData /
+>   OpeOrderMaster、FormPath→OpeOrderPathTemplate / PathMaster）。
+>   SchemaItem / SchemaTag / SchemaBg は ComeReport 系が使用するため保持
+> - EyeCenter 側: MainForm の「手術指示」ボタン（Launcher.OpeOrder() 呼び出し）を削除
+>   （EyeCenter リポジトリに未コミット変更が既存のためコミットは保留）
+> 検証: MedicalLibrary(Release|x86) ビルド成功 / EyeCenter・NidekARK1・CanonRKF1 Rebuild成功。
+> 最終状態: .cs 316ファイル。**未了事項なし（OpeOrder.exe 検証は廃止により不要）。**
+
 次回の電子カルテ移行に備え、MedicalLibrary.dll の利用アプリを
 **EyeCenter.exe / OpeOrder.exe / NidekARK1.exe / CanonRKF1.exe** の4本に絞り、
 それ以外のコード・ファイルを削除する。

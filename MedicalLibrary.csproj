@@ -128,30 +128,6 @@
     <Compile Include="Agent\FormComeReportTemplate.designer.cs">
       <DependentUpon>FormComeReportTemplate.cs</DependentUpon>
     </Compile>
-    <Compile Include="Agent\FormOpeNursingAs.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormOpeNursingAs.designer.cs">
-      <DependentUpon>FormOpeNursingAs.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormOpeNursingList.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormOpeNursingList.designer.cs">
-      <DependentUpon>FormOpeNursingList.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormOpeNursingPat.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormOpeNursingPat.designer.cs">
-      <DependentUpon>FormOpeNursingPat.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormOpeNursingSchema.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormOpeNursingSchema.designer.cs">
-      <DependentUpon>FormOpeNursingSchema.cs</DependentUpon>
-    </Compile>
     <Compile Include="Agent\Invoice.cs" />
     <Compile Include="Agent\NidekARK1.cs" />
     <Compile Include="Agent\NidekARK1ListForm.cs">
@@ -161,25 +137,6 @@
       <DependentUpon>NidekARK1ListForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Agent\NidekARK1Settings.cs" />
-    <Compile Include="Agent\OpeNursingAs.cs" />
-    <Compile Include="Agent\OpeNursingData.cs" />
-    <Compile Include="Agent\OpeNursingSchema.cs" />
-    <Compile Include="Agent\OpeNursingSettings.cs" />
-    <Compile Include="Agent\OpeOrderExcelPlan.cs" />
-    <Compile Include="Agent\OpeOrderExcelWeekPlan.cs" />
-    <Compile Include="Agent\OpeOrderDayListForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\OpeOrderDayListForm.designer.cs">
-      <DependentUpon>OpeOrderDayListForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\OpeOrderWeekListForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\OpeOrderWeekListForm.designer.cs">
-      <DependentUpon>OpeOrderWeekListForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\OpeOrderSettings.cs" />
     <Compile Include="Agent\PosDemand.cs" />
     <Compile Include="Agent\PosRegHistoryDetail.cs" />
     <Compile Include="Agent\Q26.cs" />
@@ -703,8 +660,6 @@
     <Compile Include="Entity\PatDept.cs" />
     <Compile Include="Entity\InfectionData.cs" />
     <Compile Include="Entity\PatIns.cs" />
-    <Compile Include="Entity\PatOpeOrder.cs" />
-    <Compile Include="Entity\PatOpeOrder2.cs" />
     <Compile Include="Entity\ProblemData.cs" />
     <Compile Include="Entity\ProblemMaster.cs" />
     <Compile Include="Entity\SchemaImage.cs" />
@@ -812,26 +767,8 @@
     <EmbeddedResource Include="Agent\FormComeReportTemplate.resx">
       <DependentUpon>FormComeReportTemplate.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormOpeNursingAs.resx">
-      <DependentUpon>FormOpeNursingAs.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormOpeNursingList.resx">
-      <DependentUpon>FormOpeNursingList.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormOpeNursingPat.resx">
-      <DependentUpon>FormOpeNursingPat.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormOpeNursingSchema.resx">
-      <DependentUpon>FormOpeNursingSchema.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Agent\NidekARK1ListForm.resx">
       <DependentUpon>NidekARK1ListForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\OpeOrderDayListForm.resx">
-      <DependentUpon>OpeOrderDayListForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\OpeOrderWeekListForm.resx">
-      <DependentUpon>OpeOrderWeekListForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormAnesRecord.resx">
       <DependentUpon>FormAnesRecord.cs</DependentUpon>

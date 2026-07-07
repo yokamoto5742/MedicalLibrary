@@ -138,30 +138,6 @@ namespace MedicalLibrary.Utility
         }
 
         /// <summary>
-        /// 手術指示管理システムを起動する
-        /// </summary>
-        /// <returns></returns>
-        public static Process OpeOrder()
-        {
-            string exe = AppFile.FilePath("OpeOrder.exe");
-            string args = "";
-
-            if (LoginUser.Id.Length > 0)
-            {
-                args += " -U " + LoginUser.Id;
-            }
-
-            if (File.Exists(exe))
-            {
-                return Process.Start(exe, args);
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
         /// 患者ラベル印刷を起動する
         /// </summary>
         /// <param name="pt_id"></param>

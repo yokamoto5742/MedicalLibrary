@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A Japanese electronic medical record (電子カルテ / "Karte") **class library** — patient records, orders, SOAP charts, ophthalmology (眼科) workflows, device integrations. It builds to `MedicalLibrary.dll` and is consumed by exactly four external apps: `EyeCenter.exe`, `OpeOrder.exe`, `NidekARK1.exe`, `CanonRKF1.exe`; it is **not** a standalone application. Code unreachable from those four apps was removed in 2026-07 (see `docs/cleanup-plan.md`); OpeOrder.exe's usage is inferred (its source is not on this machine), so verify against its binary before deleting more OpeOrder-related code.
+A Japanese electronic medical record (電子カルテ / "Karte") **class library** — patient records, orders, SOAP charts, ophthalmology (眼科) workflows, device integrations. It builds to `MedicalLibrary.dll` and is consumed by exactly three external apps: `EyeCenter.exe`, `NidekARK1.exe`, `CanonRKF1.exe`; it is **not** a standalone application. Code unreachable from those apps was removed in 2026-07 (see `docs/cleanup-plan.md`). OpeOrder.exe was retired in 2026-07 (フェーズ3) and its dedicated code deleted; the surgical-order UI still reachable from EyeCenter (`FormOpeOrder`, `OpeOrderData`/`OpeOrderMaster`, `OpeOrderPathTemplate`/`PathMaster`) is intentionally retained.
 
 - **No `Main` and no entry point.** Launch/interop helpers for external exes live in `Utility/Launcher.cs`, `InnoProgram.cs`.
 - **No test suite, no CI, no linter.** There is nothing to "run a single test."

@@ -102,16 +102,6 @@ namespace MedicalLibrary.Boundary
         static FormDiagSearch formDiagSearch;
 
         /// <summary>
-        /// 手術指示（週間）
-        /// </summary>
-        static OpeOrderWeekListForm formOpeOrderWeekList;
-
-        /// <summary>
-        /// 手術指示（指定日）
-        /// </summary>
-        static OpeOrderDayListForm formOpeOrderDayList;
-
-        /// <summary>
         /// 請求書・明細書PDF
         /// </summary>
         static FormBillPDFList formBillPDFList;
@@ -219,16 +209,6 @@ namespace MedicalLibrary.Boundary
             if (formDiagSearch != null)
             {
                 formDiagSearch.Dispose();
-            }
-
-            if (formOpeOrderWeekList != null)
-            {
-                formOpeOrderWeekList.Dispose();
-            }
-
-            if (formOpeOrderDayList != null)
-            {
-                formOpeOrderDayList.Dispose();
             }
 
             if (formBillPDFList != null)
@@ -513,26 +493,6 @@ namespace MedicalLibrary.Boundary
             }
 
             FormShow(formDiagSearch);
-        }
-
-        public static void FormOpeOrderWeekList_Show()
-        {
-            if (formOpeOrderWeekList == null || !formOpeOrderWeekList.Created)
-            {
-                formOpeOrderWeekList = new OpeOrderWeekListForm();
-            }
-
-            FormShow(formOpeOrderWeekList);
-        }
-
-        public static void FormOpeOrderDayList_Show()
-        {
-            if (formOpeOrderDayList == null || !formOpeOrderDayList.Created)
-            {
-                formOpeOrderDayList = new OpeOrderDayListForm();
-            }
-
-            FormShow(formOpeOrderDayList);
         }
 
         public static void FormBillPDFList_Show()

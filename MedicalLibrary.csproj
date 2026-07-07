@@ -732,7 +732,6 @@
     <Compile Include="Entity\RsvData.cs" />
     <Compile Include="Entity\RsvMaster.cs" />
     <Compile Include="Entity\Soap.cs" />
-    <Compile Include="Entity\SoapProblem.cs" />
     <Compile Include="Entity\Staff.cs" />
     <Compile Include="Entity\StdKarte1.cs" />
     <Compile Include="Entity\StdKarte2.cs" />
@@ -792,7 +791,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entity\StdClass.cs" />
     <Compile Include="Entity\VoucherCompGroup.cs" />
-    <Compile Include="Utility\MacsProgram.cs" />
     <Compile Include="Utility\TableData.cs" />
     <Compile Include="Utility\WinAPI.cs" />
   </ItemGroup>

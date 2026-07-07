@@ -4,30 +4,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A Japanese electronic medical record (電子カルテ / "Karte") **class library** — patient records, orders, DPC diagnoses, billing (医事会計), SOAP charts, drug/injection instructions, device integrations. It builds to `MedicalLibrary.dll` and is consumed by external apps (e.g. `ProasAgent.exe`); it is **not** a standalone application.
+A Japanese electronic medical record (電子カルテ / "Karte") **class library** — patient records, orders, SOAP charts, ophthalmology (眼科) workflows, device integrations. It builds to `MedicalLibrary.dll` and is consumed by exactly four external apps: `EyeCenter.exe`, `OpeOrder.exe`, `NidekARK1.exe`, `CanonRKF1.exe`; it is **not** a standalone application. Code unreachable from those four apps was removed in 2026-07 (see `docs/cleanup-plan.md`); OpeOrder.exe's usage is inferred (its source is not on this machine), so verify against its binary before deleting more OpeOrder-related code.
 
-- **No `Main` and no entry point** — `Class1.cs` is an empty stub. Launch/interop helpers for external exes live in `Utility/Launcher.cs`, `MacsProgram.cs`, `InnoProgram.cs`.
+- **No `Main` and no entry point.** Launch/interop helpers for external exes live in `Utility/Launcher.cs`, `InnoProgram.cs`.
 - **No test suite, no CI, no linter.** There is nothing to "run a single test."
-- Target: **.NET Framework 4.0, Client Profile** (legacy — not .NET Core/5+). C# + Windows Forms. Old-style (non-SDK) MSBuild `.csproj`.
+- Target: **.NET Framework 4.8** (legacy — not .NET Core/5+). C# + Windows Forms. Old-style (non-SDK) MSBuild `.csproj`.
 
 ## Build
 
-Primary configuration is **Release|x86** (Shinseikai/INNO deployment):
+The only platform is **x86** (Shinseikai deployment; output goes to `C:\shinseikai\`):
 
 ```
 msbuild MedicalLibrary.csproj /p:Configuration=Release /p:Platform=x86
 ```
 
-- `dotnet build` is **not** supported (legacy .NET 4.0 Client Profile, non-SDK csproj, GAC/HintPath references). Use `msbuild` (VS 2022) only.
-- x86 is required for INNO/Oracle builds — the native Oracle ODP.NET client is 32-bit.
-- Reference `HintPath`s and output dirs climb ~7 levels up to sibling `Karte`/`Shinseikai`/`macs` and an Oracle 11.2 client folder. Builds assume those external DLLs/folders are present on the machine.
-
-### `INNO` compile symbol changes runtime behavior
-
-The `INNO` symbol (set in the **x86** configurations) is an architectural switch, not just an output-path change:
-- Adds a third DB connection `DB.Db3` (`DBConnectionString3`), and `Entity/StdEntity.cs` repoints the shared `StdEntity.Db` from `Db1` to `Db3`.
-- DB link becomes `@INNO.WORLD` (vs `@IJI.WORLD` for AnyCPU/non-INNO).
-- INNO = the Shinseikai / innokarte hospital deployment; AnyCPU (Release → `Karte`) = the IJI deployment.
+- `dotnet build` is **not** supported (non-SDK csproj, GAC/HintPath references). Use `msbuild` (VS 2022+) only.
+- x86 is required — the native Oracle ODP.NET client is 32-bit.
+- Reference `HintPath`s climb ~7 levels up to sibling `Karte`/`Shinseikai` folders and an Oracle 11.2 client folder. Builds assume those external DLLs/folders are present on the machine.
+- The former `INNO` compile symbol and the AnyCPU/IJI configurations were removed in 2026-07: the INNO (Shinseikai) code paths are now unconditional — `StdEntity.Db` is `DB.Db3` and the DB link is `@INNO.WORLD`.
 
 ## Editing rules
 
@@ -44,7 +38,7 @@ The `INNO` symbol (set in the **x86** configurations) is an architectural switch
 ## Architecture & gotchas
 
 - **Layered by top-level folder / namespace:** `Entity/` (domain model, `MedicalLibrary.Entity`), `Boundary/` (WinForms UI: `Form*` dialogs, `Ctrl*`/`Std*` controls), `Agent/` (feature/business-logic modules + forms), `Utility/` (infrastructure: `DB.cs`, `Env.cs`, `LibSettings.cs`).
-- **DB access is via global static singletons** `DB.Db1`/`Db2` (`Utility/DB.cs`) with one shared `OracleCommand` (`BindByName=true`); entities reach the DB through the static `StdEntity.Db`. Not thread-safe by design — Open/Close/`Parameters.Clear` ordering matters.
+- **DB access is via global static singletons** `DB.Db1`/`Db2`/`Db3` (`Utility/DB.cs`) with one shared `OracleCommand` (`BindByName=true`); entities reach the DB through the static `StdEntity.Db` (= `Db3`). Not thread-safe by design — Open/Close/`Parameters.Clear` ordering matters.
 - **Hardcoded absolute paths** in `Utility/Env.cs` (`C:\macs`, `c:\karte`, `c:\innokarte`, `c:\shinseikai`) and **hardcoded Oracle credentials** in `Utility/LibSettings.cs` (serialized to/from `Setting.xml`). The app assumes this on-disk layout.
 
 ## Conventions

@@ -1,0 +1,642 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using MedicalLibrary.Entity;
+using MedicalLibrary.Utility;
+
+namespace MedicalLibrary.Agent
+{
+    public class EyeOpe
+    {
+        protected PatBase _Pat = new PatBase();
+
+        public PatBase Pat
+        {
+            get
+            {
+                if (!this._Pat.Id.Equals(this.PtId))
+                {
+                    this._Pat = PatBase.Load(this.PtId);
+                }
+
+                return this._Pat;
+            }
+        }
+
+        public string Id = "";
+        public string PtId = "";
+        public string OpeDate = "";
+        public string OpeTime = "0";
+        public string OpeKind = "";
+        public string OpeRoom = "";
+        public string OpeName = "";
+        public string Doctor = "";
+        public string PlanTime = "";
+        public string Anes = "";
+        public string Diag = "";
+        public string InOut = "";
+        public string InRoom = "";
+        public string InDate = "";
+        public string InTime = "";
+        public string InTerm = "";
+        public string EyeR = "0";
+        public string EyeL = "0";
+        public string Height = "";
+        public string Weight = "";
+        public string Infection = "";
+        public string PostDeal = "";
+        public string Past = "";
+        public string Comment = "";
+        public string AllCheck = "0";
+        public string Explain = "0";
+        public string EyeDrop = "0";
+
+        /// <summary>
+        /// 禁忌確認
+        /// （当初は「同意書渡し済み」だったが、同意書システム稼働と同時に必要なくなったため「禁忌確認」に用途変更 2010/08/29）
+        /// </summary>
+        public string Agree = "0";
+
+        /// <summary>
+        /// 術前チェック
+        /// </summary>
+        public string PreCheck = "0";
+
+        /// <summary>
+        /// 短期滞在手術等基本料3
+        /// </summary>
+        public string ShortOpe3 = "0";
+
+        /// <summary>
+        /// 手術日を早めても可
+        /// </summary>
+        public string EarlierOK = "0";
+
+        public string Staff = "";
+        public string Status = "1";
+
+        /// <summary>
+        /// 記録（EYE_OPE_RECORD と結合する場合）
+        /// </summary>
+        public string OpeRecord = "";
+
+        /// <summary>
+        /// 経過（EYE_OPE_PASS と結合する場合）
+        /// </summary>
+        public string OpePass = "";
+
+        /// <summary>
+        /// 適切な値が入っているかをチェックする。
+        /// </summary>
+        private bool DataCheck()
+        {
+            if (PtId.Length == 0) return false;
+
+            if (OpeDate.Length != 8) return false;
+
+            if (OpeTime.Length > 6) return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// データベースに保存する。
+        /// </summary>
+        public void Save()
+        {
+            if (!DataCheck()) return;
+
+            StdReturn sr = new StdReturn();
+
+            StdDbClass obj = new StdDbClass();
+            obj.Db = DB.Db2;
+
+            obj.Table = "EYE_OPE";
+
+            obj.DataList.Add(new StdDbColumn("PATIENT_ID", StdDbType.NUMBER, this.PtId));
+            obj.DataList.Add(new StdDbColumn("OPE_DATE", StdDbType.NUMBER, this.OpeDate));
+
+            if (OpeTime.Length > 0)
+            {
+                obj.DataList.Add(new StdDbColumn("OPE_TIME", StdDbType.NUMBER, this.OpeTime));
+            }
+            else
+            {
+                obj.DataList.Add(new StdDbColumn("OPE_TIME", StdDbType.NUMBER, DBNull.Value));
+            }
+
+            obj.DataList.Add(new StdDbColumn("OPE_KIND", StdDbType.NUMBER, this.OpeKind));
+            obj.DataList.Add(new StdDbColumn("OPE_ROOM", StdDbType.VARCHAR2, this.OpeRoom));
+            obj.DataList.Add(new StdDbColumn("OPE_NAME", StdDbType.VARCHAR2, this.OpeName));
+            obj.DataList.Add(new StdDbColumn("DOCTOR", StdDbType.VARCHAR2, this.Doctor));
+
+            if (PlanTime.Length > 0)
+            {
+                obj.DataList.Add(new StdDbColumn("PLAN_TIME", StdDbType.NUMBER, this.PlanTime));
+            }
+            else
+            {
+                obj.DataList.Add(new StdDbColumn("PLAN_TIME", StdDbType.NUMBER, DBNull.Value));
+            }
+
+            obj.DataList.Add(new StdDbColumn("ANES", StdDbType.VARCHAR2, this.Anes));
+            obj.DataList.Add(new StdDbColumn("DIAG", StdDbType.VARCHAR2, this.Diag));
+            obj.DataList.Add(new StdDbColumn("IN_OUT", StdDbType.VARCHAR2, this.InOut));
+
+            if (InOut.Contains("外来"))
+            {
+                obj.DataList.Add(new StdDbColumn("IN_ROOM", StdDbType.VARCHAR2, DBNull.Value));
+                obj.DataList.Add(new StdDbColumn("IN_DATE", StdDbType.NUMBER, DBNull.Value));
+                obj.DataList.Add(new StdDbColumn("IN_TIME", StdDbType.NUMBER, DBNull.Value));
+                obj.DataList.Add(new StdDbColumn("IN_TERM", StdDbType.VARCHAR2, DBNull.Value));
+            }
+            else
+            {
+                obj.DataList.Add(new StdDbColumn("IN_ROOM", StdDbType.VARCHAR2, this.InRoom));
+
+                if (InDate.Length > 0)
+                {
+                    obj.DataList.Add(new StdDbColumn("IN_DATE", StdDbType.NUMBER, InDate));
+                }
+                else
+                {
+                    obj.DataList.Add(new StdDbColumn("IN_DATE", StdDbType.NUMBER, DBNull.Value));
+                }
+
+                if (InTime.Length > 0)
+                {
+                    obj.DataList.Add(new StdDbColumn("IN_TIME", StdDbType.NUMBER, this.InTime));
+                }
+                else
+                {
+                    obj.DataList.Add(new StdDbColumn("IN_TIME", StdDbType.NUMBER, DBNull.Value));
+                }
+
+                obj.DataList.Add(new StdDbColumn("IN_TERM", StdDbType.VARCHAR2, this.InTerm));
+            }
+
+            obj.DataList.Add(new StdDbColumn("EYE_R", StdDbType.NUMBER, this.EyeR));
+            obj.DataList.Add(new StdDbColumn("EYE_L", StdDbType.NUMBER, this.EyeL));
+            obj.DataList.Add(new StdDbColumn("HEIGHT", StdDbType.VARCHAR2, this.Height));
+            obj.DataList.Add(new StdDbColumn("WEIGHT", StdDbType.VARCHAR2, this.Weight));
+            obj.DataList.Add(new StdDbColumn("INFECTION", StdDbType.VARCHAR2, this.Infection));
+            obj.DataList.Add(new StdDbColumn("POST_DEAL", StdDbType.VARCHAR2, this.PostDeal));
+            obj.DataList.Add(new StdDbColumn("PAST", StdDbType.VARCHAR2, this.Past));
+            obj.DataList.Add(new StdDbColumn("COMT", StdDbType.VARCHAR2, this.Comment));
+            obj.DataList.Add(new StdDbColumn("ALL_CHECK", StdDbType.NUMBER, this.AllCheck));
+            obj.DataList.Add(new StdDbColumn("EXPLAIN", StdDbType.NUMBER, this.Explain));
+            obj.DataList.Add(new StdDbColumn("EYE_DROP", StdDbType.NUMBER, this.EyeDrop));
+            obj.DataList.Add(new StdDbColumn("AGREE", StdDbType.NUMBER, this.Agree));
+            obj.DataList.Add(new StdDbColumn("PRE_CHECK", StdDbType.NUMBER, this.PreCheck));
+            obj.DataList.Add(new StdDbColumn("SHORT_OPE3", StdDbType.NUMBER, this.ShortOpe3));
+            obj.DataList.Add(new StdDbColumn("EARLIER_OK", StdDbType.NUMBER, this.EarlierOK));
+            obj.DataList.Add(new StdDbColumn("STAFF", StdDbType.NUMBER, this.Staff));
+            obj.DataList.Add(new StdDbColumn("SAVE_DATE", StdDbType.NUMBER, DateTime.Now.ToString("yyyyMMdd")));
+            obj.DataList.Add(new StdDbColumn("SAVE_TIME", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
+            obj.DataList.Add(new StdDbColumn("STATUS", StdDbType.NUMBER, this.Status));
+
+            if (Id.Length > 0)
+            {
+                obj.WhereList.Add("ID = " + this.Id);
+                sr = obj.UpdateSQL();
+            }
+            else
+            {
+                obj.DataList.Add(new StdDbColumn("ID", StdDbType.TEXT, "EYE_OPE_SEQ.nextval"));
+                sr = obj.InsertSQL();
+            }
+        }
+
+        public static EyeOpe GetFromStdClass(StdClass tmp)
+        {
+            EyeOpe obj = new EyeOpe();
+
+            obj.Id = tmp.DataDict["ID"].ToString();
+            obj.PtId = tmp.DataDict["PATIENT_ID"].ToString();
+            obj.OpeDate = tmp.DataDict["OPE_DATE"].ToString();
+            obj.OpeTime = tmp.DataDict["OPE_TIME"].ToString();
+            obj.OpeKind = tmp.DataDict["OPE_KIND"].ToString();
+            obj.OpeRoom = tmp.DataDict["OPE_ROOM"].ToString();
+            obj.OpeName = tmp.DataDict["OPE_NAME"].ToString();
+            obj.Doctor = tmp.DataDict["DOCTOR"].ToString();
+            obj.PlanTime = tmp.DataDict["PLAN_TIME"].ToString();
+            obj.Anes = tmp.DataDict["ANES"].ToString();
+            obj.Diag = tmp.DataDict["DIAG"].ToString();
+            obj.InOut = tmp.DataDict["IN_OUT"].ToString();
+            obj.InRoom = tmp.GetDataString("IN_ROOM");
+            obj.InDate = tmp.DataDict["IN_DATE"].ToString();
+            obj.InTime = tmp.DataDict["IN_TIME"].ToString();
+            obj.InTerm = tmp.DataDict["IN_TERM"].ToString();
+            obj.EyeR = tmp.DataDict["EYE_R"].ToString();
+            obj.EyeL = tmp.DataDict["EYE_L"].ToString();
+            obj.Height = tmp.DataDict["HEIGHT"].ToString();
+            obj.Weight = tmp.DataDict["WEIGHT"].ToString();
+            obj.Infection = tmp.DataDict["INFECTION"].ToString();
+            obj.PostDeal = tmp.DataDict["POST_DEAL"].ToString();
+            obj.Past = tmp.DataDict["PAST"].ToString();
+            obj.Comment = tmp.DataDict["COMT"].ToString();
+            obj.AllCheck = tmp.DataDict["ALL_CHECK"].ToString();
+            obj.Explain = tmp.DataDict["EXPLAIN"].ToString();
+            obj.EyeDrop = tmp.DataDict["EYE_DROP"].ToString();
+            obj.Agree = tmp.DataDict["AGREE"].ToString();
+            obj.PreCheck = tmp.DataDict["PRE_CHECK"].ToString();
+            obj.ShortOpe3 = tmp.DataDict["SHORT_OPE3"].ToString();
+            obj.EarlierOK = tmp.DataDict["EARLIER_OK"].ToString();
+            obj.Staff = tmp.DataDict["STAFF"].ToString();
+            obj.Status = tmp.DataDict["STATUS"].ToString();
+
+            return obj;
+        }
+
+        /// <summary>
+        /// データベースからロードする。
+        /// </summary>
+        public static EyeOpe Load(string ope_id)
+        {
+            EyeOpe tmpOpe = new EyeOpe();
+
+            if (ope_id.Length == 0)
+            {
+                return tmpOpe;
+            }
+
+            string cmd = "select * from EYE_OPE where ID = " + ope_id;
+
+            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
+
+            foreach (StdClass tmp in tmp_list)
+            {
+                tmpOpe = GetFromStdClass(tmp);
+                break;
+            }
+
+            return tmpOpe;
+        }
+/*
+        /// <summary>
+        /// 該当患者の手術記録をデータベースから検索する。
+        /// </summary>
+        /// <param name="pt_id"></param>
+        /// <returns></returns>
+        public static List<EyeOpe> Find(string pt_id)
+        {
+            List<EyeOpe> tmpList = new List<EyeOpe>();
+
+            if (pt_id.Length == 0)
+            {
+                return tmpList;
+            }
+
+            string cmd = "select * from EYE_OPE " +
+                " where PATIENT_ID = " + pt_id + " and STATUS != 0 " +
+                " order by OPE_DATE desc, OPE_TIME desc";
+
+            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
+
+            foreach (StdClass tmp in tmp_list)
+            {
+                tmpList.Add(GetFromStdClass(tmp));
+            }
+
+            return tmpList;
+        }
+*/
+        /// <summary>
+        /// データベースから削除する。
+        /// </summary>
+        /// <param name="ope_id">手術記録ID</param>
+        /// <param name="del_staff">ログインユーザーID</param>
+        public static void Delete(string ope_id, string del_staff)
+        {
+            if (ope_id.Length == 0 || del_staff.Length == 0)
+            {
+                return;
+            }
+
+            string cmd = "update EYE_OPE set STATUS = 0, DEL_STAFF = " + del_staff + ", DEL_DATE = " + DateTime.Now.ToString("yyyyMMdd") + ", DEL_TIME = " + DateTime.Now.ToString("HHmmss") +
+                " where ID = " + ope_id;
+
+            DB.Db2.ExecuteNonQuery(cmd);
+        }
+
+        /// <summary>
+        /// 種別・日付・時間帯を指定して取得する
+        /// </summary>
+        /// <param name="kind"></param>
+        /// <param name="date"></param>
+        /// <param name="time1"></param>
+        /// <param name="time2"></param>
+        /// <returns></returns>
+        public static List<EyeOpe> GetListByKindDateTimes(string kind, string date, string time1, string time2)
+        {
+            List<EyeOpe> list = new List<EyeOpe>();
+
+            if (!DateTimeAgent.IsDate(date))
+            {
+                return list;
+            }
+
+            List<string> cond_list = new List<string>();
+
+            cond_list.Add("OPE_DATE = " + date);
+
+            if (kind.Length > 0)
+            {
+                cond_list.Add("OPE_KIND = " + kind);
+            }
+
+            if (time1.Length > 0)
+            {
+                cond_list.Add("OPE_TIME >= " + time1);
+            }
+
+            if (time2.Length > 0)
+            {
+                cond_list.Add("OPE_TIME <= " + time2);
+            }
+
+#if INNO
+            string cmd = "select EYE_OPE.*, " +
+                " Trim(tm.P_KANA) as カナ, Trim(tm.P_NAME) as 氏名, " +
+                " tm.P_SEX 性別, tm.P_BIRTHDAY_AD 生年月日 " +
+                " from EYE_OPE left join M_PATIENT" + Env.DB_LINK + " tm on EYE_OPE.PATIENT_ID = tm.P_ID " +
+                " where " + AppString.ConcatList(cond_list, " and ") + " and STATUS != 0 " +
+                " order by OPE_KIND, OPE_DATE, OPE_TIME";
+#else
+            string cmd = "select EYE_OPE.*, " +
+                " Trim(IM01RC_F03) as カナ, Trim(IM01RC_F04) as 氏名, " +
+                " IM01RC_F05 性別, IM01RC_F10 生年月日 " +
+                " from EYE_OPE left join IM01RC" + Env.DB_LINK + " on EYE_OPE.PATIENT_ID = IM01RC.IM01RC_F01 " +
+                " where " + AppString.ConcatList(cond_list, " and ") + " and STATUS != 0 " +
+                " order by OPE_KIND, OPE_DATE, OPE_TIME";
+#endif
+            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
+
+            foreach (StdClass tmp in tmp_list)
+            {
+                EyeOpe obj = GetFromStdClass(tmp);
+
+                obj._Pat.Id = tmp.GetDataString("PATIENT_ID");
+                obj._Pat.Kana = tmp.GetDataString("カナ").TrimEnd();
+                obj._Pat.Name = tmp.GetDataString("氏名").TrimEnd();
+                obj._Pat.Sex = tmp.GetDataString("性別");
+                obj._Pat.Birth = tmp.GetDataString("生年月日");
+
+                list.Add(obj);
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// 種別・開始日・終了日を指定して取得する
+        /// </summary>
+        /// <param name="kind"></param>
+        /// <param name="start_date"></param>
+        /// <param name="end_date"></param>
+        /// <returns></returns>
+        public static List<EyeOpe> GetListByKindDates(string kind, string start_date, string end_date)
+        {
+            List<EyeOpe> list = new List<EyeOpe>();
+
+            if (!DateTimeAgent.IsDate(start_date) || !DateTimeAgent.IsDate(end_date))
+            {
+                return list;
+            }
+
+            List<string> cond_list = new List<string>();
+
+            if (kind.Length > 0)
+            {
+                cond_list.Add("OPE_KIND = " + kind);
+            }
+
+            if (DateTimeAgent.IsDate(start_date))
+            {
+                cond_list.Add("OPE_DATE >= " + start_date);
+            }
+            else
+            {
+                cond_list.Add("OPE_DATE >= " + DateTime.Now.ToString("yyyyMMdd"));
+            }
+
+            if (DateTimeAgent.IsDate(end_date))
+            {
+                cond_list.Add("OPE_DATE <= " + end_date);
+            }
+            else
+            {
+                cond_list.Add("OPE_DATE <= " + DateTime.Now.AddDays(7).ToString("yyyyMMdd"));
+            }
+
+#if INNO
+            string cmd = "select EYE_OPE.*, " +
+                " Trim(tm.P_KANA) as カナ, Trim(tm.P_NAME) as 氏名, " +
+                " tm.P_SEX 性別, tm.P_BIRTHDAY_AD 生年月日 " +
+                " from EYE_OPE left join M_PATIENT" + Env.DB_LINK + " tm on EYE_OPE.PATIENT_ID = tm.P_ID " +
+                " where " + AppString.ConcatList(cond_list, " and ") + " and STATUS != 0 " +
+                " order by OPE_KIND, OPE_DATE, OPE_TIME";
+#else
+            string cmd = "select EYE_OPE.*, " +
+                " Trim(IM01RC_F03) as カナ, Trim(IM01RC_F04) as 氏名, " +
+                " IM01RC_F05 性別, IM01RC_F10 生年月日 " +
+                " from EYE_OPE left join IM01RC" + Env.DB_LINK + " on EYE_OPE.PATIENT_ID = IM01RC.IM01RC_F01 " +
+                " where " + AppString.ConcatList(cond_list, " and ") + " and STATUS != 0 " +
+                " order by OPE_KIND, OPE_DATE, OPE_TIME";
+#endif
+            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
+
+            foreach (StdClass tmp in tmp_list)
+            {
+                EyeOpe obj = GetFromStdClass(tmp);
+
+                obj._Pat.Id = tmp.GetDataString("PATIENT_ID");
+                obj._Pat.Kana = tmp.GetDataString("カナ").TrimEnd();
+                obj._Pat.Name = tmp.GetDataString("氏名").TrimEnd();
+                obj._Pat.Sex = tmp.GetDataString("性別");
+                obj._Pat.Birth = tmp.GetDataString("生年月日");
+
+                list.Add(obj);
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// 条件に合致する手術記録をデータベースから検索する。
+        /// </summary>
+        /// <param name="pt_id"></param>
+        /// <param name="start_date"></param>
+        /// <param name="end_date"></param>
+        /// <returns></returns>
+        public static List<EyeOpe> GetListByPatDates(string pt_id, string start_date, string end_date)
+        {
+            List<EyeOpe> tmpList = new List<EyeOpe>();
+
+            int i = 0;
+
+            if (pt_id.Length == 0 || !int.TryParse(pt_id, out i))
+            {
+                return tmpList;
+            }
+
+            string pt_sql = " and PATIENT_ID = " + pt_id;
+
+            string date_sql = "";
+
+            if (start_date.Length == 8 && end_date.Length == 8)
+            {
+                date_sql = " and OPE_DATE >= " + start_date + " and OPE_DATE <= " + end_date;
+            }
+
+            string cmd = "select EYE_OPE.*, EYE_OPE_RECORD.CONT as 記録 " +
+                " from EYE_OPE left join EYE_OPE_RECORD on EYE_OPE.ID = EYE_OPE_RECORD.ID " +
+                " where EYE_OPE.STATUS != 0 " + pt_sql + date_sql +
+                " order by OPE_DATE desc, OPE_TIME desc";
+
+            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
+
+            foreach (StdClass tmp in tmp_list)
+            {
+                EyeOpe obj = GetFromStdClass(tmp);
+
+                obj.OpeRecord = tmp.GetDataString("記録");
+
+                tmpList.Add(obj);
+            }
+
+            return tmpList;
+        }
+
+        /// <summary>
+        /// 条件に合致する手術記録をデータベースから検索する。
+        /// </summary>
+        /// <param name="start_date"></param>
+        /// <param name="end_date"></param>
+        /// <param name="diag"></param>
+        /// <param name="ope"></param>
+        /// <param name="doctor"></param>
+        /// <param name="record11"></param>
+        /// <param name="record12"></param>
+        /// <param name="record13"></param>
+        /// <param name="record21"></param>
+        /// <param name="record22"></param>
+        /// <param name="record23"></param>
+        /// <returns></returns>
+        public static List<EyeOpe> GetList(string start_date, string end_date, string diag, string ope, string doctor, string record11, string record12, string record13, string record21, string record22, string record23)
+        {
+            List<EyeOpe> tmpList = new List<EyeOpe>();
+
+            string date_sql = "";
+
+            if (start_date.Length == 8 && end_date.Length == 8)
+            {
+                date_sql = " and OPE_DATE >= " + start_date + " and OPE_DATE <= " + end_date;
+            }
+
+            string diag_sql = "";
+
+            if (diag.Length > 0)
+            {
+                foreach (string s in diag.Split(' ', '　'))
+                {
+                    if (diag_sql.Length > 0)
+                    {
+                        diag_sql += " and ";
+                    }
+
+                    diag_sql += "DIAG like '%" + s + "%'";
+                }
+
+                if (diag_sql.Length > 0)
+                {
+                    diag_sql = " and (" + diag_sql + ")";
+                }
+            }
+
+            string ope_sql = "";
+
+            if (ope.Length > 0)
+            {
+                foreach (string s in ope.Split(' ', '　'))
+                {
+                    if (ope_sql.Length > 0)
+                    {
+                        ope_sql += " or ";
+                    }
+
+                    ope_sql += "OPE_NAME like '%" + s + "%'";
+                }
+
+                if (ope_sql.Length > 0)
+                {
+                    ope_sql = " and (" + ope_sql + ")";
+                }
+            }
+
+            string doctor_sql = "";
+
+            if (doctor.Length > 0)
+            {
+                foreach (string s in doctor.Split(' ', '　'))
+                {
+                    if (doctor_sql.Length > 0)
+                    {
+                        doctor_sql += " or ";
+                    }
+
+                    doctor_sql += "DOCTOR like '%" + s + "%'";
+                }
+
+                if (doctor_sql.Length > 0)
+                {
+                    doctor_sql = " and (" + doctor_sql + ")";
+                }
+            }
+
+            string record_sql1 = "";
+
+            if (record11.Length > 0)
+            {
+                record_sql1 = " and EYE_OPE_RECORD.CONT like '%" + record12 + "," + record13 + "%'";
+            }
+
+            string record_sql2 = "";
+
+            if (record21.Length > 0)
+            {
+                record_sql2 = " and EYE_OPE_RECORD.CONT like '%" + record22 + "," + record23 + "%'";
+            }
+#if INNO
+            string cmd = "select EYE_OPE.*, Trim(tm.P_KANA) as カナ, Trim(tm.P_NAME) as 氏名, tm.P_SEX as 性別, tm.P_BIRTHDAY_AD as 生年月日, EYE_OPE_RECORD.CONT as 記録, EYE_OPE_PASS.CONT as 経過 " +
+                " from EYE_OPE inner join M_PATIENT" + Env.DB_LINK + " tm on PATIENT_ID = tm.P_ID left join EYE_OPE_RECORD on EYE_OPE.ID = EYE_OPE_RECORD.ID left join EYE_OPE_PASS on EYE_OPE.ID = EYE_OPE_PASS.ID " +
+                " where EYE_OPE.STATUS != 0 " + date_sql + diag_sql + ope_sql + doctor_sql + record_sql1 + record_sql2 +
+                " order by OPE_DATE desc, OPE_TIME desc";
+#else
+            string cmd = "select EYE_OPE.*, Trim(IM01RC_F03) as カナ, Trim(IM01RC_F04) as 氏名, IM01RC_F05 as 性別, IM01RC_F10 as 生年月日, EYE_OPE_RECORD.CONT as 記録, EYE_OPE_PASS.CONT as 経過 " +
+                " from EYE_OPE inner join IM01RC" + Env.DB_LINK + " on PATIENT_ID = IM01RC_F01 left join EYE_OPE_RECORD on EYE_OPE.ID = EYE_OPE_RECORD.ID left join EYE_OPE_PASS on EYE_OPE.ID = EYE_OPE_PASS.ID " +
+                " where EYE_OPE.STATUS != 0 " + date_sql + diag_sql + ope_sql + doctor_sql + record_sql1 + record_sql2 +
+                " order by OPE_DATE desc, OPE_TIME desc";
+#endif
+            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
+
+            foreach (StdClass tmp in tmp_list)
+            {
+                EyeOpe obj = GetFromStdClass(tmp);
+
+                obj._Pat.Id = obj.PtId;
+                obj._Pat.Kana = tmp.GetDataString("カナ");
+                obj._Pat.Name = tmp.GetDataString("氏名");
+                obj._Pat.Sex = tmp.GetDataString("性別");
+                obj._Pat.Birth = tmp.GetDataString("生年月日");
+
+                obj.OpeRecord = tmp.GetDataString("記録");
+                obj.OpePass = tmp.GetDataString("経過");
+
+                tmpList.Add(obj);
+            }
+
+            return tmpList;
+        }
+    }
+}

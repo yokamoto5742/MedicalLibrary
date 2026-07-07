@@ -1,0 +1,10 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="MedicalLibrary.csproj" Id="31f961e7-9ccd-418a-82c3-02ea28ef23eb">
+    <BuildType Solution="Debug|Any CPU" Project="Release" />
+    <Platform Project="x86" />
+  </Project>
+</Solution>

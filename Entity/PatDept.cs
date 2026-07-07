@@ -25,7 +25,6 @@ namespace MedicalLibrary.Entity
 
             if (pt_id.Length == 0) return list;
 
-#if INNO
             string cmd = "select * from ZERO_KAREKI tt " +
                 " where (tt.PT_ID, tt.KAREKI_DATE) in " +
                 " (select t.PT_ID, max(t.KAREKI_DATE) KAREKI_DATE " +
@@ -34,16 +33,6 @@ namespace MedicalLibrary.Entity
                 "  group by t.PT_ID)";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
-#else
-            string cmd = "select * from IM03RC tt " +
-                " where (tt.IM03RC_F01, tt.IM03RC_F04) in " +
-                " (select t.IM03RC_F01, max(t.IM03RC_F04) IM03RC_F04 " +
-                "  from macs.IM03RC t " +
-                "  where t.IM03RC_F01 = " + pt_id +
-                "  group by t.IM03RC_F01)";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             foreach (StdClass tmp in tmp_list)
             {
                 list.Add(GetFromStdClass(tmp));
@@ -95,7 +84,6 @@ namespace MedicalLibrary.Entity
             foreach (string s in AppString.ConcatLists(pts, ",", "", 1000))
             {
                 if (s.Length == 0) break;
-#if INNO
                 cmd = "select t.PT_ID, t.DEPT, max(t.KAREKI_DATE) KAREKI_DATE " +
                     " from ZERO_KAREKI t " +
                     " where t.PT_ID in (" + s + ") ";
@@ -108,20 +96,6 @@ namespace MedicalLibrary.Entity
                 cmd += " group by t.PT_ID, t.DEPT";
 
                 List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
-#else
-                cmd = "select t.IM03RC_F01, t.IM03RC_F03, max(t.IM03RC_F04) IM03RC_F04 " +
-                    " from macs.IM03RC t " +
-                    " where t.IM03RC_F01 in (" + s + ") ";
-
-                if (dps.Count > 0)
-                {
-                    cmd += " and t.IM03RC_F03 in (" + AppString.ConcatList(dps, ",") + ")";
-                }
-
-                cmd += " group by t.IM03RC_F01, t.IM03RC_F03";
-
-                List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
                 foreach (StdClass tmp in tmp_list)
                 {
                     list.Add(GetFromStdClass(tmp));
@@ -135,18 +109,10 @@ namespace MedicalLibrary.Entity
         new public static PatDept GetFromStdClass(StdClass tmp)
         {
             PatDept obj = new PatDept();
-#if INNO
             obj.Id = tmp.GetDataString("PT_ID");
             obj.Ins = tmp.GetDataString("HOKEN_P");
             obj.Dept = tmp.GetDataString("DEPT");
             obj.LastDate = tmp.GetDataString("KAREKI_DATE");
-#else
-            obj.Id = tmp.GetDataString("IM03RC_F01");
-            obj.Ins = tmp.GetDataString("IM03RC_F02");
-            obj.InsKind = tmp.GetDataString("IM02RC_F43");
-            obj.Dept = tmp.GetDataString("IM03RC_F03");
-            obj.LastDate = tmp.GetDataString("IM03RC_F04");
-#endif
             return obj;
         }
     }

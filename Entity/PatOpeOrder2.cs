@@ -685,7 +685,6 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "Select td.*, tm.P_NAME, tm.P_SEX, tm.P_BIRTHDAY_AD " +
                 " from D_DIRECTION td inner join M_PATIENT tm on td.P_ID = tm.P_ID " +
                 " where DIRECTION_DATE = " + date +
@@ -693,14 +692,6 @@ namespace MedicalLibrary.Entity
                 " order by td.P_ID, td.SEQ";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "Select 患者コード, 指示コード, 連番, 入力値, Trim(IM01RC_F04) as 氏名, Trim(IM01RC_F05) as 性別, Trim(IM01RC_F10) as 生年月日, 日付 " +
-                " from PATH手術指示データ inner join IM01RC on 患者コード = IM01RC_F01 " +
-                " where 日付 = " + date +
-                " order by 患者コード, 指示コード, 連番";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             List<string> pt_list = new List<string>();
 
             foreach (StdClass tmp in tmp_list)
@@ -791,7 +782,6 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "Select td.*, tm.P_NAME, tm.P_SEX, tm.P_BIRTHDAY_AD " +
                 " from D_DIRECTION td inner join M_PATIENT tm on td.P_ID = tm.P_ID " +
                 " where DIRECTION_DATE = " + date +
@@ -800,15 +790,6 @@ namespace MedicalLibrary.Entity
                 " order by td.P_ID, td.SEQ";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "Select 患者コード, 指示コード, 連番, 入力値, Trim(IM01RC_F04) as 氏名, Trim(IM01RC_F05) as 性別, Trim(IM01RC_F10) as 生年月日, 日付 " +
-                " from PATH手術指示データ inner join IM01RC on 患者コード = IM01RC_F01 " +
-                " where 日付 = " + date +
-                " and 患者コード in (" + AppString.ConcatList(pt_list, ",") + ") " +
-                " order by 患者コード, 指示コード, 連番";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             foreach (StdClass tmp in tmp_list)
             {
                 bool flg = false;
@@ -895,7 +876,6 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "Select td.*, tm.P_NAME, tm.P_SEX, tm.P_BIRTHDAY_AD " +
                 " from D_DIRECTION td inner join M_PATIENT tm on td.P_ID = tm.P_ID " +
                 " where DIRECTION_DATE >= " + start_date + " and DIRECTION_DATE <= " + end_date +
@@ -903,14 +883,6 @@ namespace MedicalLibrary.Entity
                 " order by td.DIRECTION_DATE, td.P_ID, td.SEQ";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "Select 患者コード, 指示コード, 連番, 入力値, Trim(IM01RC_F04) as 氏名, Trim(IM01RC_F05) as 性別, Trim(IM01RC_F10) as 生年月日, 日付 " +
-                " from PATH手術指示データ inner join IM01RC on 患者コード = IM01RC_F01 " +
-                " where 日付 >= " + start_date + " and 日付 <= " + end_date +
-                " order by 日付, 患者コード, 指示コード, 連番";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             List<string> pt_list = new List<string>();
 
             foreach (StdClass tmp in tmp_list)

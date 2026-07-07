@@ -28,12 +28,10 @@ namespace MedicalLibrary.Utility
         /// DB情報
         /// </summary>
         public string DBConnectionString2 = "User Id=open;Password=system;Data Source=macs_open;";
-#if INNO
         /// <summary>
         /// DB情報
         /// </summary>
         public string DBConnectionString3 = "User Id=medb;Password=system;Data Source=inno_orcl;";
-#endif
         /// <summary>
         /// オーダー転送アプリのパス
         /// </summary>
@@ -489,7 +487,6 @@ namespace MedicalLibrary.Utility
         /// <param name="forced">強制的に初期化する</param>
         public static void Init(bool forced = false)
         {
-#if INNO
 			if (!init)
 			{
 				// InnoUketsukeLib を初期化しておく。
@@ -503,7 +500,6 @@ namespace MedicalLibrary.Utility
 					LibUtility.Except(ex, false);
 				}
 			}
-#endif
 
             if (forced || !init)
             {
@@ -518,13 +514,8 @@ namespace MedicalLibrary.Utility
                         LibSettings.Read(xml_file);
 
                         // DBアクセスの初期化
-#if INNO
                         DB.Db2.Init(LibSettings.Current.DBConnectionString2);
                         DB.Db3.Init(LibSettings.Current.DBConnectionString3);
-#else
-                        DB.Db1.Init(LibSettings.Current.DBConnectionString1);
-                        DB.Db2.Init(LibSettings.Current.DBConnectionString2);
-#endif
                     }
                     else
                     {

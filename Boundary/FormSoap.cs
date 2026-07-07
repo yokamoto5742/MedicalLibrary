@@ -258,11 +258,6 @@ namespace MedicalLibrary.Boundary
             // SOAPヘッダ一覧を取得する
             Dictionary<string, List<SoapHeader>> soap_header_dict = SoapHeader.GetDict(pt_id, date_list);
 
-#if INNO
-#else
-            // SOAPプロブレム一覧を取得する
-            Dictionary<string, List<SoapProblem>> problem_dict = SoapProblem.GetDict(pt_id, date_list);
-#endif
 
             // Orderデータ一覧を取得する
             Dictionary<string, Dictionary<string, SoapOrderHeader>> order_dict = SoapOrderHeader.GetDict(pt_id, date_list);
@@ -313,7 +308,6 @@ namespace MedicalLibrary.Boundary
                         lh += lb_title.Height;
 
                         // プロブレムがあれば表示する
-#if INNO
                         if (header.Problem.Length > 0)
                         {
                             Label lb = new Label();
@@ -333,44 +327,6 @@ namespace MedicalLibrary.Boundary
 
                             p.Controls.Add(lb);
                         }
-#else
-                        if (problem_dict.ContainsKey(header.Key))
-                        {
-                            foreach (SoapProblem problem in problem_dict[header.Key])
-                            {
-                                Label lb = new Label();
-                                lb.BackColor = Color.White;
-                                lb.BorderStyle = BorderStyle.None;
-                                lb.Padding = new Padding(3, 3, 3, 3);
-                                lb.Font = AppFont.FN10.Ft;
-                                lb.Location = new Point(40, lh);
-                                lb.Width = p.Width - 40;
-
-                                lb.Text = problem.ContShow(lb.Font.Size, lb.Width);
-                                lb.Height = lb.PreferredHeight + 5;
-
-                                Label lb_kind = new Label();
-                                lb_kind.BackColor = Color.LightYellow;
-                                lb_kind.BorderStyle = BorderStyle.None;
-                                lb_kind.Text = "#" + problem.ProblemCode;
-                                lb_kind.TextAlign = ContentAlignment.TopCenter;
-                                lb_kind.Padding = new Padding(3, 3, 3, 3);
-                                lb_kind.Font = AppFont.FN10.Ft;
-                                lb_kind.Location = new Point(0, lh);
-
-                                lb_kind.Width = 40;
-                                lb_kind.Height = lb.Height;
-
-                                lh += lb.Height;
-
-                                lb_kind.MouseClick += new MouseEventHandler(lb_MouseClick);
-                                lb.MouseClick += new MouseEventHandler(lb_MouseClick);
-
-                                p.Controls.Add(lb_kind);
-                                p.Controls.Add(lb);
-                            }
-                        }
-#endif
                         // 背景色
                         if (header.InOut.Equals(1))
                         {

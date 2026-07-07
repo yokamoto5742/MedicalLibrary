@@ -202,7 +202,6 @@ namespace MedicalLibrary.Entity
 
         public void BaseFromStdClass(StdClass tmp)
         {
-#if INNO
             this.PtId = tmp.GetDataString("P_ID");
             this.RegDate = tmp.GetDataInt("REG_DATE");
             this.RegTime = tmp.GetDataInt("REG_TIME");
@@ -212,17 +211,6 @@ namespace MedicalLibrary.Entity
             this.UpTime = tmp.GetDataInt("UP_TIME");
             this.UpStaffCode = tmp.GetDataString("UP_USR");
             this.UpStaffCode2 = tmp.GetDataString("UP_AGENT");
-#else
-            this.PtId = tmp.GetDataString("患者コード");
-            this.RegDate = tmp.GetDataInt("登録日");
-            this.RegTime = tmp.GetDataInt("登録時間");
-            this.RegStaffCode = tmp.GetDataString("登録者");
-            this.RegStaffCode2 = tmp.GetDataString("代行登録者");
-            this.UpDate = tmp.GetDataInt("更新日");
-            this.UpTime = tmp.GetDataInt("更新時間");
-            this.UpStaffCode = tmp.GetDataString("更新者");
-            this.UpStaffCode2 = tmp.GetDataString("代行更新者");
-#endif
         }
     }
 }

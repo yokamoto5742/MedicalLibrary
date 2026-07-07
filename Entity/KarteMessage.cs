@@ -186,7 +186,6 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "select td.*, tm.P_NAME " +
                 " from D_KARTE_MESSAGE td, M_PATIENT tm " +
                 " where td.RECV_USR = " + to_code +
@@ -210,30 +209,6 @@ namespace MedicalLibrary.Entity
             {
                 list.Add(GetFromStdClass(tmp));
             }
-#else
-            string cmd = "select t1.*, t2.IM01RC_F04 from ADT_メールデータ t1, IM01RC t2 " +
-                " where t1.受信者コード = " + to_code +
-                " and t1.患者コード = t2.IM01RC_F01";
-
-            if (!read)
-            {
-                cmd += " and 開封フラグ = 0 ";
-            }
-
-            if (!deleted)
-            {
-                cmd += " and 受信者削除フラグ = 0 ";
-            }
-
-            cmd += " order by 送信日 desc, 送信時間 desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                list.Add(GetFromStdClass(tmp));
-            }
-#endif
             return list;
         }
 
@@ -246,7 +221,6 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "select td.*, tm.P_NAME " +
                 " from D_KARTE_MESSAGE td, M_PATIENT tm " +
                 " where td.SEND_USR = " + from_code +
@@ -265,25 +239,6 @@ namespace MedicalLibrary.Entity
             {
                 list.Add(GetFromStdClass(tmp));
             }
-#else
-            string cmd = "select t1.*, t2.IM01RC_F04 from ADT_メールデータ t1, IM01RC t2 " +
-                " where t1.送信者コード = " + from_code +
-                " and t1.患者コード = t2.IM01RC_F01";
-
-            if (!deleted)
-            {
-                cmd += " and 送信者削除フラグ = 0 ";
-            }
-
-            cmd += " order by 送信日 desc, 送信時間 desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                list.Add(GetFromStdClass(tmp));
-            }
-#endif
             return list;
         }
 
@@ -296,7 +251,6 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "select td.*, tm.P_NAME " +
                 " from D_KARTE_MESSAGE td, M_PATIENT tm " +
                 " where td.SEND_USR = " + from_code +
@@ -317,27 +271,6 @@ namespace MedicalLibrary.Entity
             {
                 list.Add(GetFromStdClass(tmp));
             }
-#else
-            string cmd = "select t1.*, t2.IM01RC_F04 from ADT_メールデータ t1, IM01RC t2 " +
-                " where t1.送信者コード = " + from_code +
-                " and t1.送信日 = " + send_date +
-                " and t1.送信時間 = " + send_time +
-                " and t1.患者コード = t2.IM01RC_F01";
-
-            if (!deleted)
-            {
-                cmd += " and 受信者削除フラグ = 0 ";
-            }
-
-            cmd += " order by 送信日 desc, 送信時間 desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                list.Add(GetFromStdClass(tmp));
-            }
-#endif
             return list;
         }
 
@@ -345,7 +278,6 @@ namespace MedicalLibrary.Entity
         static KarteMessage GetFromStdClass(StdClass tmp)
         {
             KarteMessage obj = new KarteMessage();
-#if INNO
             obj.ToCode = tmp.GetDataString("RECV_USR");
             obj.FromCode = tmp.GetDataString("SEND_USR");
             obj.SendDate = tmp.GetDataString("SEND_DATE");
@@ -360,22 +292,6 @@ namespace MedicalLibrary.Entity
             obj.ReadTime = tmp.GetDataString("OPEN_TIME");
             obj.ToDeleteFlg = tmp.GetDataString("DEL_FLG_RECV").Equals("1");
             obj.FromDeleteFlg = tmp.GetDataString("DEL_FLG_SEND").Equals("1");
-#else
-            obj.ToCode = tmp.DataDict["受信者コード"].ToString();
-            obj.FromCode = tmp.DataDict["送信者コード"].ToString();
-            obj.SendDate = tmp.DataDict["送信日"].ToString();
-            obj.SendTime = tmp.DataDict["送信時間"].ToString();
-            obj.Title = tmp.DataDict["件名"].ToString();
-            obj.Msg = tmp.DataDict["本文"].ToString();
-            obj.PtId = tmp.DataDict["患者コード"].ToString();
-            obj.PtName = tmp.DataDict["IM01RC_F04"].ToString().Trim();
-            obj.Priority = tmp.DataDict["重要度"].ToString();
-            obj.ReadFlg = tmp.DataDict["開封フラグ"].ToString().Equals("1") ? true : false;
-            obj.ReadDate = tmp.DataDict["開封日"].ToString();
-            obj.ReadTime = tmp.DataDict["開封時間"].ToString();
-            obj.ToDeleteFlg = tmp.DataDict["受信者削除フラグ"].ToString().Equals("1") ? true : false;
-            obj.FromDeleteFlg = tmp.DataDict["送信者削除フラグ"].ToString().Equals("1") ? true : false;
-#endif
             return obj;
         }
 
@@ -388,7 +304,6 @@ namespace MedicalLibrary.Entity
             StdReturn sr = new StdReturn();
 
             StdDbClass obj = new StdDbClass();
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "D_KARTE_MESSAGE";
 
@@ -407,26 +322,6 @@ namespace MedicalLibrary.Entity
             obj.DataList.Add(new StdDbColumn("DEL_FLG_SEND", StdDbType.NUMBER, this.FromDeleteFlg == true ? 1 : 0));
 
             sr = obj.InsertSQL();
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_メールデータ";
-
-            obj.DataList.Add(new StdDbColumn("受信者コード", StdDbType.NUMBER, this.ToCode));
-            obj.DataList.Add(new StdDbColumn("送信者コード", StdDbType.NUMBER, this.FromCode));
-            obj.DataList.Add(new StdDbColumn("送信日", StdDbType.NUMBER, this.SendDate.Length == 8 ? this.SendDate : DateTime.Now.ToString("yyyyMMdd")));
-            obj.DataList.Add(new StdDbColumn("送信時間", StdDbType.NUMBER, this.SendTime.Length > 0 ? this.SendTime : DateTime.Now.ToString("HHmmss")));
-            obj.DataList.Add(new StdDbColumn("件名", StdDbType.VARCHAR2, this.Title));
-            obj.DataList.Add(new StdDbColumn("本文", StdDbType.VARCHAR2, this.Msg));
-            obj.DataList.Add(new StdDbColumn("患者コード", StdDbType.NUMBER, this.PtId));
-            obj.DataList.Add(new StdDbColumn("重要度", StdDbType.NUMBER, this.Priority.Length > 0 ? this.Priority : "0"));
-            obj.DataList.Add(new StdDbColumn("開封フラグ", StdDbType.NUMBER, this.ReadFlg == true ? 1 : 0));
-            obj.DataList.Add(new StdDbColumn("開封日", StdDbType.NUMBER, this.ReadDate));
-            obj.DataList.Add(new StdDbColumn("開封時間", StdDbType.NUMBER, this.ReadTime));
-            obj.DataList.Add(new StdDbColumn("受信者削除フラグ", StdDbType.NUMBER, this.ToDeleteFlg == true ? 1 : 0));
-            obj.DataList.Add(new StdDbColumn("送信者削除フラグ", StdDbType.NUMBER, this.FromDeleteFlg == true ? 1 : 0));
-
-            sr = obj.InsertSQL();
-#endif
             return sr;
         }
 
@@ -444,7 +339,6 @@ namespace MedicalLibrary.Entity
             }
 
             StdDbClass obj = new StdDbClass();
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "D_KARTE_MESSAGE";
 
@@ -467,30 +361,6 @@ namespace MedicalLibrary.Entity
             obj.WhereList.Add("SEND_TIME = " + send_time);
 
             sr = obj.UpdateSQL();
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_メールデータ";
-
-            obj.DataList.Add(new StdDbColumn("開封フラグ", StdDbType.NUMBER, read_flg == true ? 1 : 0));
-
-            if (read_flg)
-            {
-                obj.DataList.Add(new StdDbColumn("開封日", StdDbType.NUMBER, DateTime.Now.ToString("yyyyMMdd")));
-                obj.DataList.Add(new StdDbColumn("開封時間", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
-            }
-            else
-            {
-                obj.DataList.Add(new StdDbColumn("開封日", StdDbType.NUMBER, 0));
-                obj.DataList.Add(new StdDbColumn("開封時間", StdDbType.NUMBER, 0));
-            }
-
-            obj.WhereList.Add("受信者コード = " + to_code);
-            obj.WhereList.Add("送信者コード = " + from_code);
-            obj.WhereList.Add("送信日 = " + send_date);
-            obj.WhereList.Add("送信時間 = " + send_time);
-
-            sr = obj.UpdateSQL();
-#endif
             return sr;
         }
 
@@ -508,7 +378,6 @@ namespace MedicalLibrary.Entity
             }
 
             StdDbClass obj = new StdDbClass();
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "D_KARTE_MESSAGE";
 
@@ -520,19 +389,6 @@ namespace MedicalLibrary.Entity
             obj.WhereList.Add("SEND_TIME = " + send_time);
 
             sr = obj.UpdateSQL();
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_メールデータ";
-
-            obj.DataList.Add(new StdDbColumn("受信者削除フラグ", StdDbType.NUMBER, delete_flg == true ? 1 : 0));
-
-            obj.WhereList.Add("受信者コード = " + to_code);
-            obj.WhereList.Add("送信者コード = " + from_code);
-            obj.WhereList.Add("送信日 = " + send_date);
-            obj.WhereList.Add("送信時間 = " + send_time);
-
-            sr = obj.UpdateSQL();
-#endif
             return sr;
         }
 
@@ -550,7 +406,6 @@ namespace MedicalLibrary.Entity
             }
 
             StdDbClass obj = new StdDbClass();
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "D_KARTE_MESSAGE";
 
@@ -562,19 +417,6 @@ namespace MedicalLibrary.Entity
             obj.WhereList.Add("SEND_TIME = " + send_time);
 
             sr = obj.UpdateSQL();
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_メールデータ";
-
-            obj.DataList.Add(new StdDbColumn("送信者削除フラグ", StdDbType.NUMBER, delete_flg == true ? 1 : 0));
-
-            obj.WhereList.Add("受信者コード = " + to_code);
-            obj.WhereList.Add("送信者コード = " + from_code);
-            obj.WhereList.Add("送信日 = " + send_date);
-            obj.WhereList.Add("送信時間 = " + send_time);
-
-            sr = obj.UpdateSQL();
-#endif
             return sr;
         }
 
@@ -587,7 +429,6 @@ namespace MedicalLibrary.Entity
             StdReturn sr = new StdReturn();
 
             StdDbClass obj = new StdDbClass();
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "D_KARTE_MESSAGE";
 
@@ -599,19 +440,6 @@ namespace MedicalLibrary.Entity
             obj.WhereList.Add("SEND_TIME = " + this.SendTime);
 
             sr = obj.UpdateSQL();
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_メールデータ";
-
-            obj.DataList.Add(new StdDbColumn("受信者削除フラグ", StdDbType.NUMBER, this.ToDeleteFlg == true ? 1 : 0));
-
-            obj.WhereList.Add("受信者コード = " + this.ToCode);
-            obj.WhereList.Add("送信者コード = " + this.FromCode);
-            obj.WhereList.Add("送信日 = " + this.SendDate);
-            obj.WhereList.Add("送信時間 = " + this.SendTime);
-
-            sr = obj.UpdateSQL();
-#endif
             return sr;
         }
 
@@ -624,7 +452,6 @@ namespace MedicalLibrary.Entity
             StdReturn sr = new StdReturn();
 
             StdDbClass obj = new StdDbClass();
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "D_KARTE_MESSAGE";
 
@@ -636,19 +463,6 @@ namespace MedicalLibrary.Entity
             obj.WhereList.Add("SEND_TIME = " + this.SendTime);
 
             sr = obj.UpdateSQL();
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_メールデータ";
-
-            obj.DataList.Add(new StdDbColumn("送信者削除フラグ", StdDbType.NUMBER, this.FromDeleteFlg == true ? 1 : 0));
-
-            obj.WhereList.Add("受信者コード = " + this.ToCode);
-            obj.WhereList.Add("送信者コード = " + this.FromCode);
-            obj.WhereList.Add("送信日 = " + this.SendDate);
-            obj.WhereList.Add("送信時間 = " + this.SendTime);
-
-            sr = obj.UpdateSQL();
-#endif
             return sr;
         }
     }

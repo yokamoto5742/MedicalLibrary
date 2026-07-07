@@ -123,7 +123,6 @@ namespace MedicalLibrary.Entity
                 return obj;
             }
 
-#if INNO
             string cmd = "select * from D_KARTE_TAG t " +
                 " where t.P_ID = " + pt_id +
                 " and t.INOUT = " + in_out +
@@ -132,16 +131,6 @@ namespace MedicalLibrary.Entity
                 " and t.SEQ = " + seq1;
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select * from macs.ADT_付箋データ t " +
-                " where t.患者コード = " + pt_id +
-                " and t.入外区分 = " + in_out +
-                " and t.科コード = " + dept_code +
-                " and t.対象日 = " + do_date +
-                " and t.連番 = " + seq1;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {
@@ -162,20 +151,11 @@ namespace MedicalLibrary.Entity
                 return list;
             }
 
-#if INNO
             // 削除されたものも含めて取得する
             string cmd = "select * from D_KARTE_TAG t " +
                 " where t.P_ID = " + pt_id +
                 " order by t.INOUT, t.DEPT, t.TAG_DATE desc, t.DISP_SEQ";
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            // 削除されたものも含めて取得する
-            string cmd = "select * from macs.ADT_付箋データ t " +
-                " where t.患者コード = " + pt_id +
-                " order by t.入外区分, t.科コード, t.対象日 desc, t.表示順";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {
@@ -195,7 +175,6 @@ namespace MedicalLibrary.Entity
                 return list;
             }
 
-#if INNO
             string InOutSql = "";
 
             if (in_out.Length > 0)
@@ -210,22 +189,6 @@ namespace MedicalLibrary.Entity
                 " order by t.P_ID, t.INOUT, t.DEPT, t.TAG_DATE desc, t.DISP_SEQ";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string InOutSql = "";
-
-            if (in_out.Length > 0)
-            {
-                InOutSql = " and t.入外区分 = " + in_out;
-            }
-
-            // 削除されたものは飛ばす
-            string cmd = "select * from macs.ADT_付箋データ t " +
-                " where t.対象日 = " + do_date + InOutSql +
-                " and t.削除フラグ = 0 " +
-                " order by t.患者コード, t.入外区分, t.科コード, t.対象日 desc, t.表示順";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {
@@ -252,7 +215,6 @@ namespace MedicalLibrary.Entity
                 return seq;
             }
 
-#if INNO
             string cmd = "select max(SEQ) 連番 from D_KARTE_TAG t " +
                 " where t.P_ID = " + pt_id +
                 " and t.INOUT = " + in_out +
@@ -260,15 +222,6 @@ namespace MedicalLibrary.Entity
                 " and t.TAG_DATE = " + do_date;
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select max(連番) 連番 from macs.ADT_付箋データ t " +
-                " where t.患者コード = " + pt_id +
-                " and t.入外区分 = " + in_out +
-                " and t.科コード = " + dept +
-                " and t.対象日 = " + do_date;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {
@@ -285,7 +238,6 @@ namespace MedicalLibrary.Entity
 
             obj.BaseFromStdClass(tmp);
 
-#if INNO
             obj.InOut = tmp.GetDataString("INOUT");
             obj.DeptCode = tmp.GetDataString("DEPT");
             obj.DoDate = tmp.GetDataInt("TAG_DATE");
@@ -293,15 +245,6 @@ namespace MedicalLibrary.Entity
             obj.SEQ2 = tmp.GetDataInt("DISP_SEQ");
             obj.Cont1 = tmp.GetDataString("TAG_COMMENT");
             obj.DeleteFlg = tmp.GetDataString("DEL_FLG").Equals("1") ? true : false;
-#else
-            obj.InOut = tmp.GetDataString("入外区分");
-            obj.DeptCode = tmp.GetDataString("科コード");
-            obj.DoDate = tmp.GetDataInt("対象日");
-            obj.SEQ1 = tmp.GetDataInt("連番");
-            obj.SEQ2 = tmp.GetDataInt("表示順");
-            obj.Cont1 = tmp.GetDataString("付箋内容");
-            obj.DeleteFlg = tmp.GetDataString("削除フラグ").Equals("1") ? true : false;
-#endif
 
             return obj;
         }
@@ -316,7 +259,6 @@ namespace MedicalLibrary.Entity
             this.SEQ1 = PostIt.GetMaxSEQ1(this.PtId, this.InOut, this.DeptCode, this.DoDate.ToString()) + 1;
             this.SEQ2 = PostIt.GetMaxSEQ1(this.PtId, this.InOut, this.DeptCode, this.DoDate.ToString()) + 1;
 
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "D_KARTE_TAG";
 
@@ -334,25 +276,6 @@ namespace MedicalLibrary.Entity
             obj.DataList.Add(new StdDbColumn("REG_TIME", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
             obj.DataList.Add(new StdDbColumn("REG_USR", StdDbType.NUMBER, LoginUser.Id));
             obj.DataList.Add(new StdDbColumn("REG_PCNAME", StdDbType.VARCHAR2, Environment.MachineName));
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_付箋データ";
-
-            obj.DataList.Add(new StdDbColumn("患者コード", StdDbType.NUMBER, this.PtId));
-            obj.DataList.Add(new StdDbColumn("入外区分", StdDbType.NUMBER, this.InOut));
-            obj.DataList.Add(new StdDbColumn("科コード", StdDbType.NUMBER, this.DeptCode));
-            obj.DataList.Add(new StdDbColumn("対象日", StdDbType.NUMBER, this.DoDate));
-            obj.DataList.Add(new StdDbColumn("連番", StdDbType.NUMBER, this.SEQ1));
-
-            obj.DataList.Add(new StdDbColumn("付箋内容", StdDbType.VARCHAR2, this.Cont1));
-            obj.DataList.Add(new StdDbColumn("表示順", StdDbType.NUMBER, this.SEQ2));
-            obj.DataList.Add(new StdDbColumn("削除フラグ", StdDbType.NUMBER, 1));
-
-            obj.DataList.Add(new StdDbColumn("登録日", StdDbType.NUMBER, DateTime.Now.ToString("yyyyMMdd")));
-            obj.DataList.Add(new StdDbColumn("登録時間", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
-            obj.DataList.Add(new StdDbColumn("登録者", StdDbType.NUMBER, LoginUser.Id));
-            obj.DataList.Add(new StdDbColumn("代行登録者", StdDbType.NUMBER, LoginUser.Id2));
-#endif
             sr = obj.InsertSQL();
 
             return sr;
@@ -363,7 +286,6 @@ namespace MedicalLibrary.Entity
             StdReturn sr = new StdReturn();
 
             StdDbClass obj = new StdDbClass();
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "D_KARTE_TAG";
 
@@ -381,25 +303,6 @@ namespace MedicalLibrary.Entity
             obj.WhereList.Add("DEPT = " + this.DeptCode);
             obj.WhereList.Add("TAG_DATE = " + this.DoDate);
             obj.WhereList.Add("SEQ = " + this.SEQ1);
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_付箋データ";
-
-            obj.DataList.Add(new StdDbColumn("付箋内容", StdDbType.VARCHAR2, this.Cont1));
-            obj.DataList.Add(new StdDbColumn("表示順", StdDbType.NUMBER, this.SEQ2));
-            obj.DataList.Add(new StdDbColumn("削除フラグ", StdDbType.NUMBER, 0));
-
-            obj.DataList.Add(new StdDbColumn("更新日", StdDbType.NUMBER, DateTime.Now.ToString("yyyyMMdd")));
-            obj.DataList.Add(new StdDbColumn("更新時間", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
-            obj.DataList.Add(new StdDbColumn("更新者", StdDbType.NUMBER, LoginUser.Id));
-            obj.DataList.Add(new StdDbColumn("代行更新者", StdDbType.NUMBER, LoginUser.Id2));
-
-            obj.WhereList.Add("患者コード = " + this.PtId);
-            obj.WhereList.Add("入外区分 = " + this.InOut);
-            obj.WhereList.Add("科コード = " + this.DeptCode);
-            obj.WhereList.Add("対象日 = " + this.DoDate);
-            obj.WhereList.Add("連番 = " + this.SEQ1);
-#endif
             sr = obj.UpdateSQL();
 
             return sr;
@@ -410,7 +313,6 @@ namespace MedicalLibrary.Entity
             StdReturn sr = new StdReturn();
 
             StdDbClass obj = new StdDbClass();
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "D_KARTE_TAG";
 
@@ -426,23 +328,6 @@ namespace MedicalLibrary.Entity
             obj.WhereList.Add("DEPT = " + this.DeptCode);
             obj.WhereList.Add("TAG_DATE = " + this.DoDate);
             obj.WhereList.Add("SEQ = " + this.SEQ1);
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_付箋データ";
-
-            obj.DataList.Add(new StdDbColumn("削除フラグ", StdDbType.NUMBER, 1));
-
-            obj.DataList.Add(new StdDbColumn("更新日", StdDbType.NUMBER, DateTime.Now.ToString("yyyyMMdd")));
-            obj.DataList.Add(new StdDbColumn("更新時間", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
-            obj.DataList.Add(new StdDbColumn("更新者", StdDbType.NUMBER, LoginUser.Id));
-            obj.DataList.Add(new StdDbColumn("代行更新者", StdDbType.NUMBER, LoginUser.Id2));
-
-            obj.WhereList.Add("患者コード = " + this.PtId);
-            obj.WhereList.Add("入外区分 = " + this.InOut);
-            obj.WhereList.Add("科コード = " + this.DeptCode);
-            obj.WhereList.Add("対象日 = " + this.DoDate);
-            obj.WhereList.Add("連番 = " + this.SEQ1);
-#endif
             sr = obj.UpdateSQL();
 
             return sr;

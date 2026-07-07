@@ -147,17 +147,10 @@ namespace MedicalLibrary.Agent
 
             if (pat)
             {
-#if INNO
                 cmd = "select EYE_KENSA.*, Trim(tm.P_KANA) as カナ, Trim(tm.P_NAME) as 氏名, tm.P_SEX as 性別, tm.P_BIRTHDAY_AD as 生年月日 " +
                     " from EYE_KENSA inner join M_PATIENT" + Env.DB_LINK + " tm on EYE_KENSA.PATIENT_ID = tm.P_ID " +
                     " where PATIENT_ID = " + patient_id + " and KENSA_ID = " + kensa_id +
                     " order by KENSA_DATE desc";
-#else
-                cmd = "select EYE_KENSA.*, Trim(IM01RC_F03) as カナ, Trim(IM01RC_F04) as 氏名, IM01RC_F05 as 性別, IM01RC_F10 as 生年月日 " +
-                    " from EYE_KENSA inner join IM01RC" + Env.DB_LINK + " on EYE_KENSA.PATIENT_ID = IM01RC.IM01RC_F01 " +
-                    " where PATIENT_ID = " + patient_id + " and KENSA_ID = " + kensa_id +
-                    " order by KENSA_DATE desc";
-#endif
             }
             else
             {
@@ -208,17 +201,10 @@ namespace MedicalLibrary.Agent
 
             if (pat)
             {
-#if INNO
                 cmd = "select EYE_KENSA.*, Trim(tm.P_KANA) as カナ, Trim(tm.P_NAME) as 氏名, tm.P_SEX as 性別, tm.P_BIRTHDAY_AD as 生年月日 " +
                     " from EYE_KENSA inner join M_PATIENT" + Env.DB_LINK + " tm on EYE_KENSA.PATIENT_ID = tm.P_ID " +
                     " where KENSA_ID in (" + AppString.ConcatList(kensa_id_list, ",") + ") and KENSA_DATE >= " + start_date + " and KENSA_DATE <= " + end_date +
                     " order by KENSA_DATE desc";
-#else
-                cmd = "select EYE_KENSA.*, Trim(IM01RC_F03) as カナ, Trim(IM01RC_F04) as 氏名, IM01RC_F05 as 性別, IM01RC_F10 as 生年月日 " +
-                    " from EYE_KENSA inner join IM01RC" + Env.DB_LINK + " on EYE_KENSA.PATIENT_ID = IM01RC.IM01RC_F01 " +
-                    " where KENSA_ID in (" + AppString.ConcatList(kensa_id_list, ",") + ") and KENSA_DATE >= " + start_date + " and KENSA_DATE <= " + end_date +
-                    " order by KENSA_DATE desc";
-#endif
             }
             else
             {

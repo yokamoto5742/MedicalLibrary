@@ -54,7 +54,6 @@ namespace MedicalLibrary.Entity
             get
             {
                 string s = "";
-#if INNO
                 if (this.Mode.Equals("1"))
                 {
                     s = "救急";
@@ -67,16 +66,6 @@ namespace MedicalLibrary.Entity
                 {
                     s = "通常";
                 }
-#else
-                if (this.Mode.Equals("1"))
-                {
-                    s = "通常";
-                }
-                else if (this.Mode.Equals("2"))
-                {
-                    s = "救急";
-                }
-#endif
                 return s;
             }
         }
@@ -101,11 +90,7 @@ namespace MedicalLibrary.Entity
         {
             get
             {
-#if INNO
                 return DateTimeAgent.TimeFormat6(this.Time1, 4, false);
-#else
-                return DateTimeAgent.TimeFormat(this.Time1);
-#endif
             }
         }
 
@@ -118,11 +103,7 @@ namespace MedicalLibrary.Entity
         {
             get
             {
-#if INNO
                 return DateTimeAgent.TimeFormat6(this.Time2, 4, false);
-#else
-                return DateTimeAgent.TimeFormat(this.Time2);
-#endif
             }
         }
 
@@ -135,11 +116,7 @@ namespace MedicalLibrary.Entity
         {
             get
             {
-#if INNO
                 return DateTimeAgent.TimeFormat6(this.Time3, 4, false);
-#else
-                return DateTimeAgent.TimeFormat(this.Time3);
-#endif
             }
         }
 
@@ -152,11 +129,7 @@ namespace MedicalLibrary.Entity
         {
             get
             {
-#if INNO
                 return DateTimeAgent.TimeFormat6(this.Time4, 4, false);
-#else
-                return DateTimeAgent.TimeFormat(this.Time4);
-#endif
             }
         }
 
@@ -169,11 +142,7 @@ namespace MedicalLibrary.Entity
         {
             get
             {
-#if INNO
                 return DateTimeAgent.TimeFormat6(this.Time5, 4, false);
-#else
-                return DateTimeAgent.TimeFormat(this.Time5);
-#endif
             }
         }
 
@@ -216,7 +185,6 @@ namespace MedicalLibrary.Entity
                 return tmpList;
             }
 
-#if INNO
             string sqlDept = "";
 
             if (dept.Length > 0)
@@ -283,86 +251,6 @@ namespace MedicalLibrary.Entity
 
                 tmpList.Add(tmpPat);
             }
-#else
-            string sqlDept = "";
-
-            if (dept.Length > 0)
-            {
-                sqlDept = " and (変更科コード = " + dept + " or (科コード = " + dept + " and 変更科コード = 0))";
-            }
-
-            string sqlDoctor = "";
-
-            if (doctor.Length > 0)
-            {
-                sqlDoctor = " and (変更ＤＲコード = " + doctor + " or (ＤＲコード = " + doctor + " and 変更ＤＲコード = 0))";
-            }
-
-            string cmd = "Select 受付ＮＯ, 連番, ID701RC_F11, ID701RC_F10, ID701RC_F20, t4.IM02RC_F43, t5.IM01RC_F13_4, 受付時間, 患者コード, カナ氏名, 漢字氏名, 性別, 年齢, 受付種別コード, Trim(IM5034RC_F03) as 種別, 外来区分 " +
-                " , 科コード, 変更科コード, ＤＲコード, 変更ＤＲコード, 診察開始時間, 診察中断時間, 診察終了時間, 会計時間 " +
-                " from ADT_診察状況データ t1, ID701RC t2, AMB_受付種別名マスター t3, IM02RC t4, IM01RC t5 " +
-                " where t1.受付日 = " + come_date + " and t2.ID701RC_F01 = " + come_date + sqlDept + sqlDoctor +
-                " and t1.患者コード = t2.ID701RC_F03 " +
-                " and t1.受付日 = t2.ID701RC_F01 " +
-                " and t1.受付ＮＯ = t2.ID701RC_F05 " +
-                " and t1.科コード = t2.ID701RC_F04 " +
-                " and t1.受付種別コード = t3.IM5034RC_F01 " +
-                " and t1.患者コード = t4.IM02RC_F01 and t2.ID701RC_F10 = t4.IM02RC_F02 " +
-                " and t1.患者コード = t5.IM01RC_F01 " +
-                " order by 患者コード, 受付ＮＯ, 連番";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatOut tmpPat = new PatOut();
-
-                tmpPat.Id = tmp.DataDict["患者コード"].ToString();
-                tmpPat.Kana = tmp.DataDict["カナ氏名"].ToString();
-                tmpPat.Name = tmp.DataDict["漢字氏名"].ToString();
-                tmpPat.Sex = tmp.DataDict["性別"].ToString();
-                tmpPat.Age = tmp.DataDict["年齢"].ToString();
-                tmpPat.NoteCode = tmp.DataDict["IM01RC_F13_4"].ToString();
-
-                tmpPat.ComeDate = come_date;
-                tmpPat.Seq1 = tmp.DataDict["受付ＮＯ"].ToString();
-                tmpPat.Seq2 = tmp.DataDict["連番"].ToString();
-                tmpPat.Seq3 = tmp.DataDict["ID701RC_F11"].ToString();
-                tmpPat.Kind = tmp.DataDict["受付種別コード"].ToString();
-                tmpPat.KindName = tmp.DataDict["種別"].ToString();
-                tmpPat.Mode = tmp.DataDict["外来区分"].ToString();
-                tmpPat.Ins = tmp.DataDict["ID701RC_F10"].ToString();
-                tmpPat.InsKind = tmp.DataDict["IM02RC_F43"].ToString();
-
-                if (tmp.DataDict["変更科コード"].ToString().Length > 0 && !tmp.DataDict["変更科コード"].ToString().Equals("0"))
-                {
-                    tmpPat.Dept = tmp.DataDict["変更科コード"].ToString();
-                }
-                else if (tmp.DataDict["科コード"].ToString().Length > 0)
-                {
-                    tmpPat.Dept = tmp.DataDict["科コード"].ToString();
-                }
-
-                if (tmp.DataDict["変更ＤＲコード"].ToString().Length > 0 && !tmp.DataDict["変更ＤＲコード"].ToString().Equals("0"))
-                {
-                    tmpPat.Doctor = tmp.DataDict["変更ＤＲコード"].ToString();
-                }
-                else if (tmp.DataDict["ＤＲコード"].ToString().Length > 0)
-                {
-                    tmpPat.Doctor = tmp.DataDict["ＤＲコード"].ToString();
-                }
-
-                tmpPat.Time1 = tmp.DataDict["受付時間"].ToString();
-                tmpPat.Time2 = tmp.DataDict["診察開始時間"].ToString();
-                tmpPat.Time3 = tmp.DataDict["診察中断時間"].ToString();
-                tmpPat.Time4 = tmp.DataDict["診察終了時間"].ToString();
-                tmpPat.Time5 = tmp.DataDict["会計時間"].ToString();
-
-                tmpPat.Kaikei = tmp.DataDict["ID701RC_F20"].ToString();
-
-                tmpList.Add(tmpPat);
-            }
-#endif
 
             return tmpList;
         }
@@ -391,7 +279,6 @@ namespace MedicalLibrary.Entity
                 startDate = DateTime.Now.AddMonths(-6).ToString("yyyyMMdd");
             }
 
-#if INNO
             string cmd = "select UKE_DATE " +
                 " , case when CHANGE_DEPT > 0 then CHANGE_DEPT else DEPT end DEPT " +
                 " , case when SHINSATSU_DR > 0 then SHINSATSU_DR when CHANGE_DR > 0 then CHANGE_DR else DR end DR " +
@@ -418,31 +305,6 @@ namespace MedicalLibrary.Entity
 
                 tmpList.Add(tmpPat);
             }
-#else
-            string cmd = "select 受付日, 変更科コード, 変更ＤＲコード, 受付時間, 診察開始時間, 診察中断時間, 診察終了時間, 会計時間 " +
-                " from ADT_診察状況データ " +
-                " where 患者コード = " + pt_id + " and 受付日 >= " + startDate +
-                " order by 受付日 desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatOut tmpPat = new PatOut();
-
-                tmpPat.Id = pt_id;
-                tmpPat.ComeDate = tmp.DataDict["受付日"].ToString().PadRight(8, '0');
-                tmpPat.Dept = tmp.DataDict["変更科コード"].ToString();
-                tmpPat.Doctor = tmp.DataDict["変更ＤＲコード"].ToString();
-                tmpPat.Time1 = tmp.DataDict["受付時間"].ToString();
-                tmpPat.Time2 = tmp.DataDict["診察開始時間"].ToString();
-                tmpPat.Time3 = tmp.DataDict["診察中断時間"].ToString();
-                tmpPat.Time4 = tmp.DataDict["診察終了時間"].ToString();
-                tmpPat.Time5 = tmp.DataDict["会計時間"].ToString();
-
-                tmpList.Add(tmpPat);
-            }
-#endif
             return tmpList;
         }
 
@@ -471,7 +333,6 @@ namespace MedicalLibrary.Entity
                 comeDate = DateTime.Now.ToString("yyyyMMdd");
             }
 
-#if INNO
             string orderBy = order_by;
 
             if (order_by.Length == 0)
@@ -508,45 +369,6 @@ namespace MedicalLibrary.Entity
 
                 tmpList.Add(tmpPat);
             }
-#else
-            string orderBy = order_by;
-
-            if (order_by.Length == 0)
-            {
-                orderBy = "受付ＮＯ, 連番";
-            }
-
-            string cmd = "select 受付ＮＯ, 連番, カナ氏名, 受付時間, 会計時間, 科コード, 変更科コード " +
-                " from ADT_診察状況データ " +
-                " where 患者コード = " + pt_id + " and 受付日 = " + comeDate +
-                " order by " + orderBy;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatOut tmpPat = new PatOut();
-
-                tmpPat.Id = pt_id;
-                tmpPat.ComeDate = comeDate;
-                tmpPat.Kana = tmp.DataDict["カナ氏名"].ToString();
-                tmpPat.Seq1 = tmp.DataDict["受付ＮＯ"].ToString();
-                tmpPat.Seq2 = tmp.DataDict["連番"].ToString();
-                tmpPat.Time1 = tmp.DataDict["受付時間"].ToString();
-                tmpPat.Time5 = tmp.DataDict["会計時間"].ToString();
-
-                if (tmp.DataDict["変更科コード"].ToString().Length > 0 && !tmp.DataDict["変更科コード"].ToString().Equals("0"))
-                {
-                    tmpPat.Dept = tmp.DataDict["変更科コード"].ToString();
-                }
-                else
-                {
-                    tmpPat.Dept = tmp.DataDict["科コード"].ToString();
-                }
-
-                tmpList.Add(tmpPat);
-            }
-#endif
 
             return tmpList;
         }
@@ -575,7 +397,6 @@ namespace MedicalLibrary.Entity
                 comeDate = DateTime.Now.ToString("yyyyMMdd");
             }
 
-#if INNO
             string cmd = "select distinct UKE_NO " +
                 " from D_UKETSUKE " +
                 " where P_ID = " + pt_id + " and UKE_DATE = " + comeDate +
@@ -590,22 +411,6 @@ namespace MedicalLibrary.Entity
 
                 tmpList.Add(seq1);
             }
-#else
-            string cmd = "select distinct 受付ＮＯ " +
-                " from ADT_診察状況データ " +
-                " where 患者コード = " + pt_id + " and 受付日 = " + comeDate +
-                " order by 受付ＮＯ";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                int seq1 = 0;
-                int.TryParse(tmp.DataDict["受付ＮＯ"].ToString(), out seq1);
-
-                tmpList.Add(seq1);
-            }
-#endif
 
             return tmpList;
         }
@@ -634,7 +439,6 @@ namespace MedicalLibrary.Entity
                 comeDate = DateTime.Now.ToString("yyyyMMdd");
             }
 
-#if INNO
             string cmd = "select UKE_NO, UKE_INDEX, P_KANA " +
                 " , case when CHANGE_DEPT > 0 then CHANGE_DEPT else DEPT end DEPT " +
                 " , case when SHINSATSU_DR > 0 then SHINSATSU_DR when CHANGE_DR > 0 then CHANGE_DR else DR end DR " +
@@ -670,48 +474,6 @@ namespace MedicalLibrary.Entity
 
                 tmpList.Add(tmpPat);
             }
-#else
-            string cmd = "select 受付ＮＯ, 連番, カナ氏名, 受付時間, 科コード, 変更科コード " +
-                " from ADT_診察状況データ " +
-                " where 患者コード = " + pt_id + " and 受付日 = " + comeDate +
-                " order by 受付時間 desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            string time1 = "";
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                if (time1.Length > 0 && !tmp.DataDict["受付時間"].ToString().Equals(time1))
-                {
-                    break;
-                }
-                else
-                {
-                    time1 = tmp.DataDict["受付時間"].ToString();
-                }
-
-                PatOut tmpPat = new PatOut();
-
-                tmpPat.Id = pt_id;
-                tmpPat.ComeDate = comeDate;
-                tmpPat.Kana = tmp.DataDict["カナ氏名"].ToString();
-                tmpPat.Seq1 = tmp.DataDict["受付ＮＯ"].ToString();
-                tmpPat.Seq2 = tmp.DataDict["連番"].ToString();
-                tmpPat.Time1 = tmp.DataDict["受付時間"].ToString();
-
-                if (tmp.DataDict["変更科コード"].ToString().Length > 0 && !tmp.DataDict["変更科コード"].ToString().Equals("0"))
-                {
-                    tmpPat.Dept = tmp.DataDict["変更科コード"].ToString();
-                }
-                else
-                {
-                    tmpPat.Dept = tmp.DataDict["科コード"].ToString();
-                }
-
-                tmpList.Add(tmpPat);
-            }
-#endif
 
             return tmpList;
         }
@@ -740,7 +502,6 @@ namespace MedicalLibrary.Entity
                 comeDate = DateTime.Now.ToString("yyyyMMdd");
             }
 
-#if INNO
             foreach (string s in AppString.ConcatLists(pt_id_list, ","))
             {
                 string cmd = "select UKE_NO, P_ID " +
@@ -769,35 +530,6 @@ namespace MedicalLibrary.Entity
                     }
                 }
             }
-#else
-            foreach (string s in AppString.ConcatLists(pt_id_list, ","))
-            {
-                string cmd = "select 受付ＮＯ, 患者コード from ADT_診察状況データ " +
-                    " where 患者コード in (" + s + ") and 受付日 = " + comeDate +
-                    " order by 患者コード, 受付時間 desc";
-
-                List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-                string pt_id = "";
-
-                foreach (StdClass tmp in tmp_list)
-                {
-                    if (tmp.DataDict["患者コード"].ToString().Equals(pt_id))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        pt_id = tmp.DataDict["患者コード"].ToString();
-                    }
-
-                    if (!tmpDict.ContainsKey(pt_id))
-                    {
-                        tmpDict.Add(pt_id, tmp.DataDict["受付ＮＯ"].ToString());
-                    }
-                }
-            }
-#endif
 
             return tmpDict;
         }
@@ -815,7 +547,6 @@ namespace MedicalLibrary.Entity
             {
                 return;
             }
-#if INNO
             string cmd = "update D_UKETSUKE " +
                 " set BILL_USR = " + staff_code +
                 " where UKE_DATE = " + come_date +
@@ -827,19 +558,6 @@ namespace MedicalLibrary.Entity
             }
 
             DB.Db3.ExecuteNonQuery(cmd);
-#else
-            string cmd = "update ID701RC " +
-                " set ID701RC_F20 = '" + staff_code + "' " +
-                " where ID701RC_F01 = " + come_date +
-                " and ID701RC_F05 = " + seq1;
-
-            if (seq2.Length > 0)
-            {
-                cmd += " and ID701RC_F23 = " + seq2;
-            }
-
-            DB.Db1.ExecuteNonQuery(cmd);
-#endif
         }
 
         /// <summary>
@@ -855,7 +573,6 @@ namespace MedicalLibrary.Entity
             {
                 return;
             }
-#if INNO
             string cmd = "update D_UKETSUKE " +
                 " set BILL_USR = " + staff_code +
                 " where UKE_DATE = " + come_date +
@@ -863,15 +580,6 @@ namespace MedicalLibrary.Entity
                 " and (BILL_USR is null or BILL_USR = 0)";
 
             DB.Db3.ExecuteNonQuery(cmd);
-#else
-            string cmd = "update ID701RC " +
-                " set ID701RC_F20 = '" + staff_code + "' " +
-                " where ID701RC_F01 = " + come_date +
-                " and ID701RC_F03 = " + pt_id +
-                " and (ID701RC_F20 is null or ID701RC_F20 = '0')";
-
-            DB.Db1.ExecuteNonQuery(cmd);
-#endif
         }
 
         /// <summary>
@@ -884,7 +592,6 @@ namespace MedicalLibrary.Entity
         /// <param name="seq2">連番</param>
         public static void SetKaikeiTimeBySEQ(int time5, string come_date, string seq1, string seq2 = "")
         {
-#if INNO
             if (time5 < 0 || time5 >= 240000 || time5 % 10000 >= 6000 || time5 % 100 >= 60 || come_date.Length != 8 || seq1.Length == 0)
             {
                 return;
@@ -908,24 +615,6 @@ namespace MedicalLibrary.Entity
             }
 
             DB.Db3.ExecuteNonQuery(cmd);
-#else
-            if (time5 < 0 || time5 >= 2400 || time5 % 100 >= 60 || come_date.Length != 8 || seq1.Length == 0)
-            {
-                return;
-            }
-
-            string cmd = "update ID701RC " +
-                " set ID701RC_F22 = " + time5 +
-                " where ID701RC_F01 = " + come_date +
-                " and ID701RC_F05 = " + seq1;
-
-            if (seq2.Length > 0)
-            {
-                cmd += " and ID701RC_F23 = " + seq2;
-            }
-
-            DB.Db1.ExecuteNonQuery(cmd);
-#endif
         }
 
         /// <summary>
@@ -940,7 +629,6 @@ namespace MedicalLibrary.Entity
         /// <param name="doctor_code">変更ＤＲコード</param>
         public static void SetKarteStartTimeBySEQ(int time2, string come_date, string seq1, string seq2 = "1", string dept_code = "0", string doctor_code = "0")
         {
-#if INNO
             if (time2 < 0 || time2 >= 240000 || time2 % 10000 >= 6000 || time2 % 100 >= 60 || come_date.Length != 8 || seq1.Length == 0)
             {
                 return;
@@ -972,31 +660,6 @@ namespace MedicalLibrary.Entity
             }
 
             DB.Db3.ExecuteNonQuery(cmd);
-#else
-            if (time2 < 0 || time2 >= 2400 || time2 % 100 >= 60 || come_date.Length != 8 || seq1.Length == 0)
-            {
-                return;
-            }
-
-            if (dept_code.Length == 0 || doctor_code.Length == 0)
-            {
-                return;
-            }
-
-            string cmd = "update ADT_診察状況データ " +
-                " set 診察開始時間 = " + time2 +
-                " , 変更科コード = " + dept_code +
-                " , 変更ＤＲコード = " + doctor_code +
-                " where 受付日 = " + come_date +
-                " and 受付ＮＯ = " + seq1;
-
-            if (seq2.Length > 0)
-            {
-                cmd += " and 連番 = " + seq2;
-            }
-
-            DB.Db1.ExecuteNonQuery(cmd);
-#endif
         }
 
         /// <summary>
@@ -1009,7 +672,6 @@ namespace MedicalLibrary.Entity
         /// <param name="seq2">連番</param>
         public static void SetKarteStopTimeBySEQ(int time3, string come_date, string seq1, string seq2 = "1")
         {
-#if INNO
             if (time3 < 0 || time3 >= 240000 || time3 % 10000 >= 6000 || time3 % 100 >= 60 || come_date.Length != 8 || seq1.Length == 0)
             {
                 return;
@@ -1033,24 +695,6 @@ namespace MedicalLibrary.Entity
             }
 
             DB.Db3.ExecuteNonQuery(cmd);
-#else
-            if (time3 < 0 || time3 >= 2400 || time3 % 100 >= 60 || come_date.Length != 8 || seq1.Length == 0)
-            {
-                return;
-            }
-
-            string cmd = "update ADT_診察状況データ " +
-                " set 診察中断時間 = " + time3 +
-                " where 受付日 = " + come_date +
-                " and 受付ＮＯ = " + seq1;
-
-            if (seq2.Length > 0)
-            {
-                cmd += " and 連番 = " + seq2;
-            }
-
-            DB.Db1.ExecuteNonQuery(cmd);
-#endif
         }
 
         /// <summary>
@@ -1063,7 +707,6 @@ namespace MedicalLibrary.Entity
         /// <param name="seq2">連番</param>
         public static void SetKarteEndTimeBySEQ(int time4, string come_date, string seq1, string seq2 = "1")
         {
-#if INNO
             if (time4 < 0 || time4 >= 240000 || time4 % 10000 >= 6000 || time4 % 100 >= 60 || come_date.Length != 8 || seq1.Length == 0)
             {
                 return;
@@ -1087,39 +730,6 @@ namespace MedicalLibrary.Entity
             }
 
             DB.Db3.ExecuteNonQuery(cmd);
-#else
-            if (time4 < 0 || time4 >= 2400 || time4 % 100 >= 60 || come_date.Length != 8 || seq1.Length == 0)
-            {
-                return;
-            }
-
-            string cmd = "update ADT_診察状況データ " +
-                " set 診察終了時間 = " + time4 +
-                " where 受付日 = " + come_date +
-                " and 受付ＮＯ = " + seq1;
-
-            if (seq2.Length > 0)
-            {
-                cmd += " and 連番 = " + seq2;
-            }
-
-            DB.Db1.ExecuteNonQuery(cmd);
-
-            // MACS医事会計を使っていないので ID701RC_F15 は更新しなくてよい
-            /*
-            cmd = "update ID701RC " +
-                " set ID701RC_F15 = " + time4 +
-                " where ID701RC_F01 = " + come_date +
-                " and ID701RC_F05 = " + seq1;
-
-            if (seq2.Length > 0)
-            {
-                cmd += " and ID701RC_F23 = " + seq2;
-            }
-
-            DB.Db1.ExecuteNonQuery(cmd);
-             */
-#endif
         }
     }
 
@@ -1160,7 +770,6 @@ namespace MedicalLibrary.Entity
             get
             {
                 string s = "";
-#if INNO
                 if (this.ModeCode.Equals("1"))
                 {
                     s = "救急";
@@ -1173,16 +782,6 @@ namespace MedicalLibrary.Entity
                 {
                     s = "通常";
                 }
-#else
-                if (this.ModeCode.Equals("1"))
-                {
-                    s = "通常";
-                }
-                else if (this.ModeCode.Equals("2"))
-                {
-                    s = "救急";
-                }
-#endif
                 return s;
             }
         }
@@ -1199,7 +798,6 @@ namespace MedicalLibrary.Entity
             {
                 comeDate = DateTime.Now.ToString("yyyyMMdd");
             }
-#if INNO
             string cmd = "select tt.GAIRAI_TYPE, tt.DEPT, count(*) as AMOUNT " +
                 " from " +
                 " (select t.GAIRAI_TYPE, case when CHANGE_DEPT > 0 then CHANGE_DEPT else DEPT end DEPT from D_UKETSUKE t where t.UKE_DATE = " + comeDate + ") tt " +
@@ -1218,26 +816,6 @@ namespace MedicalLibrary.Entity
 
                 list.Add(obj);
             }
-#else
-            string cmd = "select 科コード, 外来区分, count(*) as 人数 " +
-                " from ADT_診察状況データ " +
-                " where 受付日 = " + comeDate +
-                " group by 外来区分, 科コード" +
-                " order by 外来区分, 科コード";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                DeptOut obj = new DeptOut();
-
-                obj.DeptCode = tmp.DataDict["科コード"].ToString();
-                obj.ModeCode = tmp.DataDict["外来区分"].ToString();
-                int.TryParse(tmp.DataDict["人数"].ToString(), out obj.Count);
-
-                list.Add(obj);
-            }
-#endif
             return list;
         }
 
@@ -1251,7 +829,6 @@ namespace MedicalLibrary.Entity
             {
                 comeDate = DateTime.Now.ToString("yyyyMMdd");
             }
-#if INNO
             string cmd = "select tt.GAIRAI_TYPE, tt.DEPT, count(*) as AMOUNT " +
                 " from " +
                 " (select t.GAIRAI_TYPE, case when CHANGE_DEPT > 0 then CHANGE_DEPT else DEPT end DEPT " +
@@ -1272,26 +849,6 @@ namespace MedicalLibrary.Entity
 
                 list.Add(obj);
             }
-#else
-            string cmd = "select 科コード, 外来区分, count(*) as 人数 " +
-                " from ADT_診察状況データ " +
-                " where 受付日 = " + comeDate + " and 診察終了時間 = 0 " +
-                " group by 外来区分, 科コード" +
-                " order by 外来区分, 科コード";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                DeptOut obj = new DeptOut();
-
-                obj.DeptCode = tmp.DataDict["科コード"].ToString();
-                obj.ModeCode = tmp.DataDict["外来区分"].ToString();
-                int.TryParse(tmp.DataDict["人数"].ToString(), out obj.Count);
-
-                list.Add(obj);
-            }
-#endif
             return list;
         }
     }

@@ -87,7 +87,6 @@ namespace MedicalLibrary.Entity
             {
                 if (list.Count == 0)
                 {
-#if INNO
                     BaseInfoFixedMaster m = new BaseInfoFixedMaster();
                     m.Code = "fm1";
                     m.Name = "トラブル";
@@ -272,153 +271,6 @@ namespace MedicalLibrary.Entity
                     m.DbColumnName1 = "STATUS_8";
                     m.DbColumnType1 = StdDbType.NUMBER;
                     list.Add(m);
-#else
-                    BaseInfoFixedMaster m = new BaseInfoFixedMaster();
-                    m.Code = "fm1";
-                    m.Name = "トラブル";
-                    m.Kind1 = InputKind.CheckBox;
-                    m.KindText1 = "有り";
-                    m.DbColumnName1 = "トラフラグ";
-                    m.DbColumnType1 = StdDbType.NUMBER;
-                    m.Kind2 = InputKind.TextBox;
-                    m.DbColumnName2 = "トラコメント";
-                    m.DbColumnType2 = StdDbType.VARCHAR2;
-                    list.Add(m);
-
-                    m = new BaseInfoFixedMaster();
-                    m.Code = "fm2";
-                    m.Name = "視覚障害";
-                    m.Kind1 = InputKind.CheckBox;
-                    m.KindText1 = "有り";
-                    m.DbColumnName1 = "障害１フラグ";
-                    m.DbColumnType1 = StdDbType.NUMBER;
-                    m.Kind2 = InputKind.TextBox;
-                    m.DbColumnName2 = "障害１コメント";
-                    m.DbColumnType2 = StdDbType.VARCHAR2;
-                    list.Add(m);
-
-                    m = new BaseInfoFixedMaster();
-                    m.Code = "fm3";
-                    m.Name = "聴覚障害";
-                    m.Kind1 = InputKind.CheckBox;
-                    m.KindText1 = "有り";
-                    m.DbColumnName1 = "障害２フラグ";
-                    m.DbColumnType1 = StdDbType.NUMBER;
-                    m.Kind2 = InputKind.TextBox;
-                    m.DbColumnName2 = "障害２コメント";
-                    m.DbColumnType2 = StdDbType.VARCHAR2;
-                    list.Add(m);
-
-                    m = new BaseInfoFixedMaster();
-                    m.Code = "fm4";
-                    m.Name = "言語障害";
-                    m.Kind1 = InputKind.CheckBox;
-                    m.KindText1 = "有り";
-                    m.DbColumnName1 = "障害３フラグ";
-                    m.DbColumnType1 = StdDbType.NUMBER;
-                    m.Kind2 = InputKind.TextBox;
-                    m.DbColumnName2 = "障害３コメント";
-                    m.DbColumnType2 = StdDbType.VARCHAR2;
-                    list.Add(m);
-
-                    m = new BaseInfoFixedMaster();
-                    m.Code = "fm5";
-                    m.Name = "運動障害";
-                    m.Kind1 = InputKind.CheckBox;
-                    m.KindText1 = "有り";
-                    m.DbColumnName1 = "障害４フラグ";
-                    m.DbColumnType1 = StdDbType.NUMBER;
-                    m.Kind2 = InputKind.TextBox;
-                    m.DbColumnName2 = "障害４コメント";
-                    m.DbColumnType2 = StdDbType.VARCHAR2;
-                    list.Add(m);
-
-                    m = new BaseInfoFixedMaster();
-                    m.Code = "fm6";
-                    m.Name = "妊娠・授乳中";
-                    m.Kind1 = InputKind.CheckBox;
-                    m.KindText1 = "有り";
-                    m.DbColumnName1 = "障害５フラグ";
-                    m.DbColumnType1 = StdDbType.NUMBER;
-                    m.Kind2 = InputKind.TextBox;
-                    m.DbColumnName2 = "障害５コメント";
-                    m.DbColumnType2 = StdDbType.VARCHAR2;
-                    list.Add(m);
-
-                    m = new BaseInfoFixedMaster();
-                    m.Code = "fm7";
-                    m.Name = "緊急度";
-                    m.Kind1 = InputKind.ComboBox;
-                    m.KindItemList1.Add("A");
-                    m.KindItemList1.Add("B");
-                    m.KindItemList1.Add("C");
-                    m.KindItemList1.Add("D");
-                    m.DbColumnName1 = "緊急区分";
-                    m.DbColumnType1 = StdDbType.CHAR;
-                    list.Add(m);
-
-                    m = new BaseInfoFixedMaster();
-                    m.Code = "fm8";
-                    m.Name = "病名告知";
-                    m.Kind1 = InputKind.CheckBox;
-                    m.KindText1 = "有り";
-                    m.DbColumnName1 = "病名告知";
-                    m.DbColumnType1 = StdDbType.NUMBER;
-                    list.Add(m);
-
-                    m = new BaseInfoFixedMaster();
-                    m.Code = "fm9";
-                    m.Name = "死亡フラグ";
-                    m.Kind1 = InputKind.CheckBox;
-                    m.KindText1 = "死亡";
-                    m.DbColumnName1 = "死亡フラグ";
-                    m.DbColumnType1 = StdDbType.NUMBER;
-                    list.Add(m);
-
-                    m = new BaseInfoFixedMaster();
-                    m.Code = "fm10";
-                    m.Name = "死亡日";
-                    m.Kind1 = InputKind.TextBox;
-                    m.DbColumnName1 = "死亡日";
-                    m.DbColumnType1 = StdDbType.NUMBER;
-                    list.Add(m);
-
-                    m = new BaseInfoFixedMaster();
-                    m.Code = "fm11";
-                    m.Name = "各種指導";
-                    m.Kind1 = InputKind.CheckBox;
-                    m.KindText1 = "有り";
-                    m.DbColumnName1 = "状態１フラグ";
-                    m.DbColumnType1 = StdDbType.NUMBER;
-                    list.Add(m);
-
-                    m = new BaseInfoFixedMaster();
-                    m.Code = "fm12";
-                    m.Name = "栄養指導";
-                    m.Kind1 = InputKind.CheckBox;
-                    m.KindText1 = "有り";
-                    m.DbColumnName1 = "状態２フラグ";
-                    m.DbColumnType1 = StdDbType.NUMBER;
-                    list.Add(m);
-
-                    m = new BaseInfoFixedMaster();
-                    m.Code = "fm13";
-                    m.Name = "リハビリ";
-                    m.Kind1 = InputKind.CheckBox;
-                    m.KindText1 = "有り";
-                    m.DbColumnName1 = "状態３フラグ";
-                    m.DbColumnType1 = StdDbType.NUMBER;
-                    list.Add(m);
-
-                    m = new BaseInfoFixedMaster();
-                    m.Code = "fm14";
-                    m.Name = "未収金";
-                    m.Kind1 = InputKind.CheckBox;
-                    m.KindText1 = "有り";
-                    m.DbColumnName1 = "状態４フラグ";
-                    m.DbColumnType1 = StdDbType.NUMBER;
-                    list.Add(m);
-#endif
                 }
 
                 return list;
@@ -451,7 +303,6 @@ namespace MedicalLibrary.Entity
                 if (list.Count == 0)
                 {
                     // マスターの取得
-#if INNO
                     string cmd = "select * from D_GENERAL_TABMASTER " +
                         " where DISPNO = 150 " +
                         " order by TABNO";
@@ -467,23 +318,6 @@ namespace MedicalLibrary.Entity
 
                         list.Add(obj);
                     }
-#else
-                    string cmd = "select * from AMB_汎用ＴＡＢ名称マスター " +
-                        " where 画面ＮＯ = 150 " +
-                        " order by ＴＡＢＮＯ";
-
-                    List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-                    foreach (StdClass tmp in tmp_list)
-                    {
-                        BaseInfoTabMaster obj = new BaseInfoTabMaster();
-
-                        obj.Code = tmp.GetDataString("ＴＡＢＮＯ");
-                        obj.Name = tmp.GetDataString("ＴＡＢ名称");
-
-                        list.Add(obj);
-                    }
-#endif
                 }
 
                 return list;
@@ -566,7 +400,6 @@ namespace MedicalLibrary.Entity
                 if (dict.Count == 0)
                 {
                     // マスターの取得
-#if INNO
                     string cmd = "select * from D_GENERAL_INPUTCTL " +
                         " where DISPNO = 150 " +
                         " order by TABNO, ROW_ORDER, COLUMN_ORDER";
@@ -609,52 +442,6 @@ namespace MedicalLibrary.Entity
                             dict.Add(obj.TabCode, list);
                         }
                     }
-#else
-                    string cmd = "select * from AMC_汎用入力画面ＣＴＬ " +
-                        " where 画面ＮＯ = 150 " +
-                        " order by ＴＡＢＮＯ, ＧＲＮＯ, 行表示順, 列表示順";
-
-                    List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-                    foreach (StdClass tmp in tmp_list)
-                    {
-                        BaseInfoItemMaster obj = new BaseInfoItemMaster();
-
-                        obj.TabCode = tmp.GetDataString("ＴＡＢＮＯ");
-                        obj.GroupCode = tmp.GetDataString("ＧＲＮＯ");
-                        obj.RowSEQ = tmp.GetDataInt("行表示順");
-                        obj.ColSEQ = tmp.GetDataInt("列表示順");
-                        obj.Pattern = tmp.GetDataInt("パターン");
-                        obj.Name1 = tmp.GetDataString("項目名タイトル１");
-                        obj.Name2 = tmp.GetDataString("項目名タイトル２");
-                        obj.InputType = tmp.GetDataInt("入力タイプ");
-                        obj.InputWidth = tmp.GetDataInt("入力行幅");
-                        obj.InputHeight = tmp.GetDataInt("入力行高");
-                        obj.Unit = tmp.GetDataString("単位");
-                        obj.SelectMasterCode = tmp.GetDataString("選択項目キー");
-                        obj.ItemKey = tmp.GetDataString("項目ユニークキー");
-
-                        // 「入力行幅」が 0 になっているものもあるので最低 1 にする
-                        if (obj.InputWidth == 0) obj.InputWidth = 1;
-
-                        // 「入力行高」が 0 になっているものもあるので最低 1 にする
-                        if (obj.InputHeight == 0) obj.InputHeight = 1;
-
-                        if (dict.ContainsKey(obj.TabCode))
-                        {
-                            // 辞書にキーが存在する場合
-                            List<BaseInfoItemMaster> list = dict[obj.TabCode];
-                            list.Add(obj);
-                        }
-                        else
-                        {
-                            // 辞書にキーが存在しない場合
-                            List<BaseInfoItemMaster> list = new List<BaseInfoItemMaster>();
-                            list.Add(obj);
-                            dict.Add(obj.TabCode, list);
-                        }
-                    }
-#endif
                 }
 
                 return dict;
@@ -737,7 +524,6 @@ namespace MedicalLibrary.Entity
                 if (dict.Count == 0)
                 {
                     // マスターの取得
-#if INNO
                     string cmd = "select * from D_GENERAL_SELECTMASTER " +
                         " order by SELECT_ITEMKEY, DISP_ORDER";
 
@@ -766,36 +552,6 @@ namespace MedicalLibrary.Entity
                             dict.Add(obj.Name, list);
                         }
                     }
-#else
-                    string cmd = "select * from AMB_汎用入力選択項目マスター " +
-                        " order by 選択項目キー, 表示順";
-
-                    List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-                    foreach (StdClass tmp in tmp_list)
-                    {
-                        BaseInfoSelectMaster obj = new BaseInfoSelectMaster();
-
-                        obj.Name = tmp.GetDataString("選択項目キー");
-                        obj.IntValue = tmp.GetDataInt("選択値");
-                        obj.StringValue = tmp.GetDataString("選択名");
-                        obj.ShowSEQ = tmp.GetDataInt("表示順");
-
-                        if (dict.ContainsKey(obj.Name))
-                        {
-                            // 辞書にキーが存在する場合
-                            List<BaseInfoSelectMaster> list = dict[obj.Name];
-                            list.Add(obj);
-                        }
-                        else
-                        {
-                            // 辞書にキーが存在しない場合
-                            List<BaseInfoSelectMaster> list = new List<BaseInfoSelectMaster>();
-                            list.Add(obj);
-                            dict.Add(obj.Name, list);
-                        }
-                    }
-#endif
                 }
 
                 return dict;

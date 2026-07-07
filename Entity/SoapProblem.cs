@@ -48,33 +48,6 @@ namespace MedicalLibrary.Entity
 
                 date_str += date;
             }
-#if INNO
-#else
-            string cmd = "select td.*, tm.問題内容 from macs.ADT_ＳＯＡＰ関連プロブレム td, macs.ADT_プロブレムデータ tm " +
-                " where td.患者コード = " + pt_id +
-                " and tm.患者コード = " + pt_id +
-                " and td.登録日 in (" + date_str + ")" +
-                " and td.プロブレムＮＯ = tm.プロブレムＮＯ" +
-                " order by td.プロブレムＮＯ";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                SoapProblem obj = GetFromStdClass(tmp);
-
-                if (dict.ContainsKey(obj.Key))
-                {
-                    dict[obj.Key].Add(obj);
-                }
-                else
-                {
-                    List<SoapProblem> soap_problem_list = new List<SoapProblem>();
-                    soap_problem_list.Add(obj);
-                    dict.Add(obj.Key, soap_problem_list);
-                }
-            }
-#endif
 
             return dict;
         }
@@ -83,17 +56,6 @@ namespace MedicalLibrary.Entity
         {
             SoapProblem obj = new SoapProblem();
 
-#if INNO
-#else
-            obj.PtId = tmp.DataDict["患者コード"].ToString();
-            int.TryParse(tmp.DataDict["入外区分"].ToString(), out obj.InOut);
-            int.TryParse(tmp.DataDict["登録日"].ToString(), out obj.RegDate);
-            int.TryParse(tmp.DataDict["登録時間"].ToString(), out obj.RegTime);
-            obj.RegStaff = tmp.DataDict["登録者"].ToString();
-            int.TryParse(tmp.DataDict["連番"].ToString(), out obj.SEQ);
-            obj.ProblemCode = tmp.DataDict["プロブレムＮＯ"].ToString();
-            obj.Cont = tmp.DataDict["問題内容"].ToString();
-#endif
             return obj;
         }
     }

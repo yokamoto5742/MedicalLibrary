@@ -497,7 +497,6 @@ namespace MedicalLibrary.Entity
 
             id = _id;
 
-#if INNO
             string cmd = "select CODE コード, Trim(NAME) 氏名, SYOZOKU 所属, SHIKAKU 資格, DEPT 科コード, DR 医師コード " +
                 " from M_USR " +
                 " where CODE = " + _id;
@@ -508,18 +507,6 @@ namespace MedicalLibrary.Entity
             }
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select IM90RC_F01 コード, Trim(IM90RC_F03) 氏名, IM90RC_F04 所属, IM90RC_F08 資格, IM90RC_F13 科コード, IM90RC_F14 医師コード " +
-                " from IM90RC " +
-                " where IM90RC_F01 = " + _id;
-
-            if (_id2.Length > 0)
-            {
-                cmd += " or IM90RC_F01 = " + _id2;
-            }
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {

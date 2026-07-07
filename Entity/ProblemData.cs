@@ -245,19 +245,11 @@ namespace MedicalLibrary.Entity
                 return obj;
             }
 
-#if INNO
             string cmd = "select * from D_PROBLEM t " +
                 " where t.P_ID = " + pt_id +
                 " and t.PROBLEM_NO = " + problem_no;
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select * from macs.ADT_プロブレムデータ t " +
-                " where t.患者コード = " + pt_id +
-                " and t.プロブレムＮＯ = " + problem_no;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {
@@ -277,19 +269,11 @@ namespace MedicalLibrary.Entity
                 return list;
             }
 
-#if INNO
             string cmd = "select * from D_PROBLEM t " +
                 " where t.P_ID = " + pt_id +
                 " order by t.PROBLEM_NO desc";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select * from macs.ADT_プロブレムデータ t " +
-                " where t.患者コード = " + pt_id +
-                " order by t.プロブレムＮＯ desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {
@@ -314,24 +298,6 @@ namespace MedicalLibrary.Entity
                 return seq;
             }
 
-#if INNO
-#else
-            string cmd = "select max(プロブレムＮＯ) ＮＯ from ADT_プロブレムデータ t " +
-                " where t.患者コード = " + pt_id +
-                " and t.入外区分 = " + in_out;
-
-            List<StdClass> tmp_list = StdClass.GetList(Db, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                if (tmp.DataDict["ＮＯ"].ToString().Length > 0)
-                {
-                    seq = int.Parse(tmp.DataDict["ＮＯ"].ToString());
-                }
-
-                break;
-            }
-#endif
 
             return seq;
         }
@@ -341,7 +307,6 @@ namespace MedicalLibrary.Entity
         {
             ProblemData obj = new ProblemData();
 
-#if INNO
             obj.InOut = tmp.DataDict["INOUT"].ToString();
             int.TryParse(tmp.DataDict["PROBLEM_NO"].ToString(), out obj.SEQ);
             obj.Date1 = tmp.DataDict["PROBLEM_DATE"].ToString();
@@ -353,19 +318,6 @@ namespace MedicalLibrary.Entity
             obj.StaffCode2 = tmp.DataDict["UP_USR"].ToString();
             obj.Cont = tmp.DataDict["PROBLEM_TITLE"].ToString() + " " + tmp.DataDict["PROBLEM_TEXT"].ToString();
             obj.DeleteFlg = tmp.DataDict["DEL_FLG"].ToString().Equals("1") ? true : false;
-#else
-            obj.InOut = tmp.DataDict["入外区分"].ToString();
-            int.TryParse(tmp.DataDict["プロブレムＮＯ"].ToString(), out obj.SEQ);
-            obj.Date1 = tmp.DataDict["発生日"].ToString();
-            obj.DeptCode1 = tmp.DataDict["発生登録科"].ToString();
-            obj.StaffCode1 = tmp.DataDict["発生登録者"].ToString();
-            obj.SectionCode1 = tmp.DataDict["資格コード"].ToString();
-            obj.Date2 = tmp.DataDict["解決日"].ToString();
-            obj.DeptCode2 = tmp.DataDict["解決登録科"].ToString();
-            obj.StaffCode2 = tmp.DataDict["解決登録者"].ToString();
-            obj.Cont = tmp.DataDict["問題内容"].ToString();
-            obj.DeleteFlg = tmp.DataDict["削除フラグ"].ToString().Equals("1") ? true : false;
-#endif
             obj.BaseFromStdClass(tmp);
 
             return obj;
@@ -377,37 +329,6 @@ namespace MedicalLibrary.Entity
 
             StdDbClass obj = new StdDbClass();
 
-#if INNO
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_プロブレムデータ";
-
-            // 連番と表示順を取得する
-            this.SEQ = ProblemData.GetMaxSEQ(this.PtId, this.InOut) + 1;
-
-            obj.DataList.Add(new StdDbColumn("患者コード", StdDbType.NUMBER, this.PtId));
-            obj.DataList.Add(new StdDbColumn("入外区分", StdDbType.NUMBER, this.InOut));
-            obj.DataList.Add(new StdDbColumn("プロブレムＮＯ", StdDbType.NUMBER, this.SEQ));
-
-            obj.DataList.Add(new StdDbColumn("発生日", StdDbType.NUMBER, this.Date1));
-            obj.DataList.Add(new StdDbColumn("発生登録科", StdDbType.NUMBER, this.DeptCode1));
-
-            obj.DataList.Add(new StdDbColumn("発生登録者", StdDbType.NUMBER, LoginUser.Id));
-            obj.DataList.Add(new StdDbColumn("資格コード", StdDbType.NUMBER, LoginUser.SectionId));
-
-            obj.DataList.Add(new StdDbColumn("問題内容", StdDbType.VARCHAR2, this.Cont));
-
-            obj.DataList.Add(new StdDbColumn("解決日", StdDbType.NUMBER, this.Date2));
-            obj.DataList.Add(new StdDbColumn("解決登録科", StdDbType.NUMBER, this.DeptCode2));
-            obj.DataList.Add(new StdDbColumn("解決登録者", StdDbType.NUMBER, this.StaffCode2));
-
-            obj.DataList.Add(new StdDbColumn("登録日", StdDbType.NUMBER, DateTime.Now.ToString("yyyyMMdd")));
-            obj.DataList.Add(new StdDbColumn("登録時間", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
-            obj.DataList.Add(new StdDbColumn("登録者", StdDbType.NUMBER, LoginUser.Id));
-            obj.DataList.Add(new StdDbColumn("代行登録者", StdDbType.NUMBER, LoginUser.Id2));
-
-            sr = obj.InsertSQL();
-#endif
             return sr;
         }
 
@@ -417,37 +338,6 @@ namespace MedicalLibrary.Entity
 
             StdDbClass obj = new StdDbClass();
 
-#if INNO
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_プロブレムデータ";
-
-            obj.DataList.Add(new StdDbColumn("発生日", StdDbType.NUMBER, this.Date1));
-            obj.DataList.Add(new StdDbColumn("発生登録科", StdDbType.NUMBER, this.DeptCode1));
-
-            // 発生登録者と資格コードは変更できない
-            /*
-            obj.DataList.Add(new StdDbColumn("発生登録者", StdDbType.NUMBER, this.StaffCode1));
-            obj.DataList.Add(new StdDbColumn("資格コード", StdDbType.NUMBER, this.SectionCode1));
-            */
-
-            obj.DataList.Add(new StdDbColumn("問題内容", StdDbType.VARCHAR2, this.Cont));
-
-            obj.DataList.Add(new StdDbColumn("解決日", StdDbType.NUMBER, this.Date2));
-            obj.DataList.Add(new StdDbColumn("解決登録科", StdDbType.NUMBER, this.DeptCode2));
-            obj.DataList.Add(new StdDbColumn("解決登録者", StdDbType.NUMBER, this.StaffCode2));
-
-            obj.DataList.Add(new StdDbColumn("更新日", StdDbType.NUMBER, DateTime.Now.ToString("yyyyMMdd")));
-            obj.DataList.Add(new StdDbColumn("更新時間", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
-            obj.DataList.Add(new StdDbColumn("更新者", StdDbType.NUMBER, LoginUser.Id));
-            obj.DataList.Add(new StdDbColumn("代行更新者", StdDbType.NUMBER, LoginUser.Id2));
-
-            obj.WhereList.Add("患者コード = " + this.PtId);
-            obj.WhereList.Add("入外区分 = " + this.InOut);
-            obj.WhereList.Add("プロブレムＮＯ = " + this.SEQ);
-
-            sr = obj.UpdateSQL();
-#endif
             return sr;
         }
 
@@ -457,24 +347,6 @@ namespace MedicalLibrary.Entity
 
             StdDbClass obj = new StdDbClass();
 
-#if INNO
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_プロブレムデータ";
-
-            obj.DataList.Add(new StdDbColumn("削除フラグ", StdDbType.NUMBER, 1));
-
-            obj.DataList.Add(new StdDbColumn("更新日", StdDbType.NUMBER, DateTime.Now.ToString("yyyyMMdd")));
-            obj.DataList.Add(new StdDbColumn("更新時間", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
-            obj.DataList.Add(new StdDbColumn("更新者", StdDbType.NUMBER, LoginUser.Id));
-            obj.DataList.Add(new StdDbColumn("代行更新者", StdDbType.NUMBER, LoginUser.Id2));
-
-            obj.WhereList.Add("患者コード = " + this.PtId);
-            obj.WhereList.Add("入外区分 = " + this.InOut);
-            obj.WhereList.Add("プロブレムＮＯ = " + this.SEQ);
-
-            sr = obj.UpdateSQL();
-#endif
             return sr;
         }
     }

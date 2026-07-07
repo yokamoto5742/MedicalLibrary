@@ -587,7 +587,6 @@ namespace MedicalLibrary.Entity
                 return;
             }
 
-#if INNO
             string cmd = "update D_ORDER_HEADER " +
                 " set SEKOU_FLG = " + val +
                 " where ORDER_NO = " + order_seq;
@@ -602,13 +601,6 @@ namespace MedicalLibrary.Entity
 
                 DB.Db3.ExecuteNonQuery(cmd);
             }
-#else
-            string cmd = "update ＮＴオーダーヘッダー " +
-                " set 施行フラグ = " + val +
-                " where オーダー番号 = " + order_seq;
-
-            DB.Db1.ExecuteNonQuery(cmd);
-#endif
         }
 
         /// <summary>
@@ -624,7 +616,6 @@ namespace MedicalLibrary.Entity
                 return;
             }
 
-#if INNO
             string cmd = "update D_ORDER_HEADER " +
                 " set BILL_FLG = " + val +
                 " where ORDER_NO = " + order_seq;
@@ -639,13 +630,6 @@ namespace MedicalLibrary.Entity
 
                 DB.Db3.ExecuteNonQuery(cmd);
             }
-#else
-            string cmd = "update ＮＴオーダーヘッダー " +
-                " set 会計フラグ = " + val +
-                " where オーダー番号 = " + order_seq;
-
-            DB.Db1.ExecuteNonQuery(cmd);
-#endif
         }
 
         /// <summary>
@@ -660,7 +644,6 @@ namespace MedicalLibrary.Entity
             {
                 return;
             }
-#if INNO
             string cmd = "update D_ORDER_HEADER " +
                 " set PRINT_FLG = " + val +
                 " where ORDER_NO = " + order_seq;
@@ -675,13 +658,6 @@ namespace MedicalLibrary.Entity
 
                 DB.Db3.ExecuteNonQuery(cmd);
             }
-#else
-            string cmd = "update ＮＴオーダーヘッダー " +
-                " set 指示箋フラグ = " + val +
-                " where オーダー番号 = " + order_seq;
-
-            DB.Db1.ExecuteNonQuery(cmd);
-#endif
         }
 
 

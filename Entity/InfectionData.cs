@@ -57,7 +57,6 @@ namespace MedicalLibrary.Entity
             {
                 return i;
             }
-#if INNO
             string cmd = "select td.*, tm.NAME " +
                 " from medb.M_INFECTION tm, medb.D_INFECTION td " +
                 " where td.P_ID = " + pt_id +
@@ -107,55 +106,6 @@ namespace MedicalLibrary.Entity
                 }
                  */
             }
-#else
-            string cmd = "select D.患者コード as 患者コード, D.検査日 as 検査日, D.感染症コード as 感染症コード, M.項目名 as 項目名, D.検査結果 as 検査結果 " +
-                " from AMB_感染症項目マスター M, ADT_感染症情報データ D " +
-                " where D.患者コード = " + pt_id + " and D.感染症コード = M.感染症コード " +
-                " order by D.検査日 desc, D.更新日 desc, D.更新時間 desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                // 最初のデータならばIDと日付をセットする
-                if (i.Id.Length == 0)
-                {
-                    i.Id = tmp.DataDict["患者コード"].ToString();
-                    i.Date = tmp.DataDict["検査日"].ToString();
-                }
-
-                // 日付が異なれば飛ばす
-                if (!i.Date.Equals(tmp.GetDataString("検査日")))
-                {
-                    continue;
-                }
-
-                if (!i.DictData.ContainsKey(tmp.GetDataString("感染症コード")))
-                {
-                    i.DictData.Add(tmp.DataDict["感染症コード"].ToString(), new InfectionDetail(tmp.DataDict["感染症コード"].ToString(), tmp.DataDict["項目名"].ToString(), tmp.DataDict["検査結果"].ToString()));
-                }
-
-                /*
-                if (i.Id.Length == 0)
-                {
-                    i.Id = tmp.DataDict["患者コード"].ToString();
-                    i.Date = tmp.DataDict["検査日"].ToString();
-                    i.DictData.Add(tmp.DataDict["感染症コード"].ToString(), new InfectionDetail(tmp.DataDict["感染症コード"].ToString(), tmp.DataDict["項目名"].ToString(), tmp.DataDict["検査結果"].ToString()));
-                }
-                else if (i.Date.Equals(tmp.DataDict["検査日"].ToString()))
-                {
-                    if (!i.DictData.ContainsKey(tmp.DataDict["感染症コード"].ToString()))
-                    {
-                        i.DictData.Add(tmp.DataDict["感染症コード"].ToString(), new InfectionDetail(tmp.DataDict["感染症コード"].ToString(), tmp.DataDict["項目名"].ToString(), tmp.DataDict["検査結果"].ToString()));
-                    }
-                }
-                else
-                {
-                    break;
-                }
-                 */
-            }
-#endif
             return i;
         }
 
@@ -172,7 +122,6 @@ namespace MedicalLibrary.Entity
             {
                 return dict;
             }
-#if INNO
             string cmd = "select td.*, tm.NAME " +
                 " from medb.M_INFECTION tm, medb.D_INFECTION td " +
                 " where td.P_ID in (" + AppString.ConcatList(pt_list, ",") + ") " +
@@ -240,73 +189,6 @@ namespace MedicalLibrary.Entity
                 dict.Add(i.Id, i);
             }
  */
-#else
-            string cmd = "select D.患者コード as 患者コード, D.検査日 as 検査日, D.感染症コード as 感染症コード, M.項目名 as 項目名, D.検査結果 as 検査結果 " +
-                " from AMB_感染症項目マスター M, ADT_感染症情報データ D " +
-                " where D.患者コード in (" + AppString.ConcatList(pt_list, ",") + ") and D.感染症コード = M.感染症コード " +
-                " order by D.患者コード, D.検査日 desc, D.更新日 desc, D.更新時間 desc";
-
-            InfectionData i;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                if (!dict.ContainsKey(tmp.GetDataString("患者コード")))
-                {
-                    i = new InfectionData();
-                    i.Id = tmp.DataDict["患者コード"].ToString();
-                    i.Date = tmp.DataDict["検査日"].ToString();
-                    dict.Add(i.Id, i);
-                }
-
-                i = dict[tmp.GetDataString("患者コード")];
-
-                // 日付が異なれば飛ばす
-                if (!i.Date.Equals(tmp.GetDataString("検査日")))
-                {
-                    continue;
-                }
-
-                if (!i.DictData.ContainsKey(tmp.GetDataString("感染症コード")))
-                {
-                    i.DictData.Add(tmp.DataDict["感染症コード"].ToString(), new InfectionDetail(tmp.DataDict["感染症コード"].ToString(), tmp.DataDict["項目名"].ToString(), tmp.DataDict["検査結果"].ToString()));
-                }
-/*
-                                if (i.Id.Length == 0)
-                                {
-                                    i.Id = tmp.DataDict["患者コード"].ToString();
-                                    i.Date = tmp.DataDict["検査日"].ToString();
-                                    i.DictData.Add(tmp.DataDict["感染症コード"].ToString(), new InfectionDetail(tmp.DataDict["感染症コード"].ToString(), tmp.DataDict["項目名"].ToString(), tmp.DataDict["検査結果"].ToString()));
-                                }
-                                else if (!i.Id.Equals(tmp.DataDict["患者コード"].ToString()))
-                                {
-                                    if (!dict.ContainsKey(i.Id))
-                                    {
-                                        dict.Add(i.Id, i);
-                                    }
-
-                                    i = new InfectionData();
-                                    i.Id = tmp.DataDict["患者コード"].ToString();
-                                    i.Date = tmp.DataDict["検査日"].ToString();
-                                    i.DictData.Add(tmp.DataDict["感染症コード"].ToString(), new InfectionDetail(tmp.DataDict["感染症コード"].ToString(), tmp.DataDict["項目名"].ToString(), tmp.DataDict["検査結果"].ToString()));
-                                }
-                                else if (i.Date.Equals(tmp.DataDict["検査日"].ToString()))
-                                {
-                                    if (!i.DictData.ContainsKey(tmp.DataDict["感染症コード"].ToString()))
-                                    {
-                                        i.DictData.Add(tmp.DataDict["感染症コード"].ToString(), new InfectionDetail(tmp.DataDict["感染症コード"].ToString(), tmp.DataDict["項目名"].ToString(), tmp.DataDict["検査結果"].ToString()));
-                                    }
-                                }
- */
-            }
-/*
-            if (i.Id.Length > 0 && !dict.ContainsKey(i.Id))
-            {
-                dict.Add(i.Id, i);
-            }
- */
-#endif
             return dict;
         }
     }

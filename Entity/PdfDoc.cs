@@ -168,7 +168,6 @@ namespace MedicalLibrary.Entity
                 return dict;
             }
 
-#if INNO
             string cmd = "select t.P_ID, t.FIGURE_1, t.FIGURE_2, t.FIGURE_3, t.FIGURE_4, t.SOAP_TEXT " +
                 " from D_SOAP_DETAIL t " +
                 " where t.P_ID = " + pt_id +
@@ -201,45 +200,6 @@ namespace MedicalLibrary.Entity
                     dict.Add(obj.PdfDate.ToString(), pdf_dict);
                 }
             }
-#else
-            string cmd = "select t.患者コード, t.年次フォルダ, t.書類フォルダ, t.ＰＤＦファイル名, t.書類コード " +
-                ", (select tm.書類名 from ＰＤＦ書類マスター tm where tm.書類コード = t.書類コード) 書類名 " +
-//                ", t.科コード, t.入力者コード, t.ＰＤＦ登録日, t.ＰＤＦ登録時刻 " +
-                " from ＰＤＦ登録データ t " +
-                " where t.患者コード = " + pt_id +
-                " and t.書類コード in (select tm.書類コード from ＰＤＦ書類マスター tm where tm.表示対象フラグ = 1) " +
-                " and t.削除区分 = 0 " +
-                " and t.ＰＤＦ登録日 in (" + AppString.ConcatList(date_list, ",") + ")";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PdfDoc obj = new PdfDoc();
-
-                obj.PtId = pt_id;
-                obj.YearFolder = tmp.GetDataString("年次フォルダ");
-                obj.DocFolder = tmp.GetDataString("書類フォルダ");
-                obj.PdfFile = tmp.GetDataString("ＰＤＦファイル名");
-                obj.PdfCode = tmp.GetDataString("書類コード");
-                obj.PdfName = tmp.GetDataString("書類名");
-//                obj.DeptCode = tmp.GetDataString("科コード");
-//                obj.StaffCode = tmp.GetDataString("入力者コード");
-//                obj.PdfDate = tmp.GetDataInt("ＰＤＦ登録日");
-//                obj.PdfTime = tmp.GetDataInt("ＰＤＦ登録時刻");
-
-                if (dict.ContainsKey(obj.PdfDate.ToString()))
-                {
-                    dict[obj.PdfDate.ToString()].Add(obj.Key, obj);
-                }
-                else
-                {
-                    Dictionary<string, PdfDoc> pdf_dict = new Dictionary<string, PdfDoc>();
-                    pdf_dict.Add(obj.Key, obj);
-                    dict.Add(obj.PdfDate.ToString(), pdf_dict);
-                }
-            }
-#endif
 
             return dict;
         }

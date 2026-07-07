@@ -226,7 +226,6 @@ namespace MedicalLibrary.Entity
             inOutDict.Add("2", "入院");
 
             wardDict = new Dictionary<string, Ward>();
-#if INNO
             Ward ward = new Ward();
             ward.SEQ = 0;
             ward.Code = "0";
@@ -269,13 +268,6 @@ namespace MedicalLibrary.Entity
             ward.Short = "未";
             ward.BackColor = Color.White;
             wardDict.Add(ward.Code, ward);
-#else
-            wardDict.Add("00", "");
-            wardDict.Add("03", "わかば");
-            wardDict.Add("04", "さくら");
-            wardDict.Add("05", "あやめ");
-            wardDict.Add("99", "病棟未定");
-#endif
 
             soapDict = new Dictionary<string, string>();
 
@@ -307,7 +299,6 @@ namespace MedicalLibrary.Entity
             sectionDict = new Dictionary<string, Section>();
             qualDict = new Dictionary<string, Qual>();
 
-#if INNO
             DB db = DB.Db3;
 
             db.Open();
@@ -454,147 +445,6 @@ namespace MedicalLibrary.Entity
             }
 
             db.Close();
-#else
-            DB db = DB.Db1;
-
-            db.Open();
-
-            // 診療区分
-            string cmd = "select IM5011RC_F01 コード, Trim(IM5011RC_F02) 名称 from IM5011RC order by IM5011RC_F01";
-
-            List<StdClass> tmp_list = StdClass.GetList(db, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                kouiDict.Add(tmp.DataDict["コード"].ToString(), tmp.DataDict["名称"].ToString());
-            }
-
-            // 施行部署
-            cmd = "select TM50RC_F02 コード, Trim(TM50RC_F03) 名称, Trim(TM50RC_F04) 略称 from TM50RC where TM50RC_F01 = 2 order by TM50RC_F02";
-
-            tmp_list = StdClass.GetList(db, cmd);
-
-            sekouDict.Add("0", new Sekou());
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                Sekou obj = new Sekou();
-
-                int.TryParse(tmp.DataDict["コード"].ToString(), out obj.Code);
-                obj.FullName = tmp.DataDict["名称"].ToString();
-                obj.ShortName = tmp.DataDict["略称"].ToString();
-
-                sekouDict.Add(obj.Code.ToString(), obj);
-            }
-
-            // 診療科
-            cmd = "select IM5001RC_F01 コード, Trim(IM5001RC_F02) 名称, Trim(IM5001RC_F03) 略称, IM5001RC_F05 ステータス from IM5001RC order by IM5001RC_F01";
-
-            tmp_list = StdClass.GetList(db, cmd);
-
-            deptDict.Add("0", new Dept());
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                Dept obj = new Dept();
-
-                int.TryParse(tmp.DataDict["コード"].ToString(), out obj.Code);
-                obj.FullName = tmp.DataDict["名称"].ToString();
-                obj.ShortName = tmp.DataDict["略称"].ToString();
-                int.TryParse(tmp.DataDict["ステータス"].ToString(), out obj.Status);
-
-                deptDict.Add(obj.Code.ToString(), obj);
-            }
-
-            // 医師
-            cmd = "select IM5002RC_F01 コード, Trim(IM5002RC_F02) 氏名, Trim(IM5002RC_F03) 略称, IM5002RC_F05 ステータス, IM5002RC_F09 科コード, IM90RC_F01 入力者コード, Trim(IM90RC_F03) 入力者氏名 " +
-                " from IM5002RC left join IM90RC on IM5002RC_F01 = IM90RC_F14 where IM90RC_F04 = 1 order by IM5002RC_F01";
-
-            tmp_list = StdClass.GetList(db, cmd);
-
-            doctorDict.Add("0", new Doctor());
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                Doctor obj = new Doctor();
-
-                int.TryParse(tmp.DataDict["コード"].ToString(), out obj.Code);
-                obj.Name = tmp.GetDataString("氏名").Trim();
-                obj.ShortName = tmp.GetDataString("略称").Trim();
-                int.TryParse(tmp.DataDict["ステータス"].ToString(), out obj.Status);
-                int.TryParse(tmp.DataDict["科コード"].ToString(), out obj.DeptCode);
-                int.TryParse(tmp.DataDict["入力者コード"].ToString(), out obj.StaffCode);
-                obj.StaffName = tmp.DataDict["入力者氏名"].ToString().Trim();
-
-                doctorDict.Add(obj.Code.ToString(), obj);
-            }
-
-            // 入力者
-            cmd = "select IM90RC_F01 コード, Trim(IM90RC_F03) 氏名, Trim(IM90RC_F02) カナ, IM90RC_F04 所属コード, IM90RC_F07 ステータス, IM90RC_F08 資格コード, IM90RC_F13 科コード, IM90RC_F14 医師コード " +
-                " from IM90RC order by IM90RC_F01";
-
-            tmp_list = StdClass.GetList(db, cmd);
-
-            staffDict.Add("0", new Staff());
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                Staff obj = new Staff();
-
-                int.TryParse(tmp.DataDict["コード"].ToString(), out obj.Code);
-                obj.Name = tmp.DataDict["氏名"].ToString();
-                obj.Kana = tmp.DataDict["カナ"].ToString();
-                int.TryParse(tmp.DataDict["所属コード"].ToString(), out obj.SectionCode);
-                int.TryParse(tmp.DataDict["ステータス"].ToString(), out obj.Status);
-                int.TryParse(tmp.DataDict["資格コード"].ToString(), out obj.QualCode);
-                int.TryParse(tmp.DataDict["所属コード"].ToString(), out obj.SectionCode);
-                int.TryParse(tmp.DataDict["科コード"].ToString(), out obj.DeptCode);
-                int.TryParse(tmp.DataDict["所属コード"].ToString(), out obj.SectionCode);
-                int.TryParse(tmp.DataDict["医師コード"].ToString(), out obj.DoctorCode);
-
-                staffDict.Add(obj.Code.ToString(), obj);
-            }
-
-            // 所属
-            cmd = "select IM5055RC_F01 コード, Trim(IM5055RC_F02) 名称, Trim(IM5055RC_F03) 略称, IM5055RC_F05 ステータス from IM5055RC order by IM5055RC_F01";
-
-            tmp_list = StdClass.GetList(db, cmd);
-
-            sectionDict.Add("0", new Section());
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                Section obj = new Section();
-
-                int.TryParse(tmp.DataDict["コード"].ToString(), out obj.Code);
-                obj.FullName = tmp.DataDict["名称"].ToString();
-                obj.ShortName = tmp.DataDict["略称"].ToString();
-                int.TryParse(tmp.DataDict["ステータス"].ToString(), out obj.Kind1);
-
-                sectionDict.Add(obj.Code.ToString(), obj);
-            }
-
-            // 資格
-            cmd = "select IM5056RC_F01 コード, Trim(IM5056RC_F02) 名称, Trim(IM5056RC_F03) 略称, IM5056RC_F05 ステータス from IM5056RC order by IM5056RC_F01";
-
-            tmp_list = StdClass.GetList(db, cmd);
-
-            qualDict.Add("0", new Qual());
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                Qual obj = new Qual();
-
-                int.TryParse(tmp.DataDict["コード"].ToString(), out obj.Code);
-                obj.FullName = tmp.DataDict["名称"].ToString();
-                obj.ShortName = tmp.DataDict["略称"].ToString();
-                int.TryParse(tmp.DataDict["ステータス"].ToString(), out obj.Kind1);
-
-                qualDict.Add(obj.Code.ToString(), obj);
-            }
-
-            db.Close();
-#endif
         }
 
         /// <summary>
@@ -636,7 +486,6 @@ namespace MedicalLibrary.Entity
             {
                 if (dict.Count == 0)
                 {
-#if INNO
                     Ward obj = new Ward();
                     obj.SEQ = 0;
                     obj.Code = "0";
@@ -684,55 +533,6 @@ namespace MedicalLibrary.Entity
                     obj.BackColor = Color.White;
 
                     dict.Add(obj.Code, obj);
-#else
-                    Ward obj = new Ward();
-                    obj.SEQ = 0;
-                    obj.Code = "00";
-                    obj.Name = "";
-                    obj.Short = "";
-                    obj.BackColor = Color.White;
-
-                    dict.Add(obj.Code, obj);
-
-                    obj = new Ward();
-                    obj.SEQ = 3;
-                    obj.Code = "03";
-                    obj.Name = "わかば";
-                    obj.Short = "若";
-                    obj.DeptCode = "31";
-                    obj.BackColor = Color.LightGreen;
-
-                    dict.Add(obj.Code, obj);
-
-                    obj = new Ward();
-                    obj.SEQ = 4;
-                    obj.Code = "04";
-                    obj.Name = "さくら";
-                    obj.Short = "桜";
-                    obj.DeptCode = "41";
-                    obj.BackColor = Color.Pink;
-
-                    dict.Add(obj.Code, obj);
-
-                    obj = new Ward();
-                    obj.SEQ = 5;
-                    obj.Code = "05";
-                    obj.Name = "あやめ";
-                    obj.Short = "菖";
-                    obj.DeptCode = "33";
-                    obj.BackColor = Color.Lavender;
-
-                    dict.Add(obj.Code, obj);
-
-                    obj = new Ward();
-                    obj.SEQ = 99;
-                    obj.Code = "99";
-                    obj.Name = "未定";
-                    obj.Short = "未";
-                    obj.BackColor = Color.White;
-
-                    dict.Add(obj.Code, obj);
-#endif
                 }
 
                 return dict;
@@ -965,7 +765,6 @@ namespace MedicalLibrary.Entity
         {
             dict.Clear();
 
-#if INNO
             string cmd = "select * from M_HOKEN t " +
                 " order by t.CODE";
 
@@ -986,28 +785,6 @@ namespace MedicalLibrary.Entity
                     dict.Add(obj.Code.ToString(), obj);
                 }
             }
-#else
-            string cmd = "select * from IM5004RC t " +
-                " order by t.IM5004RC_F01";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                Insurance obj = new Insurance();
-
-                int.TryParse(tmp.DataDict["IM5004RC_F01"].ToString(), out obj.Code);
-                obj.FullName = tmp.DataDict["IM5004RC_F02"].ToString().Trim();
-                obj.ShortName = tmp.DataDict["IM5004RC_F03"].ToString().Trim();
-                obj.Kana = tmp.DataDict["IM5004RC_F04"].ToString().Trim();
-                int.TryParse(tmp.DataDict["IM5004RC_F08"].ToString(), out obj.Kind1);
-
-                if (!dict.ContainsKey(obj.Code.ToString()))
-                {
-                    dict.Add(obj.Code.ToString(), obj);
-                }
-            }
-#endif
         }
 
 

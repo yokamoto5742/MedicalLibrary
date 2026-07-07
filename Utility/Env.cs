@@ -121,11 +121,7 @@ namespace MedicalLibrary.Utility
             inno_home = @"c:\innokarte";
             shin_home = @"c:\shinseikai";
 
-#if INNO
             db_link = "@INNO.WORLD";
-#else
-            db_link = "@IJI.WORLD";
-#endif
         }
     }
 }

@@ -234,19 +234,11 @@ namespace MedicalLibrary.Entity
             {
                 return obj;
             }
-#if INNO
             string cmd = "select * from M_PATIENT_FAMILY t " +
                 " where t.P_ID = " + pt_id +
                 " and t.P_SEQ = " + seq;
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select * from ADT_患者家族連絡先データ t " +
-                " where t.患者コード = " + pt_id +
-                " and t.連番 = " + seq;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             foreach (StdClass tmp in tmp_list)
             {
                 obj = GetFromStdClass(tmp);
@@ -264,19 +256,11 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "select * from M_PATIENT_FAMILY t " +
                 " where t.P_ID = " + pt_id +
                 " order by t.CONTACT_ORDER";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select * from ADT_患者家族連絡先データ t " +
-                " where t.患者コード = " + pt_id +
-                " order by t.連絡優先順位";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             foreach (StdClass tmp in tmp_list)
             {
                 list.Add(GetFromStdClass(tmp));
@@ -290,7 +274,6 @@ namespace MedicalLibrary.Entity
             PatContact obj = new PatContact();
 
             obj.BaseFromStdClass(tmp);
-#if INNO
             int.TryParse(tmp.DataDict["P_SEQ"].ToString(), out obj.SEQ);
             int.TryParse(tmp.DataDict["CONTACT_ORDER"].ToString(), out obj.ShowSEQ);
             obj.Kana = tmp.DataDict["KANA"].ToString().Trim();
@@ -308,25 +291,6 @@ namespace MedicalLibrary.Entity
             obj.ResidentCode = tmp.DataDict["LIVE_TYPE"].ToString();
             obj.Care = tmp.DataDict["CARE_TYPE"].ToString();
             obj.Cont = tmp.DataDict["COMMENT_2"].ToString();
-#else
-            int.TryParse(tmp.DataDict["連番"].ToString(), out obj.SEQ);
-            int.TryParse(tmp.DataDict["連絡優先順位"].ToString(), out obj.ShowSEQ);
-            obj.Kana = tmp.DataDict["カナ氏名"].ToString();
-            obj.Name = tmp.DataDict["漢字氏名"].ToString();
-            obj.Birth = tmp.DataDict["生年月日"].ToString();
-            obj.RelationCode = tmp.DataDict["続柄区分"].ToString();
-            obj.RelationComment = tmp.DataDict["続柄コメント"].ToString();
-            obj.Tel1 = tmp.DataDict["電話番号１"].ToString();
-            obj.KindCode1 = tmp.DataDict["連絡先区分１"].ToString();
-            obj.Tel2 = tmp.DataDict["電話番号２"].ToString();
-            obj.KindCode2 = tmp.DataDict["連絡先区分２"].ToString();
-            obj.Tel3 = tmp.DataDict["電話番号３"].ToString();
-            obj.KindCode3 = tmp.DataDict["連絡先区分３"].ToString();
-            obj.Health = tmp.DataDict["健康状態"].ToString();
-            obj.ResidentCode = tmp.DataDict["同別居区分"].ToString();
-            obj.Care = tmp.DataDict["介護役割"].ToString();
-            obj.Cont = tmp.DataDict["備考"].ToString();
-#endif
             return obj;
         }
 
@@ -338,17 +302,10 @@ namespace MedicalLibrary.Entity
             {
                 return seq;
             }
-#if INNO
             string cmd = "select max(P_SEQ) 連番 from M_PATIENT_FAMILY t " +
                 " where t.P_ID = " + pt_id;
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select max(連番) 連番 from ADT_患者家族連絡先データ t " +
-                " where t.患者コード = " + pt_id;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             foreach (StdClass tmp in tmp_list)
             {
                 if (tmp.DataDict["連番"].ToString().Length > 0)
@@ -367,46 +324,6 @@ namespace MedicalLibrary.Entity
             StdReturn sr = new StdReturn();
 
             StdDbClass obj = new StdDbClass();
-#if INNO
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_患者家族連絡先データ";
-
-            // 連番を取得する
-            this.SEQ = GetMaxSEQ(this.PtId) + 1;
-
-            string reg_date = DateTime.Now.ToString("yyyyMMdd");
-            string reg_time = DateTime.Now.ToString("HHmmss");
-
-            obj.DataList.Add(new StdDbColumn("患者コード", StdDbType.NUMBER, this.PtId));
-            obj.DataList.Add(new StdDbColumn("連番", StdDbType.NUMBER, this.SEQ));
-            obj.DataList.Add(new StdDbColumn("連絡優先順位", StdDbType.NUMBER, this.ShowSEQ));
-            obj.DataList.Add(new StdDbColumn("カナ氏名", StdDbType.VARCHAR2, this.Kana));
-            obj.DataList.Add(new StdDbColumn("漢字氏名", StdDbType.VARCHAR2, this.Name));
-            obj.DataList.Add(new StdDbColumn("生年月日", StdDbType.NUMBER, (this.Birth.Length == 8) ? this.Birth : "0"));
-            obj.DataList.Add(new StdDbColumn("続柄区分", StdDbType.NUMBER, this.RelationCode));
-            obj.DataList.Add(new StdDbColumn("続柄コメント", StdDbType.VARCHAR2, this.RelationComment));
-            obj.DataList.Add(new StdDbColumn("電話番号１", StdDbType.VARCHAR2, this.Tel1));
-            obj.DataList.Add(new StdDbColumn("連絡先区分１", StdDbType.NUMBER, this.KindCode1));
-            obj.DataList.Add(new StdDbColumn("電話番号２", StdDbType.VARCHAR2, this.Tel2));
-            obj.DataList.Add(new StdDbColumn("連絡先区分２", StdDbType.NUMBER, this.KindCode2));
-            obj.DataList.Add(new StdDbColumn("電話番号３", StdDbType.VARCHAR2, this.Tel3));
-            obj.DataList.Add(new StdDbColumn("連絡先区分３", StdDbType.NUMBER, this.KindCode3));
-            obj.DataList.Add(new StdDbColumn("健康状態", StdDbType.VARCHAR2, this.Health));
-            obj.DataList.Add(new StdDbColumn("同別居区分", StdDbType.NUMBER, this.ResidentCode));
-            obj.DataList.Add(new StdDbColumn("介護役割", StdDbType.VARCHAR2, this.Care));
-            obj.DataList.Add(new StdDbColumn("備考", StdDbType.VARCHAR2, this.Cont));
-            obj.DataList.Add(new StdDbColumn("登録日", StdDbType.NUMBER, reg_date));
-            obj.DataList.Add(new StdDbColumn("登録時間", StdDbType.NUMBER, reg_time));
-            obj.DataList.Add(new StdDbColumn("登録者", StdDbType.NUMBER, LoginUser.Id));
-            obj.DataList.Add(new StdDbColumn("代行登録者", StdDbType.NUMBER, LoginUser.Id2));
-            obj.DataList.Add(new StdDbColumn("更新日", StdDbType.NUMBER, reg_date));
-            obj.DataList.Add(new StdDbColumn("更新時間", StdDbType.NUMBER, reg_time));
-            obj.DataList.Add(new StdDbColumn("更新者", StdDbType.NUMBER, LoginUser.Id));
-            obj.DataList.Add(new StdDbColumn("代行更新者", StdDbType.NUMBER, LoginUser.Id2));
-
-            sr = obj.InsertSQL();
-#endif
             return sr;
         }
 
@@ -416,40 +333,6 @@ namespace MedicalLibrary.Entity
             StdReturn sr = new StdReturn();
 
             StdDbClass obj = new StdDbClass();
-#if INNO
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_患者家族連絡先データ";
-
-            string reg_date = DateTime.Now.ToString("yyyyMMdd");
-            string reg_time = DateTime.Now.ToString("HHmmss");
-
-            obj.DataList.Add(new StdDbColumn("連絡優先順位", StdDbType.NUMBER, this.ShowSEQ));
-            obj.DataList.Add(new StdDbColumn("カナ氏名", StdDbType.VARCHAR2, this.Kana));
-            obj.DataList.Add(new StdDbColumn("漢字氏名", StdDbType.VARCHAR2, this.Name));
-            obj.DataList.Add(new StdDbColumn("生年月日", StdDbType.NUMBER, (this.Birth.Length == 8) ? this.Birth : "0"));
-            obj.DataList.Add(new StdDbColumn("続柄区分", StdDbType.NUMBER, this.RelationCode));
-            obj.DataList.Add(new StdDbColumn("続柄コメント", StdDbType.VARCHAR2, this.RelationComment));
-            obj.DataList.Add(new StdDbColumn("電話番号１", StdDbType.VARCHAR2, this.Tel1));
-            obj.DataList.Add(new StdDbColumn("連絡先区分１", StdDbType.NUMBER, this.KindCode1));
-            obj.DataList.Add(new StdDbColumn("電話番号２", StdDbType.VARCHAR2, this.Tel2));
-            obj.DataList.Add(new StdDbColumn("連絡先区分２", StdDbType.NUMBER, this.KindCode2));
-            obj.DataList.Add(new StdDbColumn("電話番号３", StdDbType.VARCHAR2, this.Tel3));
-            obj.DataList.Add(new StdDbColumn("連絡先区分３", StdDbType.NUMBER, this.KindCode3));
-            obj.DataList.Add(new StdDbColumn("健康状態", StdDbType.VARCHAR2, this.Health));
-            obj.DataList.Add(new StdDbColumn("同別居区分", StdDbType.NUMBER, this.ResidentCode));
-            obj.DataList.Add(new StdDbColumn("介護役割", StdDbType.VARCHAR2, this.Care));
-            obj.DataList.Add(new StdDbColumn("備考", StdDbType.VARCHAR2, this.Cont));
-            obj.DataList.Add(new StdDbColumn("更新日", StdDbType.NUMBER, reg_date));
-            obj.DataList.Add(new StdDbColumn("更新時間", StdDbType.NUMBER, reg_time));
-            obj.DataList.Add(new StdDbColumn("更新者", StdDbType.NUMBER, LoginUser.Id));
-            obj.DataList.Add(new StdDbColumn("代行更新者", StdDbType.NUMBER, LoginUser.Id2));
-
-            obj.WhereList.Add("患者コード = " + this.PtId);
-            obj.WhereList.Add("連番 = " + this.SEQ);
-
-            sr = obj.UpdateSQL();
-#endif
             return sr;
         }
 
@@ -459,16 +342,6 @@ namespace MedicalLibrary.Entity
             StdReturn sr = new StdReturn();
 
             StdDbClass obj = new StdDbClass();
-#if INNO
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_患者家族連絡先データ";
-
-            obj.WhereList.Add("患者コード = " + this.PtId);
-            obj.WhereList.Add("連番 = " + this.SEQ);
-
-            sr = obj.DeleteSQL();
-#endif
             return sr;
         }
     }

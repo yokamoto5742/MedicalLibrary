@@ -461,7 +461,6 @@ namespace MedicalLibrary.Agent
             obj.Status = tmp.GetDataInt("STATUS");
 
             obj.PtId = tmp.GetDataString("PATIENT_ID");
-#if INNO
             obj._Pat.Id = tmp.GetDataString("PATIENT_ID");
             obj._Pat.Name = tmp.GetDataString("P_NAME").Trim();
             obj._Pat.Kana = tmp.GetDataString("P_KANA").Trim();
@@ -470,16 +469,6 @@ namespace MedicalLibrary.Agent
             obj._Pat.FacilityCode = tmp.GetDataString("PROPERTY_3");
             obj._Pat.NoteCode = tmp.GetDataString("PROPERTY_4");
             obj.InvoiceFlg = !tmp.GetDataInt("PROPERTY_6", 0).Equals(1);
-#else
-            obj._Pat.Id = tmp.GetDataString("PATIENT_ID");
-            obj._Pat.Name = tmp.GetDataString("IM01RC_F04").Trim();
-            obj._Pat.Kana = tmp.GetDataString("IM01RC_F03").Trim();
-            obj._Pat.Sex = tmp.GetDataString("IM01RC_F05");
-            obj._Pat.Birth = tmp.GetDataString("IM01RC_F10");
-            obj._Pat.FacilityCode = tmp.GetDataString("IM01RC_F13_3");
-            obj._Pat.NoteCode = tmp.GetDataString("IM01RC_F13_4");
-            obj.InvoiceFlg = !tmp.GetDataInt("IM0101RC_F02", 0).Equals(1);
-#endif
 
             return obj;
         }
@@ -503,18 +492,10 @@ namespace MedicalLibrary.Agent
 
             string cmd = "";
 
-#if INNO
             cmd = "select tp.*, tm.* " +
                 " from BILL_PAY tp, M_PATIENT" + Env.DB_LINK + " tm " +
                 " where tp.AR_DATE = " + date +
                 " and tp.PATIENT_ID = tm.P_ID";
-#else
-            cmd = "select tp.*, tm.*, tmm.* " +
-                " from BILL_PAY tp, IM01RC" + Env.DB_LINK + " tm, IM0101RC" + Env.DB_LINK + " tmm " +
-                " where tp.AR_DATE = " + date +
-                " and tp.PATIENT_ID = tm.IM01RC_F01" +
-                " and tp.PATIENT_ID = tmm.IM0101RC_F01(+)";
-#endif
 
             if (place.Length > 0)
             {
@@ -608,19 +589,11 @@ namespace MedicalLibrary.Agent
 
             string cmd = "";
 
-#if INNO
             cmd = "select tp.*, tm.* " +
                 " from BILL_PAY tp, M_PATIENT" + Env.DB_LINK + " tm " +
                 " where tp.AR_DATE = " + date +
                 " and tp.STATUS in (0, 1, 2)" +
                 " and tp.PATIENT_ID = tm.P_ID";
-#else
-            cmd = "select tp.*, tm.* " +
-                " from BILL_PAY tp, IM01RC" + Env.DB_LINK + " tm " +
-                " where tp.AR_DATE = " + date +
-                " and tp.STATUS in (0, 1, 2)" +
-                " and tp.PATIENT_ID = tm.IM01RC_F01";
-#endif
 
             if (place.Length > 0)
             {

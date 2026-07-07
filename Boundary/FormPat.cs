@@ -135,7 +135,6 @@ namespace MedicalLibrary.Boundary
 
         private void FormPat_Load(object sender, EventArgs e)
         {
-#if INNO
             // Inno カルテはログイン必須
             if (LoginUser.Status == LoginUser.STATUS.NONE)
             {
@@ -147,22 +146,6 @@ namespace MedicalLibrary.Boundary
             {
                 this.Dispose();
             }
-#else
-            // MACS カルテは ReadOnly = false の場合はログイン必須
-            if (!this.ReadOnly)
-            {
-                if (LoginUser.Status == LoginUser.STATUS.NONE)
-                {
-                    LoginUser.Init();
-                }
-
-                // この時点でログインされていなければ終了する
-                if (LoginUser.Status == LoginUser.STATUS.NONE)
-                {
-                    this.Dispose();
-                }
-            }
-#endif
 
             ButtonList.Add(this.FormBaseInfoButton1);
             ButtonList.Add(this.FormDiagButton1);
@@ -736,11 +719,7 @@ namespace MedicalLibrary.Boundary
                 formPostIt1.MdiParent = this;
 
                 // 当日の受付科があればセットする
-#if INNO
                 List<PatOut> list = PatOut.GetOneday(this.Pat.Id, DateTime.Now.ToString("yyyyMMdd"), "UKE_NO desc");
-#else
-                List<PatOut> list = PatOut.GetOneday(this.Pat.Id, DateTime.Now.ToString("yyyyMMdd"), "受付ＮＯ desc");
-#endif
 
                 foreach (PatOut obj in list)
                 {

@@ -486,15 +486,9 @@ namespace MedicalLibrary.Agent
         public static OpeNursingData Load(string id)
         {
             OpeNursingData p = new OpeNursingData();
-#if INNO
             string cmd = "select OPE_NURSING.*, Trim(P_KANA) as カナ, Trim(P_NAME) as 氏名, P_SEX as 性別, P_BIRTHDAY_AD as 生年月日 " +
                 " from OPE_NURSING inner join M_PATIENT" + Env.DB_LINK + " on PATIENT_ID = P_ID " +
                 " where ID = " + id;
-#else
-            string cmd = "select OPE_NURSING.*, Trim(IM01RC_F03) as カナ, Trim(IM01RC_F04) as 氏名, IM01RC_F05 as 性別, IM01RC_F10 as 生年月日 " +
-                " from OPE_NURSING inner join IM01RC" + Env.DB_LINK + " on PATIENT_ID = IM01RC_F01 " +
-                " where ID = " + id;
-#endif
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
 
             foreach (StdClass tmp in tmp_list)
@@ -514,17 +508,10 @@ namespace MedicalLibrary.Agent
         public static List<OpeNursingData> Find(string pt_id)
         {
             List<OpeNursingData> list = new List<OpeNursingData>();
-#if INNO
             string cmd = "select OPE_NURSING.*, Trim(P_KANA) as カナ, Trim(P_NAME) as 氏名, P_SEX as 性別, P_BIRTHDAY_AD as 生年月日 " +
                 " from OPE_NURSING inner join M_PATIENT" + Env.DB_LINK + " on PATIENT_ID = P_ID " +
                 " where PATIENT_ID = " + pt_id +
                 " order by OPE_DATE desc";
-#else
-            string cmd = "select OPE_NURSING.*, Trim(IM01RC_F03) as カナ, Trim(IM01RC_F04) as 氏名, IM01RC_F05 as 性別, IM01RC_F10 as 生年月日 " +
-                " from OPE_NURSING inner join IM01RC" + Env.DB_LINK + " on PATIENT_ID = IM01RC_F01 " +
-                " where PATIENT_ID = " + pt_id +
-                " order by OPE_DATE desc";
-#endif
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
 
             foreach (StdClass tmp in tmp_list)
@@ -544,17 +531,10 @@ namespace MedicalLibrary.Agent
         public static List<OpeNursingData> Find(string start_date, string end_date)
         {
             List<OpeNursingData> list = new List<OpeNursingData>();
-#if INNO
             string cmd = "select OPE_NURSING.*, Trim(P_KANA) as カナ, Trim(P_NAME) as 氏名, P_SEX as 性別, P_BIRTHDAY_AD as 生年月日 " +
                 " from OPE_NURSING inner join M_PATIENT" + Env.DB_LINK + " on PATIENT_ID = P_ID " +
                 " where OPE_NURSING.OPE_DATE >= " + start_date + " and OPE_NURSING.OPE_DATE <= " + end_date + " and STATUS != 0 " +
                 " order by OPE_DATE desc";
-#else
-            string cmd = "select OPE_NURSING.*, Trim(IM01RC_F03) as カナ, Trim(IM01RC_F04) as 氏名, IM01RC_F05 as 性別, IM01RC_F10 as 生年月日 " +
-                " from OPE_NURSING inner join IM01RC" + Env.DB_LINK + " on PATIENT_ID = IM01RC_F01 " +
-                " where OPE_NURSING.OPE_DATE >= " + start_date + " and OPE_NURSING.OPE_DATE <= " + end_date + " and STATUS != 0 " +
-                " order by OPE_DATE desc";
-#endif
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
 
             foreach (StdClass tmp in tmp_list)

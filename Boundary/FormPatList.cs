@@ -19,7 +19,6 @@ namespace MedicalLibrary.Boundary
         string PatListViewSort = "通番";
         SortOrder PatListViewSortOrder = SortOrder.Ascending;
 
-#if INNO
         /// <summary>
         /// 通常 or 救急 or 在宅
         /// </summary>
@@ -29,16 +28,6 @@ namespace MedicalLibrary.Boundary
             Home = 2,
             QQ = 99
         }
-#else
-        /// <summary>
-        /// 通常 or 救急
-        /// </summary>
-        public enum TimeMode : int
-        {
-            Normal = 1,
-            QQ = 99
-        }
-#endif
 
         TimeMode time_mode = TimeMode.Normal;
 
@@ -375,9 +364,7 @@ namespace MedicalLibrary.Boundary
                 // デフォルトで「通常」モードにする。
                 this.TimeModeBox1.Items.Add("通常");
                 this.TimeModeBox1.Items.Add("救急");
-#if INNO
                 this.TimeModeBox1.Items.Add("在宅");
-#endif
                 this.TimeModeBox1.Text = "通常";
 
 
@@ -984,7 +971,6 @@ namespace MedicalLibrary.Boundary
 
             List<string> filters = new List<string>();
 
-#if INNO
             // 通常 or 救急 or 在宅 の表示条件
             if (this.TimeMode1 == TimeMode.Normal)
             {
@@ -998,17 +984,6 @@ namespace MedicalLibrary.Boundary
             {
                 filters.Add("(区分 = 2)");
             }
-#else
-            // 通常 or 救急の表示条件
-            if (this.TimeMode1 == TimeMode.Normal)
-            {
-                filters.Add("(区分 = 1)");
-            }
-            else if (this.TimeMode1 == TimeMode.QQ)
-            {
-                filters.Add("(区分 = 2)");
-            }
-#endif
 
             // 入院の表示条件
             if (!ShowInBox1.Checked)
@@ -1748,11 +1723,7 @@ namespace MedicalLibrary.Boundary
         {
             if (PatListView.SelectedRows.Count > 0)
             {
-#if INNO
                 int time = int.Parse(DateTime.Now.ToString("HHmmss"));
-#else
-                int time = int.Parse(DateTime.Now.ToString("HHmm"));
-#endif
 
                 string come_date = this.DatePicker1.Value.ToString("yyyyMMdd");
                 string seq1 = PatListView.SelectedRows[0].Cells["通番"].Value.ToString();
@@ -1788,11 +1759,7 @@ namespace MedicalLibrary.Boundary
         {
             if (PatListView.SelectedRows.Count > 0)
             {
-#if INNO
                 int time = int.Parse(DateTime.Now.ToString("HHmmss"));
-#else
-                int time = int.Parse(DateTime.Now.ToString("HHmm"));
-#endif
 
                 string come_date = this.DatePicker1.Value.ToString("yyyyMMdd");
                 string seq1 = PatListView.SelectedRows[0].Cells["通番"].Value.ToString();
@@ -1828,11 +1795,7 @@ namespace MedicalLibrary.Boundary
         {
             if (PatListView.SelectedRows.Count > 0)
             {
-#if INNO
                 int time = int.Parse(DateTime.Now.ToString("HHmmss"));
-#else
-                int time = int.Parse(DateTime.Now.ToString("HHmm"));
-#endif
 
                 string come_date = this.DatePicker1.Value.ToString("yyyyMMdd");
                 string seq1 = PatListView.SelectedRows[0].Cells["通番"].Value.ToString();
@@ -1937,11 +1900,7 @@ namespace MedicalLibrary.Boundary
                 string time5 = r.Cells["会計"].Value.ToString();
 
                 // その日の診察状況データを会計時間順（昇順）にソートしたリスト
-#if INNO
                 List<PatOut> list = PatOut.GetOneday(pt_id, come_date, "BILL_TIME");
-#else
-                List<PatOut> list = PatOut.GetOneday(pt_id, come_date, "会計時間");
-#endif
 
                 // その日の何回目の会計か。
                 // 会計時間が入っている場合は、修正なので「その会計時間は、その日の何回目の会計か」とする。
@@ -2026,13 +1985,6 @@ namespace MedicalLibrary.Boundary
 
                 msgs.Clear();
 
-#if INNO
-#else
-                if (!File.Exists(LibSettings.Current.OrderXmlExe))
-                {
-                    msgs.Add("オーダー転送アプリ " + LibSettings.Current.OrderXmlExe + " が存在しません。");
-                }
-#endif
 
                 if (!File.Exists(LibSettings.Current.ReceApiExe))
                 {
@@ -2054,11 +2006,7 @@ namespace MedicalLibrary.Boundary
                 string time5 = r.Cells["会計"].Value.ToString();
 
                 // その日の診察状況データを会計時間順（昇順）にソートしたリスト
-#if INNO
                 List<PatOut> list = PatOut.GetOneday(pt_id, come_date, "BILL_TIME");
-#else
-                List<PatOut> list = PatOut.GetOneday(pt_id, come_date, "会計時間");
-#endif
 
                 // その日の何回目の会計か。
                 // 会計時間が入っている場合は、修正なので「その会計時間は、その日の何回目の会計か」とする。
@@ -2099,7 +2047,6 @@ namespace MedicalLibrary.Boundary
                 {
                     // ID701RC.F20 に会計入力者コードをセット
                     PatOut.SetKaikeiStaffBySEQ(LoginUser.Id, come_date, seq1);
-#if INNO
                     // 施行済・未会計のものを取得する
                     List<PatOrder> order_list = PatOrder.GetListByPatDates(pt_id, come_date, come_date, "1", null, null, true).FindAll((x) =>
                         {
@@ -2113,19 +2060,6 @@ namespace MedicalLibrary.Boundary
                     }
 
                     Process.Start(LibSettings.Current.ReceApiExe, "1 " + pt_id + " " + i.ToString() + " " + dept_code + " " + doctor_code + " " + ins_seq);
-#else
-                    // 会計入力の場合は Q26_OrderXml.exe を起動
-                    Process p = Process.Start(LibSettings.Current.OrderXmlExe, "-m1 1 " + pt_id + " " + come_date + " " + i.ToString() + " " + LoginUser.Id);
-
-                    if (p.WaitForExit(20 * 1000))
-                    {
-                        Thread.Sleep(LibSettings.Current.OrderReceApiIntervalInt * 1000);
-
-                        // レセを直接起動することはしない 2015/06/26
-//                        p = Process.Start(LibSettings.Current.ReceExe, "F03GS^^^^1^" + pt_id + "^" + come_date + "^" + i.ToString() + "^ADMIN0");
-                        p = Process.Start(LibSettings.Current.ReceApiExe, "1 " + pt_id + " " + i.ToString() + " " + dept_code + " " + doctor_code + " " + ins_seq);
-                    }
-#endif
                 }
             }
             else
@@ -2303,7 +2237,6 @@ namespace MedicalLibrary.Boundary
 
         private void TimeModeBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-#if INNO
             if (this.TimeModeBox1.Text.Equals("救急"))
             {
                 this.TimeMode1 = TimeMode.QQ;
@@ -2316,16 +2249,6 @@ namespace MedicalLibrary.Boundary
             {
                 this.TimeMode1 = TimeMode.Normal;
             }
-#else
-            if (this.TimeModeBox1.Text.Equals("救急"))
-            {
-                this.TimeMode1 = TimeMode.QQ;
-            }
-            else
-            {
-                this.TimeMode1 = TimeMode.Normal;
-            }
-#endif
 
             this.ListShow();
         }

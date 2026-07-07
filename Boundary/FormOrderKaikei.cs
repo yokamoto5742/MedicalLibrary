@@ -179,20 +179,11 @@ namespace MedicalLibrary.Boundary
         {
             this.ctrlDeptBox11.Init();
             this.ctrlDoctorBox11.Init();
-#if INNO
             if (!File.Exists(LibSettings.Current.ReceApiExe) ||
                 !File.Exists(LibSettings.Current.ReceExe))
             {
                 this.KaikeiButton1.Enabled = false;
             }
-#else
-            if (!File.Exists(LibSettings.Current.OrderXmlExe) ||
-                !File.Exists(LibSettings.Current.ReceApiExe) ||
-                !File.Exists(LibSettings.Current.ReceExe))
-            {
-                this.KaikeiButton1.Enabled = false;
-            }
-#endif
             ToolTip t = new ToolTip();
 
             t.SetToolTip(this.InsBox1, "F3キーで保険一覧が表示されます");
@@ -378,20 +369,11 @@ namespace MedicalLibrary.Boundary
 
         private void KaikeiButton1_Click(object sender, EventArgs e)
         {
-#if INNO
             if (!File.Exists(LibSettings.Current.ReceApiExe) ||
                 !File.Exists(LibSettings.Current.ReceExe))
             {
                 return;
             }
-#else
-            if (!File.Exists(LibSettings.Current.OrderXmlExe) ||
-                !File.Exists(LibSettings.Current.ReceApiExe) ||
-                !File.Exists(LibSettings.Current.ReceExe))
-            {
-                return;
-            }
-#endif
             // チェックの入ったオーダー
             List<PatOrder> list = new List<PatOrder>();
 
@@ -439,7 +421,6 @@ namespace MedicalLibrary.Boundary
             {
                 // ID701RC.F20 に会計入力者コードをセット
                 PatOut.SetKaikeiStaffByPtId(LoginUser.Id, this.DatePicker1.Value.ToString("yyyyMMdd"), this.Pat.Id);
-#if INNO
                 if (list.Count > 0)
                 {
                     Q26.Execute(list, DateTime.Now, 1, this.SEQ, true, LibSettings.Current.Proas.OrderXmlTmpFolder, LibSettings.Current.Proas.OrderXmlDstFolder, true, LoginUser.Id);
@@ -447,23 +428,9 @@ namespace MedicalLibrary.Boundary
                 }
 
                 Process.Start(LibSettings.Current.ReceApiExe, "1 " + this.Pat.Id + " " + this.SEQ.ToString() + " " + dept_code + " " + doctor_code + " " + ins_seq);
-#else
-                // 会計入力の場合は Q26_OrderXml.exe を起動
-                Process p = Process.Start(LibSettings.Current.OrderXmlExe, "-m2 1 " + this.Pat.Id + " " + this.DatePicker1.Value.ToString("yyyyMMdd") + " " + this.SEQ.ToString() + " " + LoginUser.Id + " " + s);
-
-                if (p.WaitForExit(20 * 1000))
-                {
-                    Thread.Sleep(LibSettings.Current.OrderReceApiIntervalInt * 1000);
-
-                    // レセを直接起動することはしない 2015/06/26
-//                    p = Process.Start(LibSettings.Current.ReceExe, "F03GS^^^^1^" + this.Pat.Id + "^" + this.DatePicker1.Value.ToString("yyyyMMdd") + "^" + this.SEQ.ToString() + "^ADMIN0");
-                    p = Process.Start(LibSettings.Current.ReceApiExe, "1 " + this.Pat.Id + " " + this.SEQ.ToString() + " " + dept_code + " " + doctor_code + " " + ins_seq);
-                }
-#endif
             }
             else
             {
-#if INNO
                 if (list.Count > 0)
                 {
                     Q26.Execute(list, DateTime.Now, 1, 0, true, LibSettings.Current.Proas.OrderXmlTmpFolder, LibSettings.Current.Proas.OrderXmlDstFolder, true, LoginUser.Id);
@@ -471,19 +438,6 @@ namespace MedicalLibrary.Boundary
                 }
 
                 Process.Start(LibSettings.Current.ReceApiExe, "2 " + this.Pat.Id + " 0 " + dept_code + " " + doctor_code + " " + ins_seq);
-#else
-                // 会計入力の場合は Q26_OrderXml.exe を起動
-                Process p = Process.Start(LibSettings.Current.OrderXmlExe, "-m3 2 " + this.Pat.Id + " 0 1 " + LoginUser.Id + " " + s);
-
-                if (p.WaitForExit(20 * 1000))
-                {
-                    Thread.Sleep(LibSettings.Current.OrderReceApiIntervalInt * 1000);
-
-                    // レセを直接起動することはしない 2015/06/26
-//                    p = Process.Start(LibSettings.Current.ReceExe, "F03GS^^^^1^" + this.Pat.Id + "^" + this.DatePicker1.Value.ToString("yyyyMMdd") + "^" + this.SEQ.ToString() + "^ADMIN0");
-                    p = Process.Start(LibSettings.Current.ReceApiExe, "2 " + this.Pat.Id + " 0 " + dept_code + " " + doctor_code + " " + ins_seq);
-                }
-#endif
             }
         }
 

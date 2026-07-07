@@ -355,21 +355,12 @@ namespace MedicalLibrary.Agent
                 cond_list.Add("OPE_TIME <= " + time2);
             }
 
-#if INNO
             string cmd = "select EYE_OPE.*, " +
                 " Trim(tm.P_KANA) as カナ, Trim(tm.P_NAME) as 氏名, " +
                 " tm.P_SEX 性別, tm.P_BIRTHDAY_AD 生年月日 " +
                 " from EYE_OPE left join M_PATIENT" + Env.DB_LINK + " tm on EYE_OPE.PATIENT_ID = tm.P_ID " +
                 " where " + AppString.ConcatList(cond_list, " and ") + " and STATUS != 0 " +
                 " order by OPE_KIND, OPE_DATE, OPE_TIME";
-#else
-            string cmd = "select EYE_OPE.*, " +
-                " Trim(IM01RC_F03) as カナ, Trim(IM01RC_F04) as 氏名, " +
-                " IM01RC_F05 性別, IM01RC_F10 生年月日 " +
-                " from EYE_OPE left join IM01RC" + Env.DB_LINK + " on EYE_OPE.PATIENT_ID = IM01RC.IM01RC_F01 " +
-                " where " + AppString.ConcatList(cond_list, " and ") + " and STATUS != 0 " +
-                " order by OPE_KIND, OPE_DATE, OPE_TIME";
-#endif
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
 
             foreach (StdClass tmp in tmp_list)
@@ -429,21 +420,12 @@ namespace MedicalLibrary.Agent
                 cond_list.Add("OPE_DATE <= " + DateTime.Now.AddDays(7).ToString("yyyyMMdd"));
             }
 
-#if INNO
             string cmd = "select EYE_OPE.*, " +
                 " Trim(tm.P_KANA) as カナ, Trim(tm.P_NAME) as 氏名, " +
                 " tm.P_SEX 性別, tm.P_BIRTHDAY_AD 生年月日 " +
                 " from EYE_OPE left join M_PATIENT" + Env.DB_LINK + " tm on EYE_OPE.PATIENT_ID = tm.P_ID " +
                 " where " + AppString.ConcatList(cond_list, " and ") + " and STATUS != 0 " +
                 " order by OPE_KIND, OPE_DATE, OPE_TIME";
-#else
-            string cmd = "select EYE_OPE.*, " +
-                " Trim(IM01RC_F03) as カナ, Trim(IM01RC_F04) as 氏名, " +
-                " IM01RC_F05 性別, IM01RC_F10 生年月日 " +
-                " from EYE_OPE left join IM01RC" + Env.DB_LINK + " on EYE_OPE.PATIENT_ID = IM01RC.IM01RC_F01 " +
-                " where " + AppString.ConcatList(cond_list, " and ") + " and STATUS != 0 " +
-                " order by OPE_KIND, OPE_DATE, OPE_TIME";
-#endif
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
 
             foreach (StdClass tmp in tmp_list)
@@ -607,17 +589,10 @@ namespace MedicalLibrary.Agent
             {
                 record_sql2 = " and EYE_OPE_RECORD.CONT like '%" + record22 + "," + record23 + "%'";
             }
-#if INNO
             string cmd = "select EYE_OPE.*, Trim(tm.P_KANA) as カナ, Trim(tm.P_NAME) as 氏名, tm.P_SEX as 性別, tm.P_BIRTHDAY_AD as 生年月日, EYE_OPE_RECORD.CONT as 記録, EYE_OPE_PASS.CONT as 経過 " +
                 " from EYE_OPE inner join M_PATIENT" + Env.DB_LINK + " tm on PATIENT_ID = tm.P_ID left join EYE_OPE_RECORD on EYE_OPE.ID = EYE_OPE_RECORD.ID left join EYE_OPE_PASS on EYE_OPE.ID = EYE_OPE_PASS.ID " +
                 " where EYE_OPE.STATUS != 0 " + date_sql + diag_sql + ope_sql + doctor_sql + record_sql1 + record_sql2 +
                 " order by OPE_DATE desc, OPE_TIME desc";
-#else
-            string cmd = "select EYE_OPE.*, Trim(IM01RC_F03) as カナ, Trim(IM01RC_F04) as 氏名, IM01RC_F05 as 性別, IM01RC_F10 as 生年月日, EYE_OPE_RECORD.CONT as 記録, EYE_OPE_PASS.CONT as 経過 " +
-                " from EYE_OPE inner join IM01RC" + Env.DB_LINK + " on PATIENT_ID = IM01RC_F01 left join EYE_OPE_RECORD on EYE_OPE.ID = EYE_OPE_RECORD.ID left join EYE_OPE_PASS on EYE_OPE.ID = EYE_OPE_PASS.ID " +
-                " where EYE_OPE.STATUS != 0 " + date_sql + diag_sql + ope_sql + doctor_sql + record_sql1 + record_sql2 +
-                " order by OPE_DATE desc, OPE_TIME desc";
-#endif
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
 
             foreach (StdClass tmp in tmp_list)

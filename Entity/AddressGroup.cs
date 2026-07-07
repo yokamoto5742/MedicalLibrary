@@ -37,7 +37,6 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "select * from M_KARTE_MESSAGE_GROUP t " +
                 " where t.CODE = " + staff_code +
                 " order by t.GROUP_NO ";
@@ -48,33 +47,15 @@ namespace MedicalLibrary.Entity
             {
                 list.Add(GetFromStdClass(tmp));
             }
-#else
-            string cmd = "select * from AMB_メールグループ t " +
-                " where t.入力者コード = " + staff_code +
-                " order by t.グループコード ";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                list.Add(GetFromStdClass(tmp));
-            }
-#endif
             return list;
         }
 
         static AddressGroup GetFromStdClass(StdClass tmp)
         {
             AddressGroup obj = new AddressGroup();
-#if INNO
             obj.StaffCode = tmp.DataDict["CODE"].ToString();
             int.TryParse(tmp.DataDict["GROUP_NO"].ToString(), out obj.SEQ);
             obj.Name = tmp.DataDict["GROUP_NAME"].ToString();
-#else
-            obj.StaffCode = tmp.DataDict["入力者コード"].ToString();
-            int.TryParse(tmp.DataDict["グループコード"].ToString(), out obj.SEQ);
-            obj.Name = tmp.DataDict["グループ名"].ToString();
-#endif
             return obj;
         }
 
@@ -86,7 +67,6 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "select * from M_KARTE_MESSAGE_ADDRESS t " +
                 " where t.CODE = " + staff_code +
                 " and t.GROUP_NO = " + seq;
@@ -102,23 +82,6 @@ namespace MedicalLibrary.Entity
                     list.Add(Dict.StaffDict[code]);
                 }
             }
-#else
-            string cmd = "select * from AMB_メールアドレス帳 t " +
-                " where t.入力者コード = " + staff_code +
-                " and t.グループコード = " + seq;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                string code = tmp.DataDict["メンバコード"].ToString();
-
-                if (Dict.StaffDict.ContainsKey(code))
-                {
-                    list.Add(Dict.StaffDict[code]);
-                }
-            }
-#endif
             return list;
         }
 
@@ -130,7 +93,6 @@ namespace MedicalLibrary.Entity
             {
                 return seq;
             }
-#if INNO
             string cmd = "select max(GROUP_NO) MAX_NO from M_KARTE_MESSAGE_GROUP t " +
                 " where t.CODE = " + staff_code;
 
@@ -145,22 +107,6 @@ namespace MedicalLibrary.Entity
 
                 break;
             }
-#else
-            string cmd = "select max(グループコード) 連番 from AMB_メールグループ t " +
-                " where t.入力者コード = " + staff_code;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                if (tmp.DataDict["連番"].ToString().Length > 0)
-                {
-                    seq = int.Parse(tmp.DataDict["連番"].ToString());
-                }
-
-                break;
-            }
-#endif
             return seq;
         }
 
@@ -169,7 +115,6 @@ namespace MedicalLibrary.Entity
             StdReturn sr = new StdReturn();
 
             StdDbClass obj = new StdDbClass();
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "M_KARTE_MESSAGE_GROUP";
 
@@ -181,19 +126,6 @@ namespace MedicalLibrary.Entity
             obj.DataList.Add(new StdDbColumn("GROUP_NAME", StdDbType.VARCHAR2, this.Name));
 
             sr = obj.InsertSQL();
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "AMB_メールグループ";
-
-            // 連番を取得する
-            this.SEQ = AddressGroup.GetMaxSEQ(LoginUser.Id) + 1;
-
-            obj.DataList.Add(new StdDbColumn("入力者コード", StdDbType.NUMBER, LoginUser.Id));
-            obj.DataList.Add(new StdDbColumn("グループコード", StdDbType.NUMBER, this.SEQ));
-            obj.DataList.Add(new StdDbColumn("グループ名", StdDbType.VARCHAR2, this.Name));
-
-            sr = obj.InsertSQL();
-#endif
             // メンバーを登録
             RegMembers(LoginUser.Id, this.SEQ, list);
 
@@ -205,7 +137,6 @@ namespace MedicalLibrary.Entity
             StdReturn sr = new StdReturn();
 
             StdDbClass obj = new StdDbClass();
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "M_KARTE_MESSAGE_GROUP";
 
@@ -215,17 +146,6 @@ namespace MedicalLibrary.Entity
             obj.WhereList.Add("GROUP_NO = " + this.SEQ);
 
             sr = obj.UpdateSQL();
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "AMB_メールグループ";
-
-            obj.DataList.Add(new StdDbColumn("グループ名", StdDbType.VARCHAR2, this.Name));
-
-            obj.WhereList.Add("入力者コード = " + LoginUser.Id);
-            obj.WhereList.Add("グループコード = " + this.SEQ);
-
-            sr = obj.UpdateSQL();
-#endif
             // メンバーを登録
             RegMembers(LoginUser.Id, this.SEQ, list);
 
@@ -237,7 +157,6 @@ namespace MedicalLibrary.Entity
             StdReturn sr = new StdReturn();
 
             StdDbClass obj = new StdDbClass();
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "M_KARTE_MESSAGE_GROUP";
 
@@ -245,15 +164,6 @@ namespace MedicalLibrary.Entity
             obj.WhereList.Add("GROUP_NO = " + this.SEQ);
 
             sr = obj.DeleteSQL();
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "AMB_メールグループ";
-
-            obj.WhereList.Add("入力者コード = " + LoginUser.Id);
-            obj.WhereList.Add("グループコード = " + this.SEQ);
-
-            sr = obj.DeleteSQL();
-#endif
             // メンバーも削除
             DeleteMembers(LoginUser.Id, this.SEQ);
 
@@ -265,7 +175,6 @@ namespace MedicalLibrary.Entity
             StdReturn sr = new StdReturn();
 
             StdDbClass obj = new StdDbClass();
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "M_KARTE_MESSAGE_ADDRESS";
 
@@ -273,15 +182,6 @@ namespace MedicalLibrary.Entity
             obj.WhereList.Add("GROUP_NO = " + seq);
 
             sr = obj.DeleteSQL();
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "AMB_メールアドレス帳";
-
-            obj.WhereList.Add("入力者コード = " + staff_code);
-            obj.WhereList.Add("グループコード = " + seq);
-
-            sr = obj.DeleteSQL();
-#endif
             return sr;
         }
 
@@ -290,7 +190,6 @@ namespace MedicalLibrary.Entity
             StdReturn sr = new StdReturn();
 
             StdDbClass obj = new StdDbClass();
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "M_KARTE_MESSAGE_ADDRESS";
 
@@ -313,30 +212,6 @@ namespace MedicalLibrary.Entity
 
                 sr = obj.InsertSQL();
             }
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "AMB_メールアドレス帳";
-
-            // いったん全メンバーを削除
-            obj.WhereList.Add("入力者コード = " + staff_code);
-            obj.WhereList.Add("グループコード = " + seq);
-
-            sr = obj.DeleteSQL();
-
-            obj.WhereList.Clear();
-
-            // メンバーを挿入
-            foreach (Staff staff in list)
-            {
-                obj.DataList.Clear();
-
-                obj.DataList.Add(new StdDbColumn("入力者コード", StdDbType.NUMBER, staff_code));
-                obj.DataList.Add(new StdDbColumn("グループコード", StdDbType.NUMBER, seq));
-                obj.DataList.Add(new StdDbColumn("メンバコード", StdDbType.NUMBER, staff.Code));
-
-                sr = obj.InsertSQL();
-            }
-#endif
             return sr;
         }
     }

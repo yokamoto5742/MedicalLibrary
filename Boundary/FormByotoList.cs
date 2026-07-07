@@ -456,15 +456,9 @@ namespace MedicalLibrary.Boundary
             table.Columns.Add("Obj", typeof(PatIn));
 
             this.WardBox1.Items.Add("");
-#if INNO
             this.WardBox1.Items.Add("3 わかば");
             this.WardBox1.Items.Add("4 さくら");
             this.WardBox1.Items.Add("5 あやめ");
-#else
-            this.WardBox1.Items.Add("03 わかば");
-            this.WardBox1.Items.Add("04 さくら");
-            this.WardBox1.Items.Add("05 あやめ");
-#endif
 
             this.DatePicker21.Value = DateTime.Now.AddDays(-14);
             this.DatePicker22.Value = DateTime.Now.AddDays(7);
@@ -2425,7 +2419,6 @@ namespace MedicalLibrary.Boundary
 
         private void WardBox1_TextChanged(object sender, EventArgs e)
         {
-#if INNO
             if (this.WardBox1.Text.StartsWith("3 "))
             {
                 this.DeptCode = "31";
@@ -2442,24 +2435,6 @@ namespace MedicalLibrary.Boundary
             {
                 this.DeptCode = "";
             }
-#else
-            if (this.WardBox1.Text.StartsWith("03"))
-            {
-                this.DeptCode = "31";
-            }
-            else if (this.WardBox1.Text.StartsWith("04"))
-            {
-                this.DeptCode = "41";
-            }
-            else if (this.WardBox1.Text.StartsWith("05"))
-            {
-                this.DeptCode = "33";
-            }
-            else
-            {
-                this.DeptCode = "";
-            }
-#endif
             this.ListFormat1();
             this.ListFormat2();
             this.ListFormat3();

@@ -52,7 +52,6 @@ namespace MedicalLibrary.Entity
             }
 
             string cmd = "select * from " + table_name;
-#if INNO
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
 
             foreach (StdClass tmp in tmp_list)
@@ -71,23 +70,6 @@ namespace MedicalLibrary.Entity
                     dict.Add(obj.Code, obj);
                 }
             }
-#else
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                StdMaster1 obj = new StdMaster1();
-
-                obj.Code = tmp.DataDict[table_name + "_F01"].ToString().Trim();
-                obj.Name = tmp.DataDict[table_name + "_F02"].ToString().Trim();
-                obj.Short = tmp.DataDict[table_name + "_F03"].ToString().Trim();
-
-                if (!dict.ContainsKey(obj.Code))
-                {
-                    dict.Add(obj.Code, obj);
-                }
-            }
-#endif
             return dict;
         }
     }

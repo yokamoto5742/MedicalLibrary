@@ -76,12 +76,6 @@ namespace MedicalLibrary.Entity
         public new void BaseFromStdClass(StdClass tmp)
         {
             base.BaseFromStdClass(tmp);
-#if INNO
-#else
-            this.PdfFlg = tmp.GetDataString("ＰＤＦ出力区分").Equals("1");
-            this.PdfDate = tmp.GetDataInt("ＰＤＦ出力日");
-            this.PdfTime = tmp.GetDataInt("ＰＤＦ出力時間");
-#endif
         }
     }
 }

@@ -108,11 +108,7 @@ namespace MedicalLibrary.Agent
                 " where 患者コード = " + pt_id +
                 " order by 開始日 desc";
 
-#if INNO
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
-#else
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {
@@ -132,11 +128,7 @@ namespace MedicalLibrary.Agent
                 " where 患者コード in (" + AppString.ConcatList(pt_id_list, ",") + ")" +
                 " order by 開始日 desc, 終了日 desc";
 
-#if INNO
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
-#else
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {

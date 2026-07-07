@@ -135,15 +135,9 @@ namespace MedicalLibrary.Agent
         {
             List<EyeSummary> list = new List<EyeSummary>();
 
-#if INNO
             string cmd = "select EYE_SUMMARY.*, Trim(tm.P_NAME) as 氏名 " +
                 " from EYE_SUMMARY " +
                 " inner join M_PATIENT" + Env.DB_LINK + " tm on PATIENT_ID = tm.P_ID";
-#else
-            string cmd = "select EYE_SUMMARY.*, Trim(IM01RC_F04) as 氏名 " +
-                " from EYE_SUMMARY " +
-                " inner join IM01RC" + Env.DB_LINK + " on PATIENT_ID = IM01RC_F01";
-#endif
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
 
             foreach (StdClass tmp in tmp_list)
@@ -194,17 +188,10 @@ namespace MedicalLibrary.Agent
         {
             List<EyeSummary> list = new List<EyeSummary>();
 
-#if INNO
             string cmd = "select EYE_SUMMARY.*, Trim(tm.P_NAME) as 氏名 " +
                 " from EYE_SUMMARY " +
                 " inner join M_PATIENT" + Env.DB_LINK + " tm on PATIENT_ID = tm.P_ID " +
                 " where CONT2 like '%," + kensa_date + " %' order by PATIENT_ID";
-#else
-            string cmd = "select EYE_SUMMARY.*, Trim(IM01RC_F04) as 氏名 " +
-                " from EYE_SUMMARY " +
-                " inner join IM01RC" + Env.DB_LINK + " on PATIENT_ID = IM01RC_F01 " +
-                " where CONT2 like '%," + kensa_date + " %' order by PATIENT_ID";
-#endif
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
 
             foreach (StdClass tmp in tmp_list)
@@ -285,13 +272,8 @@ namespace MedicalLibrary.Agent
             {
                 return list;
             }
-#if INNO
             string cmd = "select EYE_SUMMARY.*, Trim(tm.P_NAME) as 氏名, Trim(tm.P_KANA) as カナ, tm.P_SEX as 性別, tm.P_BIRTHDAY_AD as 生年月日 " +
                 " from EYE_SUMMARY inner join M_PATIENT" + Env.DB_LINK + " tm on PATIENT_ID = tm.P_ID";
-#else
-            string cmd = "select EYE_SUMMARY.*, Trim(IM01RC_F04) as 氏名, Trim(IM01RC_F03) as カナ, IM01RC_F05 as 性別, IM01RC_F10 as 生年月日 " +
-                " from EYE_SUMMARY inner join IM01RC" + Env.DB_LINK + " on PATIENT_ID = IM01RC_F01";
-#endif
             if (param.Length > 0)
             {
                 cmd += " where " + param;

@@ -127,7 +127,6 @@ namespace MedicalLibrary.Agent
         {
             ComeReportOrder obj = new ComeReportOrder();
 
-#if INNO
             obj.Pat.Id = tmp.GetDataString("P_ID");
             obj.Pat.Name = tmp.GetDataString("P_NAME").Trim();
             obj.Pat.Sex = tmp.GetDataString("P_SEX");
@@ -145,25 +144,6 @@ namespace MedicalLibrary.Agent
             obj.Pat.InsKind = tmp.GetDataString("HOKEN_TYPE");
             obj.SekouFlg = tmp.GetDataString("SEKOU_FLG");
             obj.OutSideDone = tmp.GetDataString("OUTSIDE_DONE");
-#else
-            obj.Pat.Id = tmp.GetDataString("患者コード");
-            obj.Pat.Name = tmp.GetDataString("PT_NAME").Trim();
-            obj.Pat.Sex = tmp.GetDataString("PT_SEX");
-            obj.Pat.Birth = tmp.GetDataString("PT_BIRTH");
-            obj.OrderId = tmp.GetDataString("オーダー番号");
-            obj.OrderDate = tmp.GetDataString("指示日");
-            obj.SekouDate = tmp.GetDataString("施行予定日");
-            obj.SekouTime = tmp.GetDataString("装置番号");
-            obj.Sekou1 = tmp.GetDataString("施行部署１");
-            obj.Dept = tmp.GetDataString("科コード");
-            obj.Doctor = tmp.GetDataString("指示医コード");
-//            obj.Staff = tmp.GetDataString("入力者コード");
-            obj.InOut = tmp.GetDataString("入外区分");
-            obj.Pat.Ins = tmp.GetDataString("保険ビット");
-            obj.SOAP = tmp.GetDataString("ＳＯＡＰ表示名称");
-            obj.SekouFlg = tmp.GetDataString("施行フラグ");
-            obj.OutSideDone = tmp.GetDataString("OUTSIDE_DONE");
-#endif
             return obj;
         }
 
@@ -176,7 +156,6 @@ namespace MedicalLibrary.Agent
             {
                 return list;
             }
-#if INNO
             string cmd = "select * from D_ORDER_HEADER t, M_PATIENT_HOKEN m" +
                 " where t.P_ID = " + pt_id + " and t.SEKOU_CODE in (" + AppString.ConcatList(sekou_list, ",") + ") and t.ORDER_DATE <= " + DateTime.Now.ToString("yyyyMMdd") +
                 " and t.P_ID = m.P_ID and t.P_HOKEN = m.P_HOKEN " +
@@ -204,20 +183,6 @@ namespace MedicalLibrary.Agent
                     }
                 }
             }
-#else
-            string cmd = "select * from ＮＴオーダーヘッダー" +
-                " where 患者コード = " + pt_id + " and 施行部署１ in (" + AppString.ConcatList(sekou_list, ",") + ") and 施行予定日 <= " + DateTime.Now.ToString("yyyyMMdd") +
-                " order by 施行予定日 desc, オーダー番号 desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-            List<string> order_ids = new List<string>();
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                list.Add(GetFromStdClass(tmp));
-                order_ids.Add(tmp.GetDataString("オーダー番号"));
-            }
-#endif
             // ComeReportData も取得する場合
             if (get_report && order_ids.Count > 0)
             {
@@ -249,7 +214,6 @@ namespace MedicalLibrary.Agent
             {
                 return list;
             }
-#if INNO
             string cmd = "select ORDER_NO, SEKOU_CODE, ORDER_DATE, DEPT, DR, INOUT, SEKOU_FLG, t2.P_ID, P_NAME, P_SEX, P_BIRTHDAY_AD " +
                 " from D_ORDER_HEADER t1 inner join M_PATIENT t2 on t1.P_ID = t2.P_ID " +
                 " where t1.SEKOU_CODE in (" + AppString.ConcatList(sekou_list, ",") + ") and t1.ORDER_DATE >= " + date1 + " and t1.ORDER_DATE <= " + date2 +
@@ -277,21 +241,6 @@ namespace MedicalLibrary.Agent
                     }
                 }
             }
-#else
-            string cmd = "select オーダー番号, 施行部署１, 施行予定日, 患者コード, 科コード, 指示医コード, 入外区分, ＳＯＡＰ表示名称, 施行フラグ, IM01RC_F04 as PT_NAME, IM01RC_F05 as PT_SEX, IM01RC_F10 as PT_BIRTH " +
-                " from ＮＴオーダーヘッダー inner join IM01RC on 患者コード = IM01RC_F01 " +
-                " where 施行部署１ in (" + AppString.ConcatList(sekou_list, ",") + ") and 施行予定日 >= " + date1 + " and 施行予定日 <= " + date2 +
-                " order by 施行予定日 desc, オーダー番号 desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-            List<string> order_ids = new List<string>();
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                list.Add(GetFromStdClass(tmp));
-                order_ids.Add(tmp.GetDataString("オーダー番号"));
-            }
-#endif
             // ComeReportData も取得する場合
             if (get_report && order_ids.Count > 0)
             {
@@ -330,7 +279,6 @@ namespace MedicalLibrary.Agent
             {
                 return list;
             }
-#if INNO
             string cmd = "select ORDER_NO, SEKOU_CODE, ORDER_DATE, DEPT, DR, INOUT, SEKOU_FLG, t2.P_ID, P_NAME, P_SEX, P_BIRTHDAY_AD, OUTSIDE_DONE " +
                 " from D_ORDER_HEADER" + Env.DB_LINK + " t1 inner join M_PATIENT" + Env.DB_LINK + " t2 on t1.P_ID = t2.P_ID left join COME_REPORT_OUTSIDE t3 on t1.ORDER_NO = t3.ORDER_ID " +
                 " where t1.SEKOU_CODE in (" + AppString.ConcatList(sekou_list, ",") + ") and t1.ORDER_DATE >= " + date1 + " and t1.ORDER_DATE <= " + date2 +
@@ -359,21 +307,6 @@ namespace MedicalLibrary.Agent
                     }
                 }
             }
-#else
-            string cmd = "select オーダー番号, 施行部署１, 施行予定日, 患者コード, 科コード, 指示医コード, 入外区分, ＳＯＡＰ表示名称, 施行フラグ, IM01RC_F04 as PT_NAME, IM01RC_F05 as PT_SEX, IM01RC_F10 as PT_BIRTH, OUTSIDE_DONE " +
-                " from ＮＴオーダーヘッダー" + Env.DB_LINK + " inner join IM01RC" + Env.DB_LINK + " on 患者コード = IM01RC_F01 left join COME_REPORT_OUTSIDE on オーダー番号 = ORDER_ID " +
-                " where 施行部署１ in (" + AppString.ConcatList(sekou_list, ",") + ") and 施行予定日 >= " + date1 + " and 施行予定日 <= " + date2 + " and ＳＯＡＰ表示名称 like '%読影依頼%'" +
-                " order by 施行予定日 desc, オーダー番号 desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
-            List<string> order_ids = new List<string>();
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                list.Add(GetFromStdClass(tmp));
-                order_ids.Add(tmp.GetDataString("オーダー番号"));
-            }
-#endif
             // ComeReportData も取得する場合
             if (get_report && order_ids.Count > 0)
             {
@@ -412,7 +345,6 @@ namespace MedicalLibrary.Agent
             {
                 return list;
             }
-#if INNO
             string cmd = "select distinct ORDER_NO, SEKOU_CODE, ORDER_DATE, DEPT, DR, INOUT, SEKOU_FLG, t2.P_ID, P_NAME, P_SEX, P_BIRTHDAY_AD " +
                 ", (select OUTSIDE_DONE from COME_REPORT_OUTSIDE t where t.ORDER_ID = t1.ORDER_NO) OUTSIDE_DONE " +
                 " from D_ORDER_HEADER" + Env.DB_LINK + " t1, M_PATIENT" + Env.DB_LINK + " t2, COME_REPORT t3 " +
@@ -444,25 +376,6 @@ namespace MedicalLibrary.Agent
                     }
                 }
             }
-#else
-            string cmd = "select distinct オーダー番号, 施行部署１, 施行予定日, 患者コード, 科コード, 指示医コード, 入外区分, ＳＯＡＰ表示名称, 施行フラグ, IM01RC_F04 as PT_NAME, IM01RC_F05 as PT_SEX, IM01RC_F10 as PT_BIRTH " +
-                ", (select OUTSIDE_DONE from COME_REPORT_OUTSIDE t where t.ORDER_ID = t1.オーダー番号) OUTSIDE_DONE " +
-                " from ＮＴオーダーヘッダー" + Env.DB_LINK + " t1, IM01RC" + Env.DB_LINK + " t2, COME_REPORT t3 " +
-                " where t1.施行部署１ in (" + AppString.ConcatList(sekou_list, ",") + ") and t1.施行予定日 >= " + date1 + " and t1.施行予定日 <= " + date2 +
-                " and t3.STATUS in (8,9) " +
-                " and t1.患者コード = t2.IM01RC_F01" +
-                " and t1.オーダー番号 = t3.ORDER_ID" +
-                " order by 施行予定日 desc, オーダー番号 desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
-            List<string> order_ids = new List<string>();
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                list.Add(GetFromStdClass(tmp));
-                order_ids.Add(tmp.GetDataString("オーダー番号"));
-            }
-#endif
             // ComeReportData も取得する場合
             if (get_report && order_ids.Count > 0)
             {
@@ -529,7 +442,6 @@ namespace MedicalLibrary.Agent
                 }
             }
 
-#if INNO
             cmd = "select ORDER_NO, SEKOU_CODE, ORDER_DATE, DEPT, DR, INOUT, SEKOU_FLG, tm.P_ID, P_NAME, P_SEX, P_BIRTHDAY_AD " +
                 " from D_ORDER_HEADER th inner join M_PATIENT tm on th.P_ID = tm.P_ID " +
                 " where ORDER_NO in (" + AppString.ConcatList(order_ids, ",") + ") " +
@@ -555,19 +467,6 @@ namespace MedicalLibrary.Agent
                     }
                 }
             }
-#else
-            cmd = "select オーダー番号, 施行部署１, 施行予定日, 患者コード, 科コード, 指示医コード, 入外区分, ＳＯＡＰ表示名称, 施行フラグ, IM01RC_F04 as PT_NAME, IM01RC_F05 as PT_SEX, IM01RC_F10 as PT_BIRTH " +
-                " from ＮＴオーダーヘッダー inner join IM01RC on 患者コード = IM01RC_F01 " +
-                " where オーダー番号 in (" + AppString.ConcatList(order_ids, ",") + ") " +
-                " order by 施行予定日 desc, オーダー番号 desc";
-
-            tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                list.Add(GetFromStdClass(tmp));
-            }
-#endif
 
             // ComeReportData も取得する場合
             if (get_report && order_ids.Count > 0)
@@ -623,15 +522,9 @@ namespace MedicalLibrary.Agent
             }
 
             // 作成途中のものは作成者にメッセージを送る。（読影依頼に出す検査のみ）
-#if INNO
             string cmd = "select th.P_ID 患者コード, th.ORDER_DATE 施行予定日, th.SEKOU_CODE 施行部署１, TAB, CONT, STAFF " +
                 " from COME_REPORT tr inner join D_ORDER_HEADER" + Env.DB_LINK + " th on tr.ORDER_ID = th.ORDER_NO " +
                 " where tr.ORDER_ID = " + order_id + " and th.ORDER_NO = " + order_id + " and STATUS = 2 and STAFF is not NULL";
-#else
-            string cmd = "select 患者コード, 施行予定日, 施行部署１, TAB, CONT, STAFF " +
-                " from COME_REPORT inner join ＮＴオーダーヘッダー" + Env.DB_LINK + " on ORDER_ID = オーダー番号 " +
-                " where ORDER_ID = " + order_id + " and オーダー番号 = " + order_id + " and STATUS = 2 and STAFF is not NULL";
-#endif
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
 
             string msg = "";
@@ -694,11 +587,7 @@ namespace MedicalLibrary.Agent
 
             if (sekou_codes.Length > 0)
             {
-#if INNO
                 sekou_sql = " and SEKOU_CODE in (" + sekou_codes + ")";
-#else
-                sekou_sql = " and 施行部署１１ in (" + sekou_codes + ")";
-#endif
             }
 
             string order_ids = "";
@@ -723,15 +612,9 @@ namespace MedicalLibrary.Agent
             }
 
             // 作成途中のものは作成者にメッセージを送る。（読影依頼に出す検査のみ）
-#if INNO
             cmd = "select th.P_ID 患者コード, th.ORDER_DATE 施行予定日, th.SEKOU_CODE 施行部署１, TAB, CONT, STAFF " +
                 " from COME_REPORT tr inner join D_ORDER_HEADER" + Env.DB_LINK + " th on tr.ORDER_ID = th.ORDER_NO " +
                 " where tr.ORDER_ID in (" + order_ids + ") and th.ORDER_NO in (" + order_ids + ") and th.ORDER_DATE <= " + end_date + " and STATUS = 2 and STAFF is not NULL" + sekou_sql;
-#else
-            cmd = "select 患者コード, 施行予定日, 施行部署１, TAB, CONT, STAFF " +
-                " from COME_REPORT inner join ＮＴオーダーヘッダー" + Env.DB_LINK + " on ORDER_ID = オーダー番号 " +
-                " where ORDER_ID in (" + order_ids + ") and オーダー番号 in (" + order_ids + ") and 施行予定日 <= " + end_date + " and STATUS = 2 and STAFF is not NULL" + sekou_sql;
-#endif
             tmp_list = StdClass.GetList(DB.Db2, cmd);
 
             string msg = "";
@@ -762,32 +645,18 @@ namespace MedicalLibrary.Agent
 
             // 指定期間を過ぎても未完成（STATUS = 2）のもので
             // 読影依頼に出す検査（＝指定した施行部署コードの検査）は院外（OUTSIDE = 1）にしてPDF対象外（STATUS = 9）にする。
-#if INNO
             cmd = "update COME_REPORT set STATUS = 9, OUTSIDE = 1 " +
                 " where (ORDER_ID, REPORT_ID) in " +
                 " (select ORDER_ID, REPORT_ID from COME_REPORT tr inner join D_ORDER_HEADER" + Env.DB_LINK + " th on tr.ORDER_ID = th.ORDER_NO " +
                 "  where tr.ORDER_ID in (" + order_ids + ") and th.ORDER_NO in (" + order_ids + ") and th.ORDER_DATE <= " + end_date + " and STATUS = 2 " + sekou_sql + ")";
-#else
-            cmd = "update COME_REPORT set STATUS = 9, OUTSIDE = 1 " +
-                " where (ORDER_ID, REPORT_ID) in " +
-                " (select ORDER_ID, REPORT_ID from COME_REPORT inner join ＮＴオーダーヘッダー" + Env.DB_LINK + " on ORDER_ID = オーダー番号 " +
-                "  where ORDER_ID in (" + order_ids + ") and オーダー番号 in (" + order_ids + ") and 施行予定日 <= " + end_date + " and STATUS = 2 " + sekou_sql + ")";
-#endif
             DB.Db2.ExecuteNonQuery(cmd);
 
             // 指定期間を過ぎても未完成（STATUS = 2）のもので
             // 読影依頼に出さない検査（＝指定外の施行部署コードの検査）はPDF対象外（STATUS = 9）にする。
-#if INNO
             cmd = "update COME_REPORT set STATUS = 9 " +
                 " where (ORDER_ID, REPORT_ID) in " +
                 " (select ORDER_ID, REPORT_ID from COME_REPORT tr inner join D_ORDER_HEADER" + Env.DB_LINK + " th on tr.ORDER_ID = th.ORDER_NO " +
                 "  where tr.ORDER_ID in (" + order_ids + ") and th.ORDER_NO in (" + order_ids + ") and th.ORDER_DATE <= " + end_date + " and STATUS = 2)";
-#else
-            cmd = "update COME_REPORT set STATUS = 9 " +
-                " where (ORDER_ID, REPORT_ID) in " +
-                " (select ORDER_ID, REPORT_ID from COME_REPORT inner join ＮＴオーダーヘッダー" + Env.DB_LINK + " on ORDER_ID = オーダー番号 " +
-                "  where ORDER_ID in (" + order_ids + ") and オーダー番号 in (" + order_ids + ") and 施行予定日 <= " + end_date + " and STATUS = 2)";
-#endif
             DB.Db2.ExecuteNonQuery(cmd);
         }
 
@@ -840,19 +709,11 @@ namespace MedicalLibrary.Agent
         static CrOrderDetail GetFromStdClass(StdClass tmp)
         {
             CrOrderDetail obj = new CrOrderDetail();
-#if INNO
             obj.OrderId = tmp.GetDataString("ORDER_NO");
             obj.Code = tmp.GetDataString("ORDER_CODE").Trim();
             obj.Name = tmp.GetDataString("ORDER_COMMENT").Trim();
             obj.Qty = tmp.GetDataDouble("QTY");
             obj.Times = tmp.GetDataFloat("TIMES");
-#else
-            obj.OrderId = tmp.GetDataString("オーダー番号");
-            obj.Code = tmp.GetDataString("オーダーコード").Trim();
-            obj.Name = tmp.GetDataString("コメント").Trim();
-            obj.Amount = tmp.GetDataDouble("数量");
-            obj.Number = tmp.GetDataInt("回数");
-#endif
             return obj;
         }
 
@@ -865,7 +726,6 @@ namespace MedicalLibrary.Agent
             {
                 return list;
             }
-#if INNO
             string cmd = "select * from D_ORDER_DETAIL " +
                 " where ORDER_NO = " + order_id +
                 " order by DETAIL_SEQ";
@@ -876,18 +736,6 @@ namespace MedicalLibrary.Agent
             {
                 list.Add(GetFromStdClass(tmp));
             }
-#else
-            string cmd = "select * from ＮＴオーダーディティール " +
-                " where オーダー番号 = " + order_id +
-                " order by 明細連番";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                list.Add(GetFromStdClass(tmp));
-            }
-#endif
             return list;
         }
     }

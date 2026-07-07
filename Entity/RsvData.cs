@@ -95,15 +95,9 @@ namespace MedicalLibrary.Entity
         {
             string s = "";
 
-#if INNO
             s += DateTimeAgent.TimeFormat6(this.Time1, 4, false);
             s += delimiter;
             s += DateTimeAgent.TimeFormat6(this.Time2, 4, false);
-#else
-            s += DateTimeAgent.TimeFormat(this.Time1, false);
-            s += delimiter;
-            s += DateTimeAgent.TimeFormat(this.Time2, false);
-#endif
 
             return s;
         }
@@ -162,7 +156,6 @@ namespace MedicalLibrary.Entity
         static RsvData GetFromStdClass(StdClass tmp)
         {
             RsvData obj = new RsvData();
-#if INNO
             obj.Code1 = tmp.DataDict["YOYAKU_CODE"].ToString();
             obj.Pat.Id = tmp.DataDict["P_ID"].ToString();
             obj.Cont1 = tmp.DataDict["COMMENT_1"].ToString().TrimEnd();
@@ -182,33 +175,6 @@ namespace MedicalLibrary.Entity
             obj.Pat.Name = tmp.GetDataString("P_NAME").Trim();
             obj.Pat.Sex = tmp.GetDataString("P_SEX");
             obj.Pat.Birth = tmp.GetDataString("P_BIRTHDAY_AD");
-#else
-            obj.Code1 = tmp.DataDict["予約種別コード"].ToString();
-            obj.Code2 = tmp.DataDict["予約詳細コード"].ToString();
-            obj.Pat.Id = tmp.DataDict["患者コード"].ToString();
-            obj.Cont1 = tmp.DataDict["備考１"].ToString().TrimEnd();
-            obj.Cont2 = tmp.DataDict["備考２"].ToString().TrimEnd();
-            int.TryParse(tmp.DataDict["予約年月日"].ToString(), out obj.RsvDate);
-            int.TryParse(tmp.DataDict["予約開始時間"].ToString(), out obj.Time1);
-            int.TryParse(tmp.DataDict["予約終了時間"].ToString(), out obj.Time2);
-            long.TryParse(tmp.DataDict["連番"].ToString(), out obj.SEQ);
-
-            if (tmp.DataDict.ContainsKey("予約種別"))
-            {
-                obj.Name1 = tmp.DataDict["予約種別"].ToString().Trim();
-            }
-
-            if (tmp.DataDict.ContainsKey("予約詳細"))
-            {
-                obj.Name2 = tmp.DataDict["予約詳細"].ToString().Trim();
-            }
-
-            obj.Staff = tmp.GetDataString("入力者コード");
-
-            obj.Pat.Name = tmp.GetDataString("IM01RC_F04").Trim();
-            obj.Pat.Sex = tmp.GetDataString("IM01RC_F05");
-            obj.Pat.Birth = tmp.GetDataString("IM01RC_F10");
-#endif
             return obj;
         }
 
@@ -228,7 +194,6 @@ namespace MedicalLibrary.Entity
             {
                 return dict;
             }
-#if INNO
             string cmd = "select t.*, Trim(tp.P_NAME) 氏名, tp.P_SEX 性別, tp.P_BIRTHDAY_AD 生年月日 " +
                 " from D_YOYAKU t, M_PATIENT tp " +
                 " where t.YOYAKU_CODE = " + code1 +
@@ -237,26 +202,6 @@ namespace MedicalLibrary.Entity
                 " order by t.YOYAKU_DATE, t.YOYAKU_TIME_S, t.YOYAKU_NO";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select t.*, Trim(tp.IM01RC_F04) 氏名, tp.IM01RC_F05 性別, tp.IM01RC_F10 生年月日 " +
-                " from macs.予約データ t, macs.IM01RC tp " +
-                " where t.予約種別コード = " + code1;
-
-            if (code2.Length > 0)
-            {
-                cmd += " and t.予約詳細コード = " + code2;
-            }
-            else
-            {
-                cmd += " and t.予約詳細コード = 0";
-            }
-
-            cmd += " and t.予約年月日 >= " + date1 + " and t.予約年月日 <= " + date2 +
-                " and t.患者コード = tp.IM01RC_F01 " +
-                " order by t.予約年月日, t.予約開始時間, t.連番";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             foreach (StdClass tmp in tmp_list)
             {
                 RsvData obj = RsvData.GetFromStdClass(tmp);
@@ -296,7 +241,6 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "select t.*, Trim(tp.P_NAME) 氏名, tp.P_SEX 性別, tp.P_BIRTHDAY_AD 生年月日 " +
                 " from D_YOYAKU t, M_PATIENT tp " +
                 " where t.YOYAKU_CODE = " + code1 +
@@ -305,26 +249,6 @@ namespace MedicalLibrary.Entity
                 " order by t.YOYAKU_DATE, t.YOYAKU_TIME_S, t.YOYAKU_NO";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select t.*, Trim(tp.IM01RC_F04) 氏名, tp.IM01RC_F05 性別, tp.IM01RC_F10 生年月日 " +
-                " from macs.予約データ t, macs.IM01RC tp " +
-                " where t.予約種別コード = " + code1;
-
-            if (code2.Length > 0)
-            {
-                cmd += " and t.予約詳細コード = " + code2;
-            }
-            else
-            {
-                cmd += " and t.予約詳細コード = 0";
-            }
-
-            cmd += " and t.予約年月日 >= " + date1 + " and t.予約年月日 <= " + date2 +
-                " and t.患者コード = tp.IM01RC_F01 " +
-                " order by t.予約年月日, t.予約開始時間, t.連番";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             foreach (StdClass tmp in tmp_list)
             {
                 RsvData obj = RsvData.GetFromStdClass(tmp);
@@ -356,7 +280,6 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "select t.*, Trim(tp.P_NAME) 氏名, tp.P_SEX 性別, tp.P_BIRTHDAY_AD 生年月日 " +
                 " from D_YOYAKU t, M_PATIENT tp " +
                 " where t.YOYAKU_CODE = " + code1 +
@@ -367,28 +290,6 @@ namespace MedicalLibrary.Entity
                 " order by t.YOYAKU_DATE, t.YOYAKU_TIME_S, t.YOYAKU_NO";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select t.*, Trim(tp.IM01RC_F04) 氏名, tp.IM01RC_F05 性別, tp.IM01RC_F10 生年月日 " +
-                " from macs.予約データ t, macs.IM01RC tp " +
-                " where t.予約種別コード = " + code1;
-
-            if (code2.Length > 0)
-            {
-                cmd += " and t.予約詳細コード = " + code2;
-            }
-            else
-            {
-                cmd += " and t.予約詳細コード = 0";
-            }
-
-            cmd += " and t.予約年月日 = " + rsv_date +
-                " and t.予約開始時間 < " + time2 +
-                " and t.予約終了時間 > " + time1 +
-                " and t.患者コード = tp.IM01RC_F01 " +
-                " order by t.予約年月日, t.予約開始時間, t.連番";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             foreach (StdClass tmp in tmp_list)
             {
                 RsvData obj = RsvData.GetFromStdClass(tmp);
@@ -416,21 +317,12 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "select t1.*, m.P_NAME, m.P_SEX, m.P_BIRTHDAY_AD " +
                 " from D_YOYAKU t1, M_PATIENT m " +
                 " where t1.YOYAKU_DATE = " + crit_date +
                 " and t1.P_ID = m.P_ID ";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select t1.*, m.IM01RC_F04, m.IM01RC_F05, m.IM01RC_F10 " +
-                " from macs.予約データ t1, macs.IM01RC m " +
-                " where t1.予約年月日 = " + crit_date +
-                " and t1.患者コード = m.IM01RC_F01 ";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             foreach (StdClass tmp in tmp_list)
             {
                 RsvData obj = RsvData.GetFromStdClass(tmp);
@@ -461,7 +353,6 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "select t1.*, m.P_NAME, m.P_SEX, m.P_BIRTHDAY_AD " +
                 " from D_YOYAKU t1, M_PATIENT m " +
                 " where t1.YOYAKU_DATE = " + crit_date +
@@ -470,16 +361,6 @@ namespace MedicalLibrary.Entity
                 " order by t1.P_ID, t1.YOYAKU_TIME_S, t1.YOYAKU_TIME_E";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select t1.*, m.IM01RC_F04, m.IM01RC_F05, m.IM01RC_F10 " +
-                " from macs.予約データ t1, macs.IM01RC m " +
-                " where t1.予約年月日 = " + crit_date +
-                " and (t1.予約種別コード in (" + AppString.ConcatList(code_list, ",") + ") or t1.予約詳細コード in (" + AppString.ConcatList(code_list, ",") + "))" +
-                " and t1.患者コード = m.IM01RC_F01 " +
-                " order by t1.患者コード, t1.予約開始時間, t1.予約終了時間";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             foreach (StdClass tmp in tmp_list)
             {
                 RsvData obj = RsvData.GetFromStdClass(tmp);
@@ -503,7 +384,6 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "select td.*, " +
                 " (select tm.S_NAME from M_YOYAKU_NAME tm where tm.CODE = td.YOYAKU_CODE) YOYAKU_NAME " +
                 " from D_YOYAKU td " +
@@ -511,16 +391,6 @@ namespace MedicalLibrary.Entity
                 " order by td.YOYAKU_DATE desc, td.YOYAKU_TIME_S";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select td.*, " +
-                " (select tm.TM50RC_F04 from macs.TM50RC tm where tm.TM50RC_F01 = 50 and tm.TM50RC_F02 = td.予約種別コード) 予約種別, " +
-                " case when td.予約詳細コード > 0 then (select tm.TM50RC_F04 from macs.TM50RC tm where tm.TM50RC_F01 = 51 and tm.TM50RC_F02 = td.予約詳細コード) else null end 予約詳細 " +
-                " from macs.予約データ td " +
-                " where td.患者コード = " + pt_id +
-                " order by td.予約年月日 desc, td.予約開始時間";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             foreach (StdClass tmp in tmp_list)
             {
                 RsvData obj = RsvData.GetFromStdClass(tmp);
@@ -546,7 +416,6 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "select td.*, " +
                 " (select tm.S_NAME from M_YOYAKU_NAME tm where tm.CODE = td.YOYAKU_CODE) YOYAKU_NAME " +
                 " from D_YOYAKU td " +
@@ -555,17 +424,6 @@ namespace MedicalLibrary.Entity
                 " order by td.YOYAKU_DATE, td.YOYAKU_CODE, td.YOYAKU_TIME_S";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select td.*, " +
-                " (select tm.TM50RC_F04 from macs.TM50RC tm where tm.TM50RC_F01 = 50 and tm.TM50RC_F02 = td.予約種別コード) 予約種別, " +
-                " case when td.予約詳細コード > 0 then (select tm.TM50RC_F04 from macs.TM50RC tm where tm.TM50RC_F01 = 51 and tm.TM50RC_F02 = td.予約詳細コード) else null end 予約詳細 " +
-                " from macs.予約データ td " +
-                " where td.患者コード = " + pt_id +
-                " and td.予約年月日 >= " + date1 + " and td.予約年月日 <= " + date2 +
-                " order by td.予約年月日, td.予約種別コード, td.予約開始時間";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             foreach (StdClass tmp in tmp_list)
             {
                 RsvData obj = RsvData.GetFromStdClass(tmp);
@@ -580,103 +438,12 @@ namespace MedicalLibrary.Entity
         public StdReturn Insert()
         {
             StdReturn sr = new StdReturn();
-#if INNO
-#else
-            int yyMMdd = int.Parse(DateTime.Now.ToString("yyMMdd"));
-
-            // その日の最初の予約かどうか
-            bool first_flg = false;
-
-
-            // 連番を取得する
-            long num = 0;
-
-            string cmd = "select 連番 from ＮＴ連番ファイル t " +
-                " where t.区分 = 2 and t.年月日 = " + yyMMdd;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                long.TryParse(tmp.DataDict["連番"].ToString(), out num);
-                break;
-            }
-
-            if (num == 0)
-            {
-                num = yyMMdd * 100000000 + 1;
-                first_flg = true;
-            }
-
-            StdDbClass obj = new StdDbClass();
-
-            // 予約を挿入する
-            obj.Db = DB.Db1;
-            obj.Table = "予約データ";
-
-            obj.DataList.Add(new StdDbColumn("予約種別コード", StdDbType.NUMBER, this.Code1));
-            obj.DataList.Add(new StdDbColumn("予約年月日", StdDbType.NUMBER, this.RsvDate));
-            obj.DataList.Add(new StdDbColumn("予約開始時間", StdDbType.NUMBER, this.Time1));
-            obj.DataList.Add(new StdDbColumn("患者コード", StdDbType.NUMBER, this.Pat.Id));
-            obj.DataList.Add(new StdDbColumn("予約終了時間", StdDbType.NUMBER, this.Time2));
-
-            obj.DataList.Add(new StdDbColumn("備考１", StdDbType.VARCHAR2, this.Cont1));
-            obj.DataList.Add(new StdDbColumn("備考２", StdDbType.VARCHAR2, this.Cont2));
-
-            obj.DataList.Add(new StdDbColumn("入力者コード", StdDbType.NUMBER, LoginUser.Id));
-            obj.DataList.Add(new StdDbColumn("予約詳細コード", StdDbType.NUMBER, (this.Code2.Length > 0) ? this.Code2 : "0"));
-            obj.DataList.Add(new StdDbColumn("特別枠", StdDbType.NUMBER, 1));
-            obj.DataList.Add(new StdDbColumn("連番", StdDbType.NUMBER, num));
-
-            sr = obj.InsertSQL();
-
-
-            // 連番をインクリメントする
-            obj.Table = "ＮＴ連番ファイル";
-
-            num++;
-            obj.DataList.Clear();
-
-            if (first_flg)
-            {
-                obj.DataList.Add(new StdDbColumn("区分", StdDbType.NUMBER, 2));
-                obj.DataList.Add(new StdDbColumn("科コード", StdDbType.NUMBER, 0));
-                obj.DataList.Add(new StdDbColumn("年月日", StdDbType.NUMBER, yyMMdd));
-                obj.DataList.Add(new StdDbColumn("連番", StdDbType.NUMBER, num));
-
-                sr = obj.InsertSQL();
-            }
-            else
-            {
-                obj.DataList.Add(new StdDbColumn("連番", StdDbType.NUMBER, num));
-
-                obj.WhereList.Add("区分 = 2");
-                obj.WhereList.Add("科コード = 0");
-                obj.WhereList.Add("年月日 = " + yyMMdd);
-
-                sr = obj.UpdateSQL();
-            }
-#endif
             return sr;
         }
 
         public StdReturn Delete()
         {
             StdReturn sr = new StdReturn();
-#if INNO
-#else
-            StdDbClass obj = new StdDbClass();
-
-            obj.Db = DB.Db1;
-            obj.Table = "予約データ";
-
-            obj.WhereList.Add("予約種別コード = " + this.Code1);
-            obj.WhereList.Add("予約年月日 = " + this.RsvDate);
-            obj.WhereList.Add("予約開始時間 = " + this.Time1);
-            obj.WhereList.Add("患者コード = " + this.Pat.Id);
-
-            sr = obj.DeleteSQL();
-#endif
             return sr;
         }
     }

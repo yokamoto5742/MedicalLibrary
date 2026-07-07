@@ -509,17 +509,10 @@ namespace MedicalLibrary.Entity
                 return obj;
             }
 
-#if INNO
             string cmd = "select * from M_PATIENT " +
                 " where P_ID = " + pt_id;
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select * from IM01RC " +
-                " where IM01RC_F01 = " + pt_id;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {
@@ -544,17 +537,10 @@ namespace MedicalLibrary.Entity
             {
                 if (pts.Length == 0) break;
 
-#if INNO
                 string cmd = "select * from M_PATIENT " +
                     " where P_ID in (" + pts + ")";
 
                 List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-                string cmd = "select * from IM01RC " +
-                    " where IM01RC_F01 in (" + pts + ")";
-
-                List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
                 foreach (StdClass tmp in tmp_list)
                 {
@@ -574,7 +560,6 @@ namespace MedicalLibrary.Entity
                 return list;
             }
 
-#if INNO
             List<string> conds = new List<string>();
             string cond = "";
 
@@ -624,57 +609,6 @@ namespace MedicalLibrary.Entity
                 " order by P_ID";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            List<string> conds = new List<string>();
-            string cond = "";
-
-            if (name.Length > 0)
-            {
-                cond = "(IM01RC_F04 like '%" + name + "%' ";
-
-                if (name.Contains(" "))
-                {
-                    cond += " or IM01RC_F04 like '%" + name.Replace(' ', '　') + "%' ";
-                }
-                else if (name.Contains("　"))
-                {
-                    cond += " or IM01RC_F04 like '%" + name.Replace('　', ' ') + "%' ";
-                }
-
-                cond += ")";
-
-                conds.Add(cond);
-            }
-
-            if (kana.Length > 0)
-            {
-                cond = "(IM01RC_F03 like '%" + kana + "%' ";
-
-                if (kana.Contains(" "))
-                {
-                    cond += " or IM01RC_F03 like '%" + kana.Replace(' ', '　') + "%' ";
-                }
-                else if (name.Contains("　"))
-                {
-                    cond += " or IM01RC_F03 like '%" + kana.Replace('　', ' ') + "%' ";
-                }
-
-                cond += ")";
-
-                conds.Add(cond);
-            }
-
-            if (birth.Length == 8)
-            {
-                conds.Add("(IM01RC_F10 = " + birth + ")");
-            }
-
-            string cmd = "select * from IM01RC t " +
-                " where " + AppString.ConcatList(conds, " and ") +
-                " order by IM01RC_F01";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {
@@ -688,7 +622,6 @@ namespace MedicalLibrary.Entity
         {
             PatBase obj = new PatBase();
 
-#if INNO
             obj.Id = tmp.GetDataString("P_ID");
             obj.Name = tmp.GetDataString("P_NAME").Trim();
             obj.Kana = tmp.GetDataString("P_KANA").Trim();
@@ -714,33 +647,6 @@ namespace MedicalLibrary.Entity
             obj.Dead = tmp.GetDataString("PROPERTY_2");
             obj.FacilityCode = tmp.GetDataString("PROPERTY_3");
             obj.NoteCode = tmp.GetDataString("PROPERTY_4");
-#else
-            obj.Id = tmp.GetDataString("IM01RC_F01");
-            obj.Name = tmp.GetDataString("IM01RC_F04").Trim();
-            obj.Kana = tmp.GetDataString("IM01RC_F03").Trim();
-            obj.Sex = tmp.GetDataString("IM01RC_F05");
-            obj.Birth = tmp.GetDataString("IM01RC_F10");
-
-            obj.Tel = tmp.GetDataString("IM01RC_F08").Trim();
-            obj.Post = tmp.GetDataString("IM01RC_F14").Trim();
-            obj.Addr1 = tmp.GetDataString("IM01RC_F15").Trim();
-            obj.Addr2 = tmp.GetDataString("IM01RC_F16").Trim();
-
-            if (tmp.GetDataString("IM01RC_F24").Equals("1"))
-            {
-                obj.InOut = "2";
-            }
-            else
-            {
-                obj.InOut = "1";
-            }
-
-            obj.Ins = tmp.GetDataString("IM01RC_F31");
-
-            obj.Dead = tmp.GetDataString("IM01RC_F13_2");
-            obj.FacilityCode = tmp.GetDataString("IM01RC_F13_3");
-            obj.NoteCode = tmp.GetDataString("IM01RC_F13_4");
-#endif
             return obj;
         }
 
@@ -795,15 +701,9 @@ namespace MedicalLibrary.Entity
         /// <param name="force">true: 強制的に削除, false: 電子カルテが動いていなければ削除</param>
         public static void DeletePatCSV(bool force = false)
         {
-#if INNO
             string processName = "InnoKarte";
             string patFile = Env.INNO_HOME + @"\Pat.csv";
             string patFile2 = Env.INNO_HOME + @"\Pat2.csv";
-#else
-			string processName = "KARTE";
-			string patFile = Env.LEGACY_HOME + @"\Pat.csv";
-			string patFile2 = Env.LEGACY_HOME + @"\Pat2.csv";
-#endif
             if (force || System.Diagnostics.Process.GetProcessesByName(processName).Length == 0)
             {
                 if (File.Exists(patFile))
@@ -877,11 +777,7 @@ namespace MedicalLibrary.Entity
 
             try
             {
-#if INNO
                 string patDir = Env.INNO_HOME;
-#else
-				string patDir = Env.LEGACY_HOME;
-#endif
                 if (Directory.Exists(patDir))
                 {
                     string patFile = patDir + @"\pat.csv";
@@ -929,7 +825,6 @@ namespace MedicalLibrary.Entity
                 {
                     if (dict.Count == 0)
                     {
-#if INNO
                         foreach (StdMaster1 m in StdMaster1.GetDict("M_PROPERTY_3").Values)
                         {
                             Facility obj = new Facility();
@@ -943,21 +838,6 @@ namespace MedicalLibrary.Entity
                                 dict.Add(obj.Code, obj);
                             }
                         }
-#else
-                        foreach (StdMaster1 m in StdMaster1.GetDict("IM5103RC").Values)
-                        {
-                            Facility obj = new Facility();
-
-                            obj.Code = m.Code;
-                            obj.Name = m.Name;
-                            obj.Short = m.Short;
-
-                            if (!dict.ContainsKey(obj.Code))
-                            {
-                                dict.Add(obj.Code, obj);
-                            }
-                        }
-#endif
                     }
 
                     return dict;
@@ -1085,7 +965,6 @@ namespace MedicalLibrary.Entity
                 {
                     if (dict.Count == 0)
                     {
-#if INNO
                         foreach (StdMaster1 m in StdMaster1.GetDict("M_PROPERTY_4").Values)
                         {
                             Note obj = new Note();
@@ -1099,21 +978,6 @@ namespace MedicalLibrary.Entity
                                 dict.Add(obj.Code, obj);
                             }
                         }
-#else
-                        foreach (StdMaster1 m in StdMaster1.GetDict("IM5104RC").Values)
-                        {
-                            Note obj = new Note();
-
-                            obj.Code = m.Code;
-                            obj.Name = m.Name;
-                            obj.Short = m.Short;
-
-                            if (!dict.ContainsKey(obj.Code))
-                            {
-                                dict.Add(obj.Code, obj);
-                            }
-                        }
-#endif
                     }
 
                     return dict;

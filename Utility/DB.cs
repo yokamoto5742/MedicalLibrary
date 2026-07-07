@@ -13,9 +13,7 @@ namespace MedicalLibrary.Utility
     {
         public static DB Db1 = new DB();
         public static DB Db2 = new DB();
-#if INNO
         public static DB Db3 = new DB();
-#endif
         public OracleConnection Connection = new OracleConnection();
         public OracleCommand Command = new OracleCommand();
 

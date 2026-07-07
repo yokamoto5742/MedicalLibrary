@@ -54,19 +54,11 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string cmd = "select * from D_KARTE_MEMO t " +
                 " where t.P_ID = " + pt_id +
                 " order by t.INOUT";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select * from macs.ADT_患者サマリデータ t " +
-                " where t.患者コード = " + pt_id +
-                " order by t.入外区分";
-
-            List<StdClass> tmp_list = StdClass.GetList(Db, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {
@@ -86,17 +78,10 @@ namespace MedicalLibrary.Entity
                 return obj;
             }
 
-#if INNO
             string cmd = "select * from D_KARTE_MEMO t " +
                 " where t.P_ID = " + pt_id + " and t.INOUT = " + in_out;
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select * from macs.ADT_患者サマリデータ t " +
-                " where t.患者コード = " + pt_id + " and t.入外区分 = " + in_out;
-
-            List<StdClass> tmp_list = StdClass.GetList(Db, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {
@@ -137,13 +122,8 @@ namespace MedicalLibrary.Entity
         {
             Memo obj = new Memo();
 
-#if INNO
             obj.InOut = tmp.DataDict["INOUT"].ToString();
             obj.Cont = tmp.DataDict["KARTE_MEMO"].ToString();
-#else
-            obj.InOut = tmp.DataDict["入外区分"].ToString();
-            obj.Cont = tmp.DataDict["サマリ内容"].ToString();
-#endif
 
             obj.BaseFromStdClass(tmp);
 
@@ -157,7 +137,6 @@ namespace MedicalLibrary.Entity
 
             StdDbClass obj = new StdDbClass();
 
-#if INNO
             obj.Db = DB.Db3;
             obj.Table = "D_KARTE_MEMO";
 
@@ -185,35 +164,6 @@ namespace MedicalLibrary.Entity
 
                 sr = obj.InsertSQL();
             }
-#else
-            obj.Db = DB.Db1;
-            obj.Table = "ADT_患者サマリデータ";
-
-            obj.DataList.Add(new StdDbColumn("サマリ内容", StdDbType.VARCHAR2, this.Cont));
-
-            obj.DataList.Add(new StdDbColumn("更新日", StdDbType.NUMBER, DateTime.Now.ToString("yyyyMMdd")));
-            obj.DataList.Add(new StdDbColumn("更新時間", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
-            obj.DataList.Add(new StdDbColumn("更新者", StdDbType.NUMBER, LoginUser.Id));
-            obj.DataList.Add(new StdDbColumn("代行更新者", StdDbType.NUMBER, LoginUser.Id2));
-
-            obj.WhereList.Add("患者コード = " + this.PtId);
-            obj.WhereList.Add("入外区分 = " + this.InOut);
-
-            sr = obj.UpdateSQL();
-
-            if (sr.IntValue == 0)
-            {
-                obj.DataList.Add(new StdDbColumn("患者コード", StdDbType.NUMBER, this.PtId));
-                obj.DataList.Add(new StdDbColumn("入外区分", StdDbType.NUMBER, this.InOut));
-
-                obj.DataList.Add(new StdDbColumn("登録日", StdDbType.NUMBER, DateTime.Now.ToString("yyyyMMdd")));
-                obj.DataList.Add(new StdDbColumn("登録時間", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
-                obj.DataList.Add(new StdDbColumn("登録者", StdDbType.NUMBER, LoginUser.Id));
-                obj.DataList.Add(new StdDbColumn("代行登録者", StdDbType.NUMBER, LoginUser.Id2));
-
-                sr = obj.InsertSQL();
-            }
-#endif
 
             return sr;
         }

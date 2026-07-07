@@ -234,7 +234,6 @@ namespace MedicalLibrary.Entity
 
         public PatOrderDetail(StdClass tmp)
         {
-#if INNO
             this.OrderId = tmp.GetDataString("ORDER_NO");
             this.DetailId = tmp.GetDataString("DETAIL_SEQ");
             this.Pat.Id = tmp.GetDataString("P_ID");
@@ -255,28 +254,6 @@ namespace MedicalLibrary.Entity
             this.ReceShinku1 = tmp.GetDataString("IJI_SHINKU_G");
             this.ReceShinku2 = tmp.GetDataString("IJI_SHINKU_N");
             this.IppanNameFlg = tmp.GetDataString("IPPAN_FLG");
-#else
-            this.OrderId = tmp.GetDataString("オーダー番号").Trim();
-            this.DetailId = tmp.GetDataString("明細連番").Trim();
-            this.Pat.Id = tmp.GetDataString("患者コード").Trim();
-            this.SekouDate = tmp.GetDataString("施行予定日").Trim();
-            this.KouiCode = tmp.GetDataString("ＳＤＣＤ");
-            this.Code = tmp.GetDataString("オーダーコード").Trim();
-            this.Name = tmp.GetDataString("コメント").Trim();
-            this.Qty = tmp.GetDataFloat("数量");
-            this.QtyString = tmp.GetDataString("表示数量").Trim();
-            this.QtyFormat = tmp.GetDataInt("数量編集");
-            this.DataType = tmp.GetDataInt("データ区分");
-            this.Unit = tmp.GetDataString("単位").Trim();
-            this.Times = tmp.GetDataFloat("回数");
-            this._RsvCode = tmp.GetDataString("予備フラグ７");
-
-			// 2019/03/22
-			// MACSPROASCONV2 からの取得
-			// 動作検証しにくいため保留とする
-//			this.ReceCode1 = tmp.GetDataString("IJI_CODE_G").Length > 0 ? tmp.GetDataString("IJI_CODE_G") : this.Code;
-//			this.ReceCode2 = tmp.GetDataString("IJI_CODE_N").Length > 0 ? tmp.GetDataString("IJI_CODE_N") : this.Code;
-#endif
         }
 
         /// <summary>
@@ -292,7 +269,6 @@ namespace MedicalLibrary.Entity
             {
                 return tmpList;
             }
-#if INNO
             string cmd = "select td.*, tm.S_NAME, tm.UNIT, tm.QTY_FORMAT, tm.DATA_TYPE, tm.YOYAKU_TYPE " +
                 " , tm.IJI_CODE_G, tm.IJI_CODE_N, tm.IJI_SHINKU_G, tm.IJI_SHINKU_N, tm.IPPAN_FLG " +
                 " from D_ORDER_DETAIL td, M_ORDER tm " +
@@ -303,17 +279,6 @@ namespace MedicalLibrary.Entity
                 " order by td.DETAIL_SEQ";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select td.*, tm.単位, tm.数量編集, tm.データ区分, tm.予備フラグ７ " +
-//				" , (select t2.プロアスコード from macs.MACSPROASCONV2 t2 where t2.オーダーコード = td.オーダーコード and t2.入外区分 = 1 and t2.世代区分 = 2) IJI_CODE_G " +
-//				" , (select t2.プロアスコード from macs.MACSPROASCONV2 t2 where t2.オーダーコード = td.オーダーコード and t2.入外区分 = 2 and t2.世代区分 = 2) IJI_CODE_N " +
-                " from ＮＴオーダーディティール td, ＮＴオーダーマスター tm " +
-                " where td.オーダー番号 = " + order_id +
-                " and tm.オーダーコード(+) = td.オーダーコード " +
-                " order by td.明細連番";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             foreach (StdClass tmp in tmp_list)
             {
                 tmpList.Add(new PatOrderDetail(tmp));
@@ -338,7 +303,6 @@ namespace MedicalLibrary.Entity
 
             foreach (string s in AppString.ConcatLists(order_id_list, ","))
             {
-#if INNO
                 string cmd = "select td.*, tm.S_NAME, tm.UNIT, tm.QTY_FORMAT, tm.DATA_TYPE, tm.YOYAKU_TYPE " +
                     " , tm.IJI_CODE_G, tm.IJI_CODE_N, tm.IJI_SHINKU_G, tm.IJI_SHINKU_N, tm.IPPAN_FLG " +
                     " from D_ORDER_DETAIL td, M_ORDER tm " +
@@ -349,17 +313,6 @@ namespace MedicalLibrary.Entity
                     " order by td.ORDER_DATE desc, td.ORDER_NO, td.DETAIL_SEQ";
 
                 List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-                string cmd = "select td.*, tm.単位, tm.数量編集, tm.データ区分, tm.予備フラグ７ " +
-//					" , (select t2.プロアスコード from macs.MACSPROASCONV2 t2 where t2.オーダーコード = td.オーダーコード and t2.入外区分 = 1 and t2.世代区分 = 2) IJI_CODE_G " +
-//					" , (select t2.プロアスコード from macs.MACSPROASCONV2 t2 where t2.オーダーコード = td.オーダーコード and t2.入外区分 = 2 and t2.世代区分 = 2) IJI_CODE_N " +
-					" from ＮＴオーダーディティール td, ＮＴオーダーマスター tm " +
-                    " where td.オーダー番号 in (" + s + ")" +
-                    " and tm.オーダーコード(+) = td.オーダーコード " +
-                    " order by td.施行予定日 desc, td.オーダー番号, td.明細連番";
-
-                List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
                 foreach (StdClass tmp in tmp_list)
                 {
                     tmpList.Add(new PatOrderDetail(tmp));
@@ -418,7 +371,6 @@ namespace MedicalLibrary.Entity
 
                 master_codes += "'" + s + "'";
             }
-#if INNO
             string cmd = "select td.*, tm.S_NAME, tm.UNIT, tm.QTY_FORMAT, tm.DATA_TYPE, tm.YOYAKU_TYPE " +
                 " , tm.IJI_CODE_G, tm.IJI_CODE_N, tm.IJI_SHINKU_G, tm.IJI_SHINKU_N, tm.IPPAN_FLG " +
                 " from D_ORDER_DETAIL td, M_ORDER tm " +
@@ -436,24 +388,6 @@ namespace MedicalLibrary.Entity
             {
                 tmpList.Add(new PatOrderDetail(tmp));
             }
-#else
-            string cmd = "select td.*, tm.単位, tm.数量編集, tm.データ区分, tm.予備フラグ７ " +
-//				" , (select t2.プロアスコード from macs.MACSPROASCONV2 t2 where t2.オーダーコード = td.オーダーコード and t2.入外区分 = 1 and t2.世代区分 = 2) IJI_CODE_G " +
-//				" , (select t2.プロアスコード from macs.MACSPROASCONV2 t2 where t2.オーダーコード = td.オーダーコード and t2.入外区分 = 2 and t2.世代区分 = 2) IJI_CODE_N " +
-				" from ＮＴオーダーディティール td, ＮＴオーダーマスター tm " +
-                " where td.施行予定日 >= " + s_date +
-                " and td.施行予定日 <= " + e_date +
-                " and td.オーダーコード in (" + master_codes + ")" +
-                " and tm.オーダーコード(+) = td.オーダーコード " +
-                " order by td.施行予定日 desc, td.オーダー番号, td.明細連番";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                tmpList.Add(new PatOrderDetail(tmp));
-            }
-#endif
             return tmpList;
         }
 

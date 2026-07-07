@@ -16,7 +16,6 @@ namespace MedicalLibrary.Utility
         public static string FilePath(string f)
         {
             string s = "";
-#if INNO
             if (File.Exists(f))
             {
                 s = Path.GetFullPath(f);
@@ -45,28 +44,6 @@ namespace MedicalLibrary.Utility
             {
                 s = Env.LEGACY_HOME + "\\" + f;
             }
-#else
-			if (File.Exists(f))
-            {
-                s = Path.GetFullPath(f);
-            }
-			else if (File.Exists(Directory.GetCurrentDirectory() + "\\" + f))
-			{
-				s = Directory.GetCurrentDirectory() + "\\" + f;
-			}
-			else if (File.Exists(Env.KARTE_HOME + "\\" + f))
-            {
-                s = Env.KARTE_HOME + "\\" + f;
-            }
-            else if (File.Exists(Env.AGENT_HOME + "\\" + f))
-            {
-                s = Env.AGENT_HOME + "\\" + f;
-            }
-            else if (File.Exists(Env.LEGACY_HOME + "\\" + f))
-            {
-                s = Env.LEGACY_HOME + "\\" + f;
-            }
-#endif
             return s;
         }
 /*

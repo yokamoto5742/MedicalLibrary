@@ -37,7 +37,6 @@ namespace MedicalLibrary.Entity
                 return list;
             }
 
-#if INNO
             string cmd = "select tt.P_ID, tt.UKE_NO, count(*) AMOUNT, sum(tt.SHINSATSU_END) ENDS " +
                 " from " +
                 " (select t.P_ID, t.UKE_NO " +
@@ -61,31 +60,6 @@ namespace MedicalLibrary.Entity
 
                 list.Add(obj);
             }
-#else
-            string cmd = "select tt.患者コード, tt.受付ＮＯ, count(*) 合計, sum(tt.診察終了) 終了 " +
-                " from " +
-                " (select t.患者コード, t.受付ＮＯ " +
-                " , case when t.変更科コード != 0 then t.変更科コード else t.科コード end 科コード " +
-                " , decode(t.診察終了時間, 0, 0, 1) 診察終了 " +
-                " from macs.ADT_診察状況データ t " +
-                " where t.受付日 = " + come_date + ") tt " +
-                " group by tt.患者コード, tt.受付ＮＯ " +
-                " order by tt.患者コード, tt.受付ＮＯ";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatOutKarteStatus obj = new PatOutKarteStatus();
-
-                obj.Id = tmp.DataDict["患者コード"].ToString();
-                obj.Seq1 = tmp.DataDict["受付ＮＯ"].ToString();
-                int.TryParse(tmp.DataDict["合計"].ToString(), out obj.Amount);
-                int.TryParse(tmp.DataDict["終了"].ToString(), out obj.End);
-
-                list.Add(obj);
-            }
-#endif
             return list;
         }
     }

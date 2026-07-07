@@ -86,7 +86,6 @@ namespace MedicalLibrary.Entity
             {
                 return dict;
             }
-#if INNO
             string cmd = "select distinct t.SOAP_DATE, t.INOUT, t.DEPT " +
                 " from medb.D_SOAP_HEADER t " +
                 " where t.P_ID = " + pt_id +
@@ -117,49 +116,6 @@ namespace MedicalLibrary.Entity
                     dict.Add(obj.Date.ToString(), soap_list);
                 }
             }
-#else
-            string cmd = "select t1.ＳＯＡＰ対象日 登録日, t1.入外区分 入外, t1.登録科 科コード " +
-                " from macs.ADT_ＳＯＡＰデータヘッダ t1 " +
-                " where t1.患者コード = " + pt_id +
-                " and t1.ＳＯＡＰ対象日 <= " + crit_date +
-                " and t1.削除フラグ = 0 " +
-                "  union " +
-                " select t2.ＰＤＦ登録日 登録日, 0 入外, t2.科コード from macs.ＰＤＦ登録データ t2 " +
-                " where t2.患者コード = " + pt_id +
-                " and t2.ＰＤＦ登録日 <= " + crit_date +
-                " and t2.書類コード in (select tm.書類コード from macs.ＰＤＦ書類マスター tm where tm.表示対象フラグ = 1) " +
-                " and t2.削除区分 = 0 " +
-                "  union " +
-                " select t3.施行予定日 登録日, t3.入外区分 入外, t3.科コード from macs.ＮＴオーダーヘッダー t3 " +
-                " where t3.患者コード = " + pt_id +
-                " and t3.施行予定日 <= " + crit_date +
-                " and t3.施行予定日 < 99999999 " +
-                " order by 登録日 desc";
-
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                SoapDate obj = new SoapDate();
-
-                obj.PtId = pt_id;
-                int.TryParse(tmp.DataDict["登録日"].ToString(), out obj.Date);
-                int.TryParse(tmp.DataDict["入外"].ToString(), out obj.InOut);
-                obj.Dept = tmp.DataDict["科コード"].ToString();
-
-                if (dict.ContainsKey(obj.Date.ToString()))
-                {
-                    dict[obj.Date.ToString()].Add(obj);
-                }
-                else
-                {
-                    List<SoapDate> soap_list = new List<SoapDate>();
-                    soap_list.Add(obj);
-                    dict.Add(obj.Date.ToString(), soap_list);
-                }
-            }
-#endif
             return dict;
         }
     }

@@ -365,7 +365,6 @@ namespace MedicalLibrary.Utility
         /// <returns></returns>
         public static Process PdfViewer()
         {
-#if INNO
             string exe = AppFile.FilePath(@"c:\shinseikai\PdfView\PdfView.exe");
             string args = "";
 
@@ -377,9 +376,6 @@ namespace MedicalLibrary.Utility
             {
                 return null;
             }
-#else
-            return MacsProgram.PdfKarteShow();
-#endif
         }
     }
 }

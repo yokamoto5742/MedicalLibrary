@@ -372,7 +372,6 @@ namespace MedicalLibrary.Entity
         {
             Staff obj = new Staff();
 
-#if INNO
 			try
 			{
 				// InnoUketsukeLib で認証
@@ -393,13 +392,6 @@ namespace MedicalLibrary.Entity
                 " where CODE = " + id;
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select IM90RC_F01 コード, Trim(IM90RC_F03) 氏名, IM90RC_F04 所属, IM90RC_F08 資格, IM90RC_F13 科コード, IM90RC_F14 医師コード " +
-                " from IM90RC " +
-                " where IM90RC_F01 = " + id + " and IM90RC_F06 = '" + pw + "'";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {

@@ -143,19 +143,11 @@ namespace MedicalLibrary.Entity
                 return dict;
             }
 
-#if INNO
             string cmd = "select * from M_PATIENT_HOKEN t " +
                 " where t.P_ID = " + pt_id +
                 " order by t.P_HOKEN";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select * from IM02RC t " +
-                " where t.IM02RC_F01 = " + pt_id +
-                " order by t.IM02RC_F02";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {
@@ -240,7 +232,6 @@ namespace MedicalLibrary.Entity
         {
             PatIns obj = new PatIns();
 
-#if INNO
             obj.PtId = tmp.GetDataString("P_ID");
             int.TryParse(tmp.DataDict["P_HOKEN"].ToString(), out obj.SEQ);
             obj.Code = tmp.DataDict["MAIN_NO"].ToString().Trim();
@@ -251,17 +242,6 @@ namespace MedicalLibrary.Entity
             int.TryParse(tmp.DataDict["HOKEN_TYPE"].ToString(), out obj.KindCode);
             int.TryParse(tmp.DataDict["MAIN_RATE_OUT"].ToString(), out obj.Per1);
             int.TryParse(tmp.DataDict["MAIN_RATE_IN"].ToString(), out obj.Per2);
-#else
-            int.TryParse(tmp.DataDict["IM02RC_F02"].ToString(), out obj.SEQ);
-            obj.Code = tmp.DataDict["IM02RC_F03"].ToString().Trim();
-            obj.Name1 = tmp.DataDict["IM02RC_F04"].ToString().Trim();
-            obj.Name2 = tmp.DataDict["IM02RC_F05"].ToString().Trim();
-            int.TryParse(tmp.DataDict["IM02RC_F06"].ToString(), out obj.StartDate);
-            int.TryParse(tmp.DataDict["IM02RC_F07"].ToString(), out obj.EndDate);
-            int.TryParse(tmp.DataDict["IM02RC_F43"].ToString(), out obj.KindCode);
-            int.TryParse(tmp.DataDict["IM02RC_F08"].ToString(), out obj.Per1);
-            int.TryParse(tmp.DataDict["IM02RC_F09"].ToString(), out obj.Per2);
-#endif
 
             return obj;
         }

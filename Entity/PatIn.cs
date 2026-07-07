@@ -78,7 +78,6 @@ namespace MedicalLibrary.Entity
             get
             {
                 string s = "";
-#if INNO
                 if (this.InTime.Equals("1"))
                 {
                     s = "朝";
@@ -95,20 +94,6 @@ namespace MedicalLibrary.Entity
                 {
                     s = "未定";
                 }
-#else
-                if (this.InTime.Equals("1"))
-                {
-                    s = "午前";
-                }
-                else if (this.InTime.Equals("2"))
-                {
-                    s = "午後";
-                }
-                else if (this.InTime.Equals("3"))
-                {
-                    s = "未定";
-                }
-#endif
                 return s;
             }
         }
@@ -167,7 +152,6 @@ namespace MedicalLibrary.Entity
             get
             {
                 string s = "";
-#if INNO
                 if (this.OutTime.Equals("1"))
                 {
                     s = "朝";
@@ -184,20 +168,6 @@ namespace MedicalLibrary.Entity
                 {
                     s = "未定";
                 }
-#else
-                if (this.OutTime.Equals("1"))
-                {
-                    s = "午前";
-                }
-                else if (this.OutTime.Equals("2"))
-                {
-                    s = "午後";
-                }
-                else if (this.OutTime.Equals("3"))
-                {
-                    s = "未定";
-                }
-#endif
                 return s;
             }
         }
@@ -256,7 +226,6 @@ namespace MedicalLibrary.Entity
             get
             {
                 string s = "";
-#if INNO
                 if (this.DoTime.Equals("1"))
                 {
                     s = "朝";
@@ -273,20 +242,6 @@ namespace MedicalLibrary.Entity
                 {
                     s = "未定";
                 }
-#else
-                if (this.DoTime.Equals("1"))
-                {
-                    s = "午前";
-                }
-                else if (this.DoTime.Equals("2"))
-                {
-                    s = "午後";
-                }
-                else if (this.DoTime.Equals("3"))
-                {
-                    s = "未定";
-                }
-#endif
                 return s;
             }
         }
@@ -501,7 +456,6 @@ namespace MedicalLibrary.Entity
         public new static PatIn GetFromStdClass(StdClass tmp)
         {
             PatIn obj = new PatIn();
-#if INNO
             obj.Id = tmp.GetDataString("P_ID");
             obj.Kana = tmp.GetDataString("P_KANA").Trim();
             obj.Name = tmp.GetDataString("P_NAME").Trim();
@@ -524,40 +478,6 @@ namespace MedicalLibrary.Entity
             obj.Bed = tmp.GetDataString("BED");
             obj.InKind = tmp.GetDataString("NYUIN_TYPE");
             obj.OutKind = tmp.GetDataString("TAIIN_TYPE");
-#else
-            obj.Id = tmp.GetDataString("IM01RC_F01");
-            obj.Kana = tmp.GetDataString("IM01RC_F03").Trim();
-            obj.Name = tmp.GetDataString("IM01RC_F04").Trim();
-            obj.Sex = tmp.GetDataString("IM01RC_F05");
-            obj.Birth = tmp.GetDataString("IM01RC_F10");
-
-            if (tmp.GetDataString("IM21RC_F03").Length > 0)
-            {
-                // IM2... テーブルから取得する場合
-                obj.InDate = tmp.GetDataString("IM21RC_F03");
-                obj.OutDate = tmp.GetDataString("IM21RC_F04");
-                obj.Dept = tmp.GetDataString("IM22RC_F05");
-                obj.Doctor = tmp.GetDataString("IM23RC_F05");
-                obj.Ward = tmp.GetDataString("IM24RC_F05").Trim();
-                obj.Room = tmp.GetDataString("IM24RC_F06").Trim();
-                obj.InKind = tmp.GetDataString("IM21RC_F05");
-                obj.OutKind = tmp.GetDataString("IM21RC_F06");
-            }
-            else
-            {
-                // ADT_入退院予定データから取得する場合
-                obj.InDate = tmp.GetDataString("入院予定日");
-                obj.InTime = tmp.GetDataString("入院予定時間");
-                obj.OutDate = tmp.GetDataString("退院予定日");
-                obj.OutTime = tmp.GetDataString("退院予定時間");
-                obj.Dept = tmp.GetDataString("科コード");
-                obj.Doctor = tmp.GetDataString("ＤＲ１コード");
-                obj.Ward = tmp.GetDataString("病棟コード").Trim();
-                obj.Room = tmp.GetDataString("病室コード").Trim();
-                obj.InKind = tmp.GetDataString("入院区分");
-                obj.OutKind = tmp.GetDataString("退院区分");
-            }
-#endif
             return obj;
         }
 
@@ -626,7 +546,6 @@ namespace MedicalLibrary.Entity
 
             string cmd = "";
             
-#if INNO
             string today = DateTime.Now.ToString("yyyyMMdd");
 
             // 過去の入院
@@ -688,74 +607,6 @@ namespace MedicalLibrary.Entity
                 }
             }
 
-#else
-            if (yet)
-            {
-                cmd = "select IM01RC_F01, IM01RC_F03, IM01RC_F04, IM01RC_F05, IM01RC_F10, " +
-                    " t2.* " +
-                    " from IM01RC t1, ADT_入退院予定データ t2 " +
-                    " where t1.IM01RC_F01 = " + pt_id + " and t2.患者コード = " + pt_id +
-                    " and t1.IM01RC_F01 = t2.患者コード and t2.入院確定フラグ = 0 " +
-                    " order by t2.入院予定日 desc";
-
-                List<StdClass> yet_list = StdClass.GetList(DB.Db1, cmd);
-
-                foreach (StdClass tmp in yet_list)
-                {
-                    PatIn obj = GetFromStdClass(tmp);
-                    obj.Yet = true;
-
-                    // 同じデータが存在しなければ登録する
-                    if (list.FindAll((x) => { return x.Id.Equals(obj.Id) && x.InDate.Equals(obj.InDate); }).Count == 0)
-                    {
-                        list.Add(obj);
-                    }
-                }
-            }
-
-            cmd = "select IM01RC_F01, IM01RC_F03, IM01RC_F04, IM01RC_F05, IM01RC_F10 " +
-                ", t21.IM21RC_F03, t21.IM21RC_F04, t21.IM21RC_F05, t21.IM21RC_F06 " +
-                ", t24.IM24RC_F05, t24.IM24RC_F06, t22.IM22RC_F05, t23.IM23RC_F05 " +
-                " from IM01RC t1, IM21RC t21, " +
-                " (select * from " +
-                " (select t.*, row_number() over (partition by t.IM22RC_F02 order by t.IM22RC_F04 desc) rn " +
-                "  from IM22RC t " +
-                "  where (t.IM22RC_F01, t.IM22RC_F02) in (select t21.IM21RC_F01, t21.IM21RC_F03 from IM21RC t21 where t21.IM21RC_F01 = " + pt_id + ")" +
-                "  order by t.IM22RC_F01, t.IM22RC_F02 desc, t.IM22RC_F03 desc) tt " +
-                " where tt.RN = 1) t22, " +
-                " (select * from " +
-                " (select t.*, row_number() over (partition by t.IM23RC_F02 order by t.IM23RC_F04 desc) rn " +
-                "  from IM23RC t " +
-                "  where (t.IM23RC_F01, t.IM23RC_F02) in (select t21.IM21RC_F01, t21.IM21RC_F03 from IM21RC t21 where t21.IM21RC_F01 = " + pt_id + ")" +
-                "  order by t.IM23RC_F01, t.IM23RC_F02 desc, t.IM23RC_F03 desc) tt " +
-                "  where tt.RN = 1) t23, " +
-                " (select * from " +
-                " (select t.*, row_number() over (partition by t.IM24RC_F02 order by t.IM24RC_F04 desc) rn " +
-                "  from IM24RC t " +
-                "  where (t.IM24RC_F01, t.IM24RC_F02) in (select t21.IM21RC_F01, t21.IM21RC_F03 from IM21RC t21 where t21.IM21RC_F01 = " + pt_id + ")" +
-                "  order by t.IM24RC_F01, t.IM24RC_F02 desc, t.IM24RC_F03 desc) tt " +
-                "  where tt.RN = 1) t24 " +
-                " where " +
-                "  t21.IM21RC_F01 = " + pt_id +
-                "  and t1.IM01RC_F01 = " + pt_id +
-                "  and t22.IM22RC_F02 = t21.IM21RC_F03" +
-                "  and t23.IM23RC_F02 = t21.IM21RC_F03" +
-                "  and t24.IM24RC_F02 = t21.IM21RC_F03" +
-                " order by IM21RC_F02 desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatIn obj = GetFromStdClass(tmp);
-
-                // 同じデータが存在しなければ登録する
-                if (list.FindAll((x) => { return x.Id.Equals(obj.Id) && x.InDate.Equals(obj.InDate); }).Count == 0)
-                {
-                    list.Add(obj);
-                }
-            }
-#endif
             // 入院日の降順に並べ替える
             list.Sort((x, y) => { return y.InDateInt - x.InDateInt; });
 
@@ -784,7 +635,6 @@ namespace MedicalLibrary.Entity
             {
                 adm_date = today;
             }
-#if INNO
             string cmd = "";
             List<StdClass> tmp_list;
 
@@ -946,66 +796,6 @@ namespace MedicalLibrary.Entity
                     }
                 }
             }
-#else
-            string sqlWard = "";
-
-            if (ward.Length > 0)
-            {
-                sqlWard = " and IM24RC_F05 = '" + ward + "'";
-            }
-
-            string sqlDept = "";
-
-            if (dept.Length > 0)
-            {
-                sqlDept = " and IM22RC_F05 = '" + dept + "'";
-            }
-
-            string cmd = "select IM01RC_F01, IM01RC_F03, IM01RC_F04, IM01RC_F05, IM01RC_F10 " +
-                ", t21.IM21RC_F03, t21.IM21RC_F04, t21.IM21RC_F05, t21.IM21RC_F06 " +
-                ", t24.IM24RC_F05, t24.IM24RC_F06, t22.IM22RC_F05, t23.IM23RC_F05 " +
-                " from IM01RC t1, IM21RC t21, " +
-                " (select * from " +
-                " (select t.*, row_number() over (partition by t.IM22RC_F01 order by t.IM22RC_F04 desc) rn " +
-                "  from IM22RC t " +
-                "  where (t.IM22RC_F01, t.IM22RC_F02) in (select t21.IM21RC_F01, t21.IM21RC_F03 from IM21RC t21 where t21.IM21RC_F03 <= " + adm_date + " and (t21.IM21RC_F04 = 0 or t21.IM21RC_F04 >= " + adm_date + ")) " +
-                "  order by t.IM22RC_F01, t.IM22RC_F02 desc, t.IM22RC_F03 desc) tt " +
-                " where tt.RN = 1) t22, " +
-                " (select * from " +
-                " (select t.*, row_number() over (partition by t.IM23RC_F01 order by t.IM23RC_F04 desc) rn " +
-                "  from IM23RC t " +
-                "  where (t.IM23RC_F01, t.IM23RC_F02) in (select t21.IM21RC_F01, t21.IM21RC_F03 from IM21RC t21 where t21.IM21RC_F03 <= " + adm_date + " and (t21.IM21RC_F04 = 0 or t21.IM21RC_F04 >= " + adm_date + ")) " +
-                "  order by t.IM23RC_F01, t.IM23RC_F02 desc, t.IM23RC_F03 desc) tt " +
-                "  where tt.RN = 1) t23, " +
-                " (select * from " +
-                " (select t.*, row_number() over (partition by t.IM24RC_F01 order by t.IM24RC_F04 desc) rn " +
-                "  from IM24RC t " +
-                "  where (t.IM24RC_F01, t.IM24RC_F02) in (select t21.IM21RC_F01, t21.IM21RC_F03 from IM21RC t21 where t21.IM21RC_F03 <= " + adm_date + " and (t21.IM21RC_F04 = 0 or t21.IM21RC_F04 >= " + adm_date + ")) " +
-                "  order by t.IM24RC_F01, t.IM24RC_F02 desc, t.IM24RC_F03 desc) tt " +
-                "  where tt.RN = 1) t24 " +
-                " where " +
-                "  t21.IM21RC_F03 <= " + adm_date + " and (t21.IM21RC_F04 = 0 or t21.IM21RC_F04 >= " + adm_date + ") " +
-                "  and t1.IM01RC_F01 in (select t.IM21RC_F01 from IM21RC t where t.IM21RC_F03 <= " + adm_date + " and (t.IM21RC_F04 >= " + adm_date + " or t.IM21RC_F04 = 0)) " +
-                "  and t21.IM21RC_F01 = t1.IM01RC_F01 " +
-                "  and t22.IM22RC_F01 = t1.IM01RC_F01 " +
-                "  and t23.IM23RC_F01 = t1.IM01RC_F01 " +
-                "  and t24.IM24RC_F01 = t1.IM01RC_F01 " +
-                sqlDept + sqlWard +
-                " order by t24.IM24RC_F06, t21.IM21RC_F03 desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatIn obj = GetFromStdClass(tmp);
-
-                // 同じデータが存在しなければ登録する
-                if (list.FindAll((x) => { return x.Id.Equals(obj.Id) && x.InDate.Equals(obj.InDate); }).Count == 0)
-                {
-                    list.Add(obj);
-                }
-            }
-#endif
             // 部屋順に並べかえる
             list.Sort((x, y) =>
             {
@@ -1033,7 +823,6 @@ namespace MedicalLibrary.Entity
         public static List<PatIn> GetYoteiList(string crit_date, string ward = "", string dept = "")
         {
             List<PatIn> list = new List<PatIn>();
-#if INNO
             string sqlDate = "";
 
             if (crit_date.Length > 0)
@@ -1081,47 +870,6 @@ namespace MedicalLibrary.Entity
                     list.Add(obj);
                 }
             }
-#else
-            string sqlDate = "";
-
-            if (crit_date.Length > 0)
-            {
-                sqlDate = " and 入院予定日 >= " + crit_date;
-            }
-
-            string sqlWard = "";
-
-            if (ward.Length > 0)
-            {
-                sqlWard = " and 病棟コード = '" + ward + "'";
-            }
-
-            string sqlDept = "";
-
-            if (dept.Length > 0)
-            {
-                sqlDept = " and 科コード = '" + dept + "'";
-            }
-
-            string cmd = "select IM01RC_F01, IM01RC_F03, IM01RC_F04, IM01RC_F05, IM01RC_F10, "
-                            + " t2.* "
-                            + " from IM01RC t1, ADT_入退院予定データ t2 "
-                            + " where t1.IM01RC_F01 = t2.患者コード and t2.入院確定フラグ = 0 "
-                            + sqlDate + sqlDept + sqlWard;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatIn obj = GetFromStdClass(tmp);
-
-                // 同じデータが存在しなければ登録する
-                if (list.FindAll((x) => { return x.Id.Equals(obj.Id) && x.InDate.Equals(obj.InDate); }).Count == 0)
-                {
-                    list.Add(obj);
-                }
-            }
-#endif
             // 入院予定日の順に並べ替える
             list.Sort((x, y) => { return x.InDateInt - y.InDateInt; });
 
@@ -1138,7 +886,6 @@ namespace MedicalLibrary.Entity
         public static List<PatIn> GetList(string ward = "", string dept = "", bool pat_info = true)
         {
             List<PatIn> list = new List<PatIn>();
-#if INNO
             string sqlWard = "";
 
             if (ward.Length > 0)
@@ -1188,40 +935,6 @@ namespace MedicalLibrary.Entity
                     list.Add(obj);
                 }
             }
-#else
-            string sqlWard = "";
-
-            if (ward.Length > 0)
-            {
-                sqlWard = " and 病棟コード = '" + ward + "'";
-            }
-
-            string sqlDept = "";
-
-            if (dept.Length > 0)
-            {
-                sqlDept = " and 科コード = '" + dept + "'";
-            }
-
-            string cmd = "select IM01RC_F01, IM01RC_F03, IM01RC_F04, IM01RC_F05, IM01RC_F10, "
-                            + " t2.* "
-                            + " from IM01RC t1, AMP_患者入院マスター t2 "
-                            + " where t1.IM01RC_F01 = t2.患者コード and t2.履歴区分 = 0 "
-                            + sqlDept + sqlWard;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatIn obj = GetFromStdClass(tmp);
-
-                // 同じデータが存在しなければ登録する
-                if (list.FindAll((x) => { return x.Id.Equals(obj.Id) && x.InDate.Equals(obj.InDate); }).Count == 0)
-                {
-                    list.Add(obj);
-                }
-            }
-#endif
             return list;
         }
 
@@ -1264,7 +977,6 @@ namespace MedicalLibrary.Entity
         public static List<PatIn> GetOutList(string date1 = "", string date2 = "", string ward = "", string dept = "")
         {
             List<PatIn> list = new List<PatIn>();
-#if INNO
             string sqlDate1 = date1;
 
             if (date1.Length != 8)
@@ -1313,80 +1025,6 @@ namespace MedicalLibrary.Entity
                     list.Add(obj);
                 }
             }
-#else
-            string sqlDate1 = date1;
-
-            if (date1.Length != 8)
-            {
-                sqlDate1 = DateTime.Now.AddDays(-14).ToString("yyyyMMdd");
-            }
-
-            string sqlDate2 = date2;
-
-            if (date2.Length != 8)
-            {
-                sqlDate2 = DateTime.Now.ToString("yyyyMMdd");
-            }
-
-            string sqlWard = "";
-
-            if (ward.Length > 0)
-            {
-                sqlWard = " and IM24RC_F05 = '" + ward + "'";
-            }
-
-            string sqlDept = "";
-
-            if (dept.Length > 0)
-            {
-                sqlDept = " and IM22RC_F05 = '" + dept + "'";
-            }
-
-            string cmd = "select IM01RC_F01, IM01RC_F03, IM01RC_F04, IM01RC_F05, IM01RC_F10 " +
-                ", t21.IM21RC_F03, t21.IM21RC_F04, t21.IM21RC_F05, t21.IM21RC_F06 " +
-                ", t24.IM24RC_F05, t24.IM24RC_F06, t22.IM22RC_F05, t23.IM23RC_F05 " +
-                " from IM01RC t1, IM21RC t21, " +
-                " (select * from " +
-                " (select t.*, row_number() over (partition by t.IM22RC_F01 order by t.IM22RC_F04 desc, t.IM22RC_F03 desc) rn " +
-                "  from IM22RC t " +
-                "  where (t.IM22RC_F01, t.IM22RC_F02) in (select t21.IM21RC_F01, t21.IM21RC_F03 from IM21RC t21 where t21.IM21RC_F04 >= " + sqlDate1 + " and t21.IM21RC_F04 <= " + sqlDate2 + ") " +
-                "  order by t.IM22RC_F01, t.IM22RC_F02 desc, t.IM22RC_F03 desc) tt " +
-                " where tt.RN = 1) t22, " +
-                " (select * from " +
-                " (select t.*, row_number() over (partition by t.IM23RC_F01 order by t.IM23RC_F04 desc, t.IM23RC_F03 desc) rn " +
-                "  from IM23RC t " +
-                "  where (t.IM23RC_F01, t.IM23RC_F02) in (select t21.IM21RC_F01, t21.IM21RC_F03 from IM21RC t21 where t21.IM21RC_F04 >= " + sqlDate1 + " and t21.IM21RC_F04 <= " + sqlDate2 + ") " +
-                "  order by t.IM23RC_F01, t.IM23RC_F02 desc, t.IM23RC_F03 desc) tt " +
-                "  where tt.RN = 1) t23, " +
-                " (select * from " +
-                " (select t.*, row_number() over (partition by t.IM24RC_F01 order by t.IM24RC_F04 desc, t.IM24RC_F03 desc) rn " +
-                "  from IM24RC t " +
-                "  where (t.IM24RC_F01, t.IM24RC_F02) in (select t21.IM21RC_F01, t21.IM21RC_F03 from IM21RC t21 where t21.IM21RC_F04 >= " + sqlDate1 + " and t21.IM21RC_F04 <= " + sqlDate2 + ") " +
-                "  order by t.IM24RC_F01, t.IM24RC_F02 desc, t.IM24RC_F03 desc) tt " +
-                "  where tt.RN = 1) t24 " +
-                " where " +
-                "  t21.IM21RC_F04 >= " + sqlDate1 + " and t21.IM21RC_F04 <= " + sqlDate2 +
-                "  and t1.IM01RC_F01 in (select t.IM21RC_F01 from IM21RC t where t.IM21RC_F04 >= " + sqlDate1 + " and t.IM21RC_F04 <= " + sqlDate2 + ") " +
-                "  and t21.IM21RC_F01 = t1.IM01RC_F01 " +
-                "  and t22.IM22RC_F01 = t1.IM01RC_F01 " +
-                "  and t23.IM23RC_F01 = t1.IM01RC_F01 " +
-                "  and t24.IM24RC_F01 = t1.IM01RC_F01 " +
-                sqlDept + sqlWard +
-                " order by t24.IM24RC_F06, t21.IM21RC_F03 desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatIn obj = GetFromStdClass(tmp);
-
-                // 同じデータが存在しなければ登録する
-                if (list.FindAll((x) => { return x.Id.Equals(obj.Id) && x.InDate.Equals(obj.InDate); }).Count == 0)
-                {
-                    list.Add(obj);
-                }
-            }
-#endif
             // 退院日の降順に並べ替える
             list.Sort((x, y) => { return y.OutDateInt - x.OutDateInt; });
 
@@ -1656,7 +1294,6 @@ namespace MedicalLibrary.Entity
             Dictionary<string, List<PatIn>> dict = new Dictionary<string, List<PatIn>>();
 
             List<PatIn> list = new List<PatIn>();
-#if INNO
             string cmd = "select * from D_NYUIN td " +
                 " where td.PROCESS in (11, 13) and (td.DEL_FLG is null or td.DEL_FLG = 0) " +
                 " and (td.P_ID, td.NYUIN_NO) in " +
@@ -1665,14 +1302,6 @@ namespace MedicalLibrary.Entity
                 " order by P_ID, NYUIN_NO, APPLY_DATE, APPLY_ZONE, NYUIN_INDEX";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select * from IM24RC t " +
-                " where (t.IM24RC_F01, t.IM24RC_F02) in " +
-                " (select tt.患者コード, tt.入院日 from macs.AMP_患者入院マスター tt where tt.履歴区分 = 0) " +
-                " order by t.IM24RC_F01, t.IM24RC_F03";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
             foreach (StdClass tmp in tmp_list)
             {
                 PatIn obj = PatIn.GetFromStdClass(tmp);

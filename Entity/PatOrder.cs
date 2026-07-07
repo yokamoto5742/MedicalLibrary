@@ -251,11 +251,7 @@ namespace MedicalLibrary.Entity
         {
             get
             {
-#if INNO
                 return DateTimeAgent.TimeFormat6(this.OrderTime, 4, false);
-#else
-                return DateTimeAgent.TimeFormat(this.OrderTime, false);
-#endif
             }
         }
 
@@ -291,11 +287,7 @@ namespace MedicalLibrary.Entity
         {
             get
             {
-#if INNO
                 return DateTimeAgent.TimeFormat6(this.RsvTime, 4, false);
-#else
-                return DateTimeAgent.TimeFormat(this.RsvTime, false);
-#endif
             }
         }
 
@@ -650,7 +642,6 @@ namespace MedicalLibrary.Entity
         public static List<PatOrder> GetListByPatCond(string pt_id, List<string> cond_list, string order_by = "", bool detail = false)
         {
             List<PatOrder> list = new List<PatOrder>();
-#if INNO
             string cmd = "select * from D_ORDER_HEADER " +
                 " where P_ID = " + pt_id;
 
@@ -679,36 +670,6 @@ namespace MedicalLibrary.Entity
 
                 list.Add(p);
             }
-#else
-            string cmd = "select * from ＮＴオーダーヘッダー " +
-                " where 患者コード = " + pt_id;
-
-            if (cond_list.Count > 0)
-            {
-                cmd += " and " + AppString.ConcatList(cond_list, " and ");
-            }
-
-            if (order_by.Length > 0)
-            {
-                cmd += " order by " + order_by;
-            }
-            else
-            {
-                cmd += " order by 施行予定日 desc, オーダー番号 desc";
-            }
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-            List<string> order_id_list = new List<string>();
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatOrder p = PatOrder.GetFromStdClass(tmp);
-
-                order_id_list.Add(p.OrderId);
-
-                list.Add(p);
-            }
-#endif
 
             if (detail)
             {
@@ -754,7 +715,6 @@ namespace MedicalLibrary.Entity
             string date1 = DateTimeAgent.IsDate(start_date) ? start_date : DateTime.Now.ToString("yyyyMMdd");
             string date2 = DateTimeAgent.IsDate(end_date) ? end_date : DateTime.Now.ToString("yyyyMMdd");
 
-#if INNO
             string date_sql = "";
 
             // 診療区分に 21, 22 が含まれる場合は DATE_S, DATE_E で絞る
@@ -803,56 +763,6 @@ namespace MedicalLibrary.Entity
 
                 tmpList.Add(p);
             }
-#else
-            string date_sql = "";
-
-            // 診療区分に 21, 22 が含まれる場合は DATE_S, DATE_E で絞る
-
-            if (shinku_list != null && (shinku_list.Contains("21") || shinku_list.Contains("22")))
-            {
-                date_sql = " and 終了日付 >= " + date1 + " and 開始日付 <= " + date2;
-            }
-            else
-            {
-                date_sql = " and 施行予定日 >= " + date1 + " and 施行予定日 <= " + date2;
-            }
-
-            string cmd = "select * from ＮＴオーダーヘッダー " +
-                " where 患者コード = " + pt_id + date_sql;
-
-            if (in_out.Equals("1"))
-            {
-                cmd += " and 入外区分 = 1";
-            }
-            else if (in_out.Equals("2"))
-            {
-                cmd += " and 入外区分 = 2";
-            }
-
-            if (shinku_list != null && shinku_list.Count > 0)
-            {
-                cmd += " and 診療区分 in (" + AppString.ConcatList(shinku_list, ",") + ")";
-            }
-
-            if (dept_list != null && dept_list.Count > 0)
-            {
-                cmd += " and 科コード in (" + AppString.ConcatList(dept_list, ",") + ")";
-            }
-
-            cmd += " order by 施行予定日 desc, 受付番号, 連番, オーダー番号";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-            List<string> order_id_list = new List<string>();
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatOrder p = PatOrder.GetFromStdClass(tmp);
-
-                order_id_list.Add(p.OrderId);
-
-                tmpList.Add(p);
-            }
-#endif
             if (detail)
             {
                 List<PatOrderDetail> tmpList2 = PatOrderDetail.Load(order_id_list);
@@ -883,7 +793,6 @@ namespace MedicalLibrary.Entity
                 return tmpList;
             }
 
-#if INNO
             List<string> sqls = new List<string>();
 
             if (DateTimeAgent.IsDate(end_date))
@@ -956,84 +865,6 @@ namespace MedicalLibrary.Entity
 
                 tmpList.Add(p);
             }
-#else
-            List<string> sqls = new List<string>();
-
-            if (DateTimeAgent.IsDate(end_date))
-            {
-                if (mitei)
-                {
-                    sqls.Add("((t1.施行予定日 >= " + start_date + " and t1.施行予定日 <= " + end_date + ") or t1.施行予定日 = 99999999)");
-                }
-                else
-                {
-                    sqls.Add("(t1.施行予定日 >= " + start_date + " and t1.施行予定日 <= " + end_date + ")");
-                }
-            }
-            else
-            {
-                if (mitei)
-                {
-                    sqls.Add("(t1.施行予定日 >= " + start_date + ")");
-                }
-                else
-                {
-                    sqls.Add("(t1.施行予定日 >= " + start_date + " and t1.施行予定日 < 99999999)");
-                }
-            }
-
-            if (in_out.Equals("1"))
-            {
-                sqls.Add("(t1.入外区分 = 1)");
-            }
-            else if (in_out.Equals("2"))
-            {
-                sqls.Add("(t1.入外区分 = 2)");
-            }
-
-            if (shinku_list.Count > 0)
-            {
-                sqls.Add("t1.診療区分 in (" + AppString.ConcatList(shinku_list, ",") + ")");
-            }
-
-            if (dept_list.Count > 0)
-            {
-                sqls.Add("t1.科コード in (" + AppString.ConcatList(dept_list, ",") + ")");
-            }
-
-            if (sekou1_list.Count > 0)
-            {
-                sqls.Add("t1.施行部署１ in (" + AppString.ConcatList(sekou1_list, ",") + ")");
-            }
-
-            // 条件が３つ未満なら件数が増えすぎるため終了
-            if (sqls.Count < 3)
-            {
-                return tmpList;
-            }
-
-            string cmd = "select t1.*, t2.IM01RC_F03 カナ, t2.IM01RC_F04 氏名, t2.IM01RC_F05 性別, t2.IM01RC_F10 生年月日 from ＮＴオーダーヘッダー t1, IM01RC t2 " +
-                " where " + AppString.ConcatList(sqls, " and ") +
-                " and t1.患者コード = t2.IM01RC_F01 " +
-                " order by t1.患者コード, t1.施行予定日 desc, t1.受付番号, t1.連番, t1.オーダー番号";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-            List<string> order_id_list = new List<string>();
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatOrder p = PatOrder.GetFromStdClass(tmp);
-
-                p.Pat.Kana = tmp.GetDataString("カナ").Trim();
-                p.Pat.Name = tmp.GetDataString("氏名").Trim();
-                p.Pat.Sex = tmp.GetDataString("性別");
-                p.Pat.Birth = tmp.GetDataString("生年月日");
-
-                order_id_list.Add(p.OrderId);
-
-                tmpList.Add(p);
-            }
-#endif
             if (detail)
             {
                 List<PatOrderDetail> tmpList2 = PatOrderDetail.Load(order_id_list);
@@ -1075,7 +906,6 @@ namespace MedicalLibrary.Entity
                 return tmpList;
             }
 
-#if INNO
             List<string> sqls = new List<string>();
 
             if (DateTimeAgent.IsDate(start_date))
@@ -1151,87 +981,6 @@ namespace MedicalLibrary.Entity
 
                 tmpList.Add(p);
             }
-#else
-            List<string> sqls = new List<string>();
-
-            if (DateTimeAgent.IsDate(start_date))
-            {
-                if (DateTimeAgent.IsDate(end_date))
-                {
-                    if (mitei)
-                    {
-                        sqls.Add("((t1.施行予定日 >= " + start_date + " and t1.施行予定日 <= " + end_date + ") or t1.施行予定日 = 99999999)");
-                    }
-                    else
-                    {
-                        sqls.Add("(t1.施行予定日 >= " + start_date + " and t1.施行予定日 <= " + end_date + ")");
-                    }
-                }
-                else
-                {
-                    if (mitei)
-                    {
-                        sqls.Add("(t1.施行予定日 >= " + start_date + ")");
-                    }
-                    else
-                    {
-                        sqls.Add("(t1.施行予定日 >= " + start_date + " and t1.施行予定日 < 99999999)");
-                    }
-                }
-            }
-
-            if (in_out.Equals("1"))
-            {
-                sqls.Add("(t1.入外区分 = 1)");
-            }
-            else if (in_out.Equals("2"))
-            {
-                sqls.Add("(t1.入外区分 = 2)");
-            }
-
-            if (shinku_list.Count > 0)
-            {
-                sqls.Add("t1.診療区分 in (" + AppString.ConcatList(shinku_list, ",") + ")");
-            }
-
-            if (dept_list.Count > 0)
-            {
-                sqls.Add("t1.科コード in (" + AppString.ConcatList(dept_list, ",") + ")");
-            }
-
-            if (sekou1_list.Count > 0)
-            {
-                sqls.Add("t1.施行部署１ in (" + AppString.ConcatList(sekou1_list, ",") + ")");
-            }
-
-            if (sqls.Count == 0)
-            {
-                return tmpList;
-            }
-
-            string cmd = "select t1.*, t2.IM01RC_F03 カナ, t2.IM01RC_F04 氏名, t2.IM01RC_F05 性別, t2.IM01RC_F10 生年月日 from ＮＴオーダーヘッダー t1, IM01RC t2 " +
-                " where t1.患者コード = " + pt_id +
-                " and " + AppString.ConcatList(sqls, " and ") +
-                " and t1.患者コード = t2.IM01RC_F01 " +
-                " order by t1.患者コード, t1.施行予定日 desc, t1.受付番号, t1.連番, t1.オーダー番号";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-            List<string> order_id_list = new List<string>();
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatOrder p = PatOrder.GetFromStdClass(tmp);
-
-                p.Pat.Kana = tmp.GetDataString("カナ").Trim();
-                p.Pat.Name = tmp.GetDataString("氏名").Trim();
-                p.Pat.Sex = tmp.GetDataString("性別");
-                p.Pat.Birth = tmp.GetDataString("生年月日");
-
-                order_id_list.Add(p.OrderId);
-
-                tmpList.Add(p);
-            }
-#endif
 
             if (detail)
             {
@@ -1274,7 +1023,6 @@ namespace MedicalLibrary.Entity
                 return tmpList;
             }
 
-#if INNO
             List<string> sqls = new List<string>();
 
             if (mitei)
@@ -1333,69 +1081,6 @@ namespace MedicalLibrary.Entity
 
                 tmpList.Add(p);
             }
-#else
-            List<string> sqls = new List<string>();
-
-            if (mitei)
-            {
-                sqls.Add("t1.施行予定日 in (" + date + ", 99999999)");
-            }
-            else
-            {
-                sqls.Add("t1.施行予定日 = " + date);
-            }
-
-            if (in_out.Equals("1"))
-            {
-                sqls.Add("(t1.入外区分 = 1)");
-            }
-            else if (in_out.Equals("2"))
-            {
-                sqls.Add("(t1.入外区分 = 2)");
-            }
-
-            if (shinku_list.Count > 0)
-            {
-                sqls.Add("t1.診療区分 in (" + AppString.ConcatList(shinku_list, ",") + ")");
-            }
-
-            if (dept_list.Count > 0)
-            {
-                sqls.Add("t1.科コード in (" + AppString.ConcatList(dept_list, ",") + ")");
-            }
-
-            if (sekou1_list.Count > 0)
-            {
-                sqls.Add("t1.施行部署１ in (" + AppString.ConcatList(sekou1_list, ",") + ")");
-            }
-
-            if (sqls.Count == 0)
-            {
-                return tmpList;
-            }
-
-            string cmd = "select t1.*, t2.IM01RC_F03 カナ, t2.IM01RC_F04 氏名, t2.IM01RC_F05 性別, t2.IM01RC_F10 生年月日 from ＮＴオーダーヘッダー t1, IM01RC t2 " +
-                " where " + AppString.ConcatList(sqls, " and ") +
-                " and t1.患者コード = t2.IM01RC_F01 " +
-                " order by t1.患者コード, t1.施行予定日 desc, t1.受付番号, t1.連番, t1.オーダー番号";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-            List<string> order_id_list = new List<string>();
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatOrder p = PatOrder.GetFromStdClass(tmp);
-
-                p.Pat.Kana = tmp.GetDataString("カナ").Trim();
-                p.Pat.Name = tmp.GetDataString("氏名").Trim();
-                p.Pat.Sex = tmp.GetDataString("性別");
-                p.Pat.Birth = tmp.GetDataString("生年月日");
-
-                order_id_list.Add(p.OrderId);
-
-                tmpList.Add(p);
-            }
-#endif
 
             if (detail)
             {
@@ -1436,7 +1121,6 @@ namespace MedicalLibrary.Entity
                 return tmpList;
             }
 
-#if INNO
             List<string> sqls = new List<string>();
 
             sqls.Add("(t1.ORDER_DATE >= " + start_date + " and t1.ORDER_DATE <= " + end_date + ")");
@@ -1479,55 +1163,6 @@ namespace MedicalLibrary.Entity
 
                 tmpList.Add(p);
             }
-#else
-            List<string> sqls = new List<string>();
-
-            sqls.Add("(t1.施行予定日 >= " + start_date + " and t1.施行予定日 <= " + end_date + ")");
-
-            if (in_out.Equals("1"))
-            {
-                sqls.Add("(t1.入外区分 = 1)");
-            }
-            else if (in_out.Equals("2"))
-            {
-                sqls.Add("(t1.入外区分 = 2)");
-            }
-
-            if (dept_list.Count > 0)
-            {
-                sqls.Add("t1.科コード in (" + AppString.ConcatList(dept_list, ",") + ")");
-            }
-
-            if (sqls.Count == 0)
-            {
-                return tmpList;
-            }
-
-            string cmd = "select t1.*, t2.IM01RC_F03 カナ, t2.IM01RC_F04 氏名, t2.IM01RC_F05 性別, t2.IM01RC_F10 生年月日, t2.IM01RC_F13_4 備考 " +
-                " from ＮＴオーダーヘッダー t1, IM01RC t2 " +
-                " where " + AppString.ConcatList(sqls, " and ") +
-                " and t1.施行フラグ = 1 and (t1.会計フラグ is null or t1.会計フラグ = 0) " +
-                " and t1.患者コード = t2.IM01RC_F01 " +
-                " order by t1.患者コード, t1.科コード, t1.施行予定日, t1.受付番号, t1.連番, t1.オーダー番号";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-            List<string> order_id_list = new List<string>();
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatOrder p = PatOrder.GetFromStdClass(tmp);
-
-                p.Pat.Kana = tmp.GetDataString("カナ").Trim();
-                p.Pat.Name = tmp.GetDataString("氏名").Trim();
-                p.Pat.Sex = tmp.GetDataString("性別");
-                p.Pat.Birth = tmp.GetDataString("生年月日");
-                p.Pat.NoteCode = tmp.GetDataString("備考");
-
-                order_id_list.Add(p.OrderId);
-
-                tmpList.Add(p);
-            }
-#endif
 
             if (detail)
             {
@@ -1570,7 +1205,6 @@ namespace MedicalLibrary.Entity
                 return tmpList;
             }
 
-#if INNO
             List<string> sqls = new List<string>();
 
             sqls.Add("(t1.ORDER_DATE >= " + start_date + " and t1.ORDER_DATE <= " + end_date + ")");
@@ -1618,55 +1252,6 @@ namespace MedicalLibrary.Entity
 
                 tmpList.Add(p);
             }
-#else
-            List<string> sqls = new List<string>();
-
-            sqls.Add("(t1.施行予定日 >= " + start_date + " and t1.施行予定日 <= " + end_date + ")");
-
-            if (in_out.Equals("1"))
-            {
-                sqls.Add("(t1.入外区分 = 1)");
-            }
-            else if (in_out.Equals("2"))
-            {
-                sqls.Add("(t1.入外区分 = 2)");
-            }
-
-            if (dept_list.Count > 0)
-            {
-                sqls.Add("t1.科コード in (" + AppString.ConcatList(dept_list, ",") + ")");
-            }
-
-            if (sqls.Count == 0)
-            {
-                return tmpList;
-            }
-
-            string cmd = "select t1.*, t2.IM01RC_F03 カナ, t2.IM01RC_F04 氏名, t2.IM01RC_F05 性別, t2.IM01RC_F10 生年月日, t2.IM01RC_F13_4 備考 " +
-                " from ＬＧオーダーヘッダー t1, IM01RC t2 " +
-                " where " + AppString.ConcatList(sqls, " and ") +
-                " and t1.削除種別 in (1, 2) and (t1.会計フラグ is null or t1.会計フラグ = 0) " +
-                " and t1.患者コード = t2.IM01RC_F01 " +
-                " order by t1.患者コード, t1.科コード, t1.施行予定日, t1.受付番号, t1.連番, t1.オーダー番号";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-            List<string> order_id_list = new List<string>();
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatOrder p = PatOrder.GetFromStdClass(tmp);
-
-                p.Pat.Kana = tmp.GetDataString("カナ").Trim();
-                p.Pat.Name = tmp.GetDataString("氏名").Trim();
-                p.Pat.Sex = tmp.GetDataString("性別");
-                p.Pat.Birth = tmp.GetDataString("生年月日");
-                p.Pat.NoteCode = tmp.GetDataString("備考");
-
-                order_id_list.Add(p.OrderId);
-
-                tmpList.Add(p);
-            }
-#endif
 
             if (detail)
             {
@@ -1697,7 +1282,6 @@ namespace MedicalLibrary.Entity
                 return tmpList;
             }
 
-#if INNO
             string cmd = "select t1.*, t2.P_KANA, t2.P_NAME, t2.P_SEX, t2.P_BIRTHDAY_AD, t3.HOKEN_TYPE " +
                 " from D_ORDER_HEADER t1, M_PATIENT t2, M_PATIENT_HOKEN t3 " +
                 " where ORDER_NO in " +
@@ -1717,32 +1301,6 @@ namespace MedicalLibrary.Entity
 
                 tmpList.Add(p);
             }
-#else
-
-            string cmd = "select t1.*, t2.IM01RC_F03 カナ, t2.IM01RC_F04 氏名, t2.IM01RC_F05 性別, t2.IM01RC_F10 生年月日 " +
-                " from ＮＴオーダーヘッダー t1, IM01RC t2 " +
-                " where オーダー番号 in " +
-                " (select オーダー番号 from ＮＴオーダーディティール where 患者コード = " + pt_id + " and オーダーコード in (" + AppString.ConcatList(order_code_list, ",", "'") + "))" +
-                " and t1.患者コード = t2.IM01RC_F01 " +
-                " order by t1.患者コード, t1.施行予定日 desc, t1.受付番号, t1.連番, t1.オーダー番号";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-            List<string> order_id_list = new List<string>();
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatOrder p = PatOrder.GetFromStdClass(tmp);
-
-                p.Pat.Kana = tmp.GetDataString("カナ").Trim();
-                p.Pat.Name = tmp.GetDataString("氏名").Trim();
-                p.Pat.Sex = tmp.GetDataString("性別");
-                p.Pat.Birth = tmp.GetDataString("生年月日");
-
-                order_id_list.Add(p.OrderId);
-
-                tmpList.Add(p);
-            }
-#endif
             if (detail)
             {
                 List<PatOrderDetail> tmpList2 = PatOrderDetail.Load(order_id_list);
@@ -1777,17 +1335,10 @@ namespace MedicalLibrary.Entity
                 return obj;
             }
 
-#if INNO
             string cmd = "select * from D_ORDER_HEADER " +
                 " where ORDER_NO = " + order_id;
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-#else
-            string cmd = "select * from macs.ＮＴオーダーヘッダー " +
-                " where オーダー番号 = " + order_id;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-#endif
 
             foreach (StdClass tmp in tmp_list)
             {
@@ -1802,7 +1353,6 @@ namespace MedicalLibrary.Entity
         {
             PatOrder obj = new PatOrder();
 
-#if INNO
             obj.OrderId = tmp.GetDataString("ORDER_NO");
             obj.UkeId = tmp.GetDataString("RP_NO");
             obj.UkeSEQ = tmp.GetDataInt("ORDER_SEQ");
@@ -1840,37 +1390,6 @@ namespace MedicalLibrary.Entity
             //            obj.Sekou2 = tmp.GetDataString("施行部署２");
             obj.SekouStaff = tmp.GetDataString("SEKOU_USR");
             obj.Staff = tmp.GetDataString("REG_USR");
-#else
-            obj.OrderId = tmp.GetDataString("オーダー番号");
-            obj.UkeId = tmp.GetDataString("受付番号");
-            obj.UkeSEQ = tmp.GetDataInt("連番");
-            obj.Pat.Id = tmp.GetDataString("患者コード");
-            obj.SekouDate = tmp.GetDataString("施行予定日");
-            obj.SekouTime = tmp.GetDataString("装置番号");
-            obj.Pat.Ins = tmp.GetDataString("保険ビット");
-            obj.Shinku = tmp.GetDataString("診療区分");
-            obj.InOut = tmp.GetDataString("入外区分");
-            obj.Dept = tmp.GetDataString("科コード");
-            obj.Doctor = tmp.GetDataString("指示医コード");
-            obj.OrderDate = tmp.GetDataString("指示日");
-            obj.OrderTime = tmp.GetDataString("指示時間");
-            obj.RsvSEQ = tmp.GetDataLong("予約番号");
-            obj.RsvDate = tmp.GetDataString("予約日");
-            obj.RsvTime = tmp.GetDataString("予約時間");
-            obj.StartDate = tmp.GetDataString("開始日付");
-            obj.EndDate = tmp.GetDataString("終了日付");
-            obj.SOAP = tmp.GetDataString("ＳＯＡＰ表示名称");
-            obj.SekouFlg = tmp.GetDataString("施行フラグ");
-            obj.KaikeiFlg = tmp.GetDataString("会計フラグ");
-            obj.PaperFlg = tmp.GetDataString("指示箋フラグ");
-            obj.InnaiFlg = tmp.GetDataString("院内区分");
-            obj.RinjiFlg = tmp.GetDataString("伝票種別").Equals("1") ? "1" : "";
-            obj.TaiinFlg = tmp.GetDataString("伝票種別").Equals("2") ? "1" : "";
-            obj.Sekou1 = tmp.GetDataString("施行部署１");
-            obj.Sekou2 = tmp.GetDataString("施行部署２");
-            obj.SekouStaff = tmp.GetDataString("施行者コード");
-            obj.Staff = tmp.GetDataString("入力者コード");
-#endif
             return obj;
         }
 
@@ -1899,7 +1418,6 @@ namespace MedicalLibrary.Entity
 				uid = 0;
 			}
 
-#if INNO
             string cmd = "update D_ORDER_HEADER " +
                 " set BILL_FLG = " + flg +
 				" , BILL_USR = " + uid +
@@ -1917,7 +1435,6 @@ namespace MedicalLibrary.Entity
 				" where ORDER_NO = " + order_id;
 
             DB.Db3.ExecuteNonQuery(cmd);
-#endif
         }
 
 

@@ -75,7 +75,6 @@ namespace MedicalLibrary.Entity
                 return list;
             }
 
-#if INNO
             string deptSql1 = "";
             string deptSql2 = "";
 
@@ -113,39 +112,6 @@ namespace MedicalLibrary.Entity
 
                 list.Add(obj);
             }
-#else
-            string deptSql = "";
-
-            if (dept.Length > 0)
-            {
-                deptSql = " and 科コード = " + dept;
-            }
-
-            string cmd = "select distinct ts.患者コード, ts.科コード, th.診療区分, th.院内区分, th.施行フラグ from " +
-                " (select t.患者コード, case when t.変更科コード != 0 then t.変更科コード else t.科コード end 科コード " +
-                " from macs.ADT_診察状況データ t " +
-                " where t.受付日 = " + come_date + deptSql + ") ts, " +
-                " (select t.患者コード, t.診療区分, t.科コード, t.院内区分, t.施行フラグ " +
-                " from macs.ＮＴオーダーヘッダー t " +
-                " where t.施行予定日 = " + come_date + deptSql + " and t.入外区分 = 1) th " +
-                " where ts.患者コード = th.患者コード and ts.科コード = th.科コード " +
-                " order by ts.患者コード, ts.科コード, th.診療区分, th.院内区分, th.施行フラグ desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatOutKoui obj = new PatOutKoui();
-
-                obj.Id = tmp.DataDict["患者コード"].ToString();
-                obj.Dept = tmp.DataDict["科コード"].ToString();
-                int.TryParse(tmp.DataDict["診療区分"].ToString(), out obj.Koui);
-                obj.PharmacyInOut = tmp.DataDict["院内区分"].ToString();
-                int.TryParse(tmp.DataDict["施行フラグ"].ToString(), out obj.Sekou);
-
-                list.Add(obj);
-            }
-#endif
             return list;
         }
     }

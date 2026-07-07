@@ -863,19 +863,11 @@ namespace MedicalLibrary.Agent
             {
                 return list;
             }
-#if INNO
             string cmd = "select STAFF, SEKOU_CODE {s•”‚P, count(*) CNT from " +
                 " (select distinct ORDER_NO, STAFF, SEKOU_CODE " +
                 " from COME_REPORT inner join D_ORDER_HEADER" + Env.DB_LINK + " on ORDER_ID = ORDER_NO " +
                 " where ORDER_DATE >= " + date1 + " and ORDER_DATE <= " + date2 + " and SEKOU_CODE in (" + AppString.ConcatList(sekou_list, ",") + ") and STATUS = 1 and STAFF is not NULL) " +
                 " group by STAFF, SEKOU_CODE";
-#else
-            string cmd = "select STAFF, {s•”‚P, count(*) CNT from " +
-                " (select distinct ƒI[ƒ_[”Ô†, STAFF, {s•”‚P " +
-                " from COME_REPORT inner join ‚m‚sƒI[ƒ_[ƒwƒbƒ_[" + Env.DB_LINK + " on ORDER_ID = ƒI[ƒ_[”Ô† " +
-                " where {s—\’è“ú >= " + date1 + " and {s—\’è“ú <= " + date2 + " and {s•”‚P in (" + AppString.ConcatList(sekou_list, ",") + ") and STATUS = 1 and STAFF is not NULL) " +
-                " group by STAFF, {s•”‚P";
-#endif
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
 
             foreach (StdClass tmp in tmp_list)

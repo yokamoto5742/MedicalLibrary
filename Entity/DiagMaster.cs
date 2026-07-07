@@ -87,7 +87,6 @@ namespace MedicalLibrary.Entity
         {
             List<DiagMaster> list = new List<DiagMaster>();
 
-#if INNO
             // 病名マスターの取得
             string cmd = "select * from M_BYOUMEI " +
                     " where FLD_06 like '%" + name + "%'";
@@ -130,44 +129,6 @@ namespace MedicalLibrary.Entity
 
                 list.Add(obj);
             }
-#else
-            // 病名マスターの取得
-            string cmd = "select * from IM73RC " +
-                    " where IM73RC_F04 like '%" + name + "%'";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                DiagMaster obj = new DiagMaster();
-
-                obj.Code = tmp.DataDict["IM73RC_F02"].ToString();
-                obj.Name = tmp.DataDict["IM73RC_F04"].ToString();
-                obj.Kana = tmp.DataDict["IM73RC_F05"].ToString();
-                obj.ICD10 = tmp.DataDict["IM73RC_F13"].ToString();
-
-                list.Add(obj);
-            }
-
-
-            // 修飾語マスターの取得
-            cmd = "select * from IM74RC " +
-                    " where IM74RC_F04 like '%" + name + "%'";
-
-            tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                DiagMaster obj = new DiagMaster();
-
-                obj.Code = tmp.DataDict["IM74RC_F02"].ToString();
-                obj.Name = tmp.DataDict["IM74RC_F04"].ToString();
-                obj.Kana = tmp.DataDict["IM74RC_F05"].ToString();
-                obj.KindCode = tmp.DataDict["IM74RC_F06"].ToString();
-
-                list.Add(obj);
-            }
-#endif
             return list;
         }
 
@@ -186,7 +147,6 @@ namespace MedicalLibrary.Entity
             {
                 return list;
             }
-#if INNO
             string diag_sql = "";
 
             if (diag_name.Length > 0)
@@ -235,54 +195,6 @@ namespace MedicalLibrary.Entity
                 list.Add(obj);
  */
             }
-#else
-            string diag_sql = "";
-
-            if (diag_name.Length > 0)
-            {
-                diag_sql += " IM73RC_F04 like '%" + diag_name + "%'";
-            }
-
-            if (icd.Length > 0)
-            {
-                if (diag_sql.Length > 0)
-                {
-                    diag_sql += " or ";
-                }
-
-                diag_sql += " IM73RC_F13 like '%" + icd + "%' or IM73RC_F08 like '%" + icd + "%' or " +
-                    " IM73RC_F13 like '%" + icd.ToUpper() + "%' or IM73RC_F08 like '%" + icd.ToUpper() + "%'";
-            }
-
-            // 病名マスターの取得
-            string cmd = "select * from IM73RC " +
-                    " where " + diag_sql;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db1, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                // IM73RC_F08, IM73RC_F13 いずれに合致しても、他方のものもリストに追加する。
-
-                DiagMaster obj = new DiagMaster();
-
-                obj.Code = tmp.DataDict["IM73RC_F02"].ToString();
-                obj.Name = tmp.DataDict["IM73RC_F04"].ToString();
-                obj.Kana = tmp.DataDict["IM73RC_F05"].ToString();
-                obj.ICD10 = tmp.DataDict["IM73RC_F13"].ToString();
-
-                list.Add(obj);
-
-                obj = new DiagMaster();
-
-                obj.Code = tmp.DataDict["IM73RC_F02"].ToString();
-                obj.Name = tmp.DataDict["IM73RC_F04"].ToString();
-                obj.Kana = tmp.DataDict["IM73RC_F05"].ToString();
-                obj.ICD10 = tmp.DataDict["IM73RC_F08"].ToString();
-
-                list.Add(obj);
-            }
-#endif
             return list;
         }
     }

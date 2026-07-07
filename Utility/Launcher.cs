@@ -15,11 +15,6 @@ namespace MedicalLibrary.Utility
             return Process.Start(@"C:\Program Files\Internet Explorer\iexplore.exe", url);
         }
 
-        public static Process InternetExplorer(string url)
-        {
-            return Process.Start(@"C:\Program Files\Internet Explorer\iexplore.exe", url);
-        }
-
         public static Process Dicom(string pt_id, DicomKind kind)
         {
             if (kind == DicomKind.PRO)
@@ -130,37 +125,6 @@ namespace MedicalLibrary.Utility
             if (argument.Length > 0)
             {
                 args += " " + argument;
-            }
-
-            if (File.Exists(exe))
-            {
-                return Process.Start(exe, args);
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 持参薬システムを起動する
-        /// </summary>
-        /// <param name="pt_id"></param>
-        /// <param name="date"></param>
-        /// <returns></returns>
-        public static Process BringDrug(string pt_id = "")
-        {
-            string exe = AppFile.FilePath("BringDrug.exe");
-            string args = "";
-
-            if (LoginUser.Id.Length > 0)
-            {
-                args += " " + LoginUser.Id;
-            }
-
-            if (pt_id.Length > 0)
-            {
-                args += " " + pt_id;
             }
 
             if (File.Exists(exe))

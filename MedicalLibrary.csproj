@@ -172,17 +172,7 @@
     <Compile Include="Agent\FormOpeNursingSchema.designer.cs">
       <DependentUpon>FormOpeNursingSchema.cs</DependentUpon>
     </Compile>
-    <Compile Include="Agent\FormPos.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormPos.designer.cs">
-      <DependentUpon>FormPos.cs</DependentUpon>
-    </Compile>
     <Compile Include="Agent\Invoice.cs" />
-    <Compile Include="Agent\MWMData.cs" />
-    <Compile Include="Agent\MWMOrder.cs" />
-    <Compile Include="Agent\MWMSent.cs" />
-    <Compile Include="Agent\MWMSettings.cs" />
     <Compile Include="Agent\NidekARK1.cs" />
     <Compile Include="Agent\NidekARK1ListForm.cs">
       <SubType>Form</SubType>
@@ -475,12 +465,6 @@
     <Compile Include="Boundary\FormInCal2.Designer.cs">
       <DependentUpon>FormInCal2.cs</DependentUpon>
     </Compile>
-    <Compile Include="Boundary\FormInfo1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Boundary\FormInfo1.Designer.cs">
-      <DependentUpon>FormInfo1.cs</DependentUpon>
-    </Compile>
     <Compile Include="Boundary\FormInputString1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -588,12 +572,6 @@
     </Compile>
     <Compile Include="Boundary\FormPDFViewer1.designer.cs">
       <DependentUpon>FormPDFViewer1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Boundary\FormPDFViewer2.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Boundary\FormPDFViewer2.Designer.cs">
-      <DependentUpon>FormPDFViewer2.cs</DependentUpon>
     </Compile>
     <Compile Include="Boundary\FormPostIt1.cs">
       <SubType>Form</SubType>
@@ -703,12 +681,6 @@
     <Compile Include="Agent\ComeReportData.cs" />
     <Compile Include="Agent\ComeReportSchema.cs" />
     <Compile Include="Agent\ComeReportSchemaItem.cs" />
-    <Compile Include="Boundary\StdMsgBox.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Boundary\StdMsgBox.Designer.cs">
-      <DependentUpon>StdMsgBox.cs</DependentUpon>
-    </Compile>
     <Compile Include="Entity\AddressGroup.cs" />
     <Compile Include="Entity\Allergy.cs" />
     <Compile Include="Entity\BaseInfo.cs" />
@@ -770,7 +742,6 @@
     <Compile Include="Entity\PatOrder.cs" />
     <Compile Include="Entity\PatOrderDetail.cs" />
     <Compile Include="Entity\PatOut.cs" />
-    <Compile Include="Entity\PatOutDrugSeq.cs" />
     <Compile Include="Entity\PatOutKarteStatus.cs" />
     <Compile Include="Entity\PatOutKoui.cs" />
     <Compile Include="Entity\PdfDoc.cs" />
@@ -874,9 +845,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Agent\FormOpeNursingSchema.resx">
       <DependentUpon>FormOpeNursingSchema.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormPos.resx">
-      <DependentUpon>FormPos.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Agent\NidekARK1ListForm.resx">
       <DependentUpon>NidekARK1ListForm.cs</DependentUpon>
@@ -995,9 +963,6 @@
     <EmbeddedResource Include="Boundary\FormInCal2.resx">
       <DependentUpon>FormInCal2.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Boundary\FormInfo1.resx">
-      <DependentUpon>FormInfo1.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormInputString1.resx">
       <DependentUpon>FormInputString1.cs</DependentUpon>
     </EmbeddedResource>
@@ -1051,9 +1016,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormPDFViewer1.resx">
       <DependentUpon>FormPDFViewer1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Boundary\FormPDFViewer2.resx">
-      <DependentUpon>FormPDFViewer2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormPostIt1.resx">
       <DependentUpon>FormPostIt1.cs</DependentUpon>
@@ -1111,9 +1073,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormString1.resx">
       <DependentUpon>FormString1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Boundary\StdMsgBox.resx">
-      <DependentUpon>StdMsgBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

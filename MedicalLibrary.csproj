@@ -90,7 +90,6 @@
     <Reference Include="UIAutomationTypes" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Agent\Alert.cs" />
     <Compile Include="Agent\Bill.cs" />
     <Compile Include="Agent\BillMakerSettings.cs" />
     <Compile Include="Agent\BillPay.cs" />
@@ -103,13 +102,6 @@
     </Compile>
     <Compile Include="Agent\ComeReportOrder.cs" />
     <Compile Include="Agent\ComeReportSettings.cs" />
-    <Compile Include="Agent\DrugAdvAgree.cs" />
-    <Compile Include="Agent\DrugAdvComment.cs" />
-    <Compile Include="Agent\DrugAdvDischarge.cs" />
-    <Compile Include="Agent\DrugAdv.cs" />
-    <Compile Include="Agent\DrugAdvNode.cs" />
-    <Compile Include="Agent\DrugAdvSettings.cs" />
-    <Compile Include="Agent\DrugAdvTemplate.cs" />
     <Compile Include="Agent\EyeDict.cs" />
     <Compile Include="Agent\EyeDoc.cs" />
     <Compile Include="Agent\EyeIV.cs" />
@@ -126,61 +118,11 @@
     <Compile Include="Agent\EyeOpeRsv.cs" />
     <Compile Include="Agent\EyeRefKrt.cs" />
     <Compile Include="Agent\EyeSummary.cs" />
-    <Compile Include="Agent\FCRData.cs" />
-    <Compile Include="Agent\FCRForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FCRForm.designer.cs">
-      <DependentUpon>FCRForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FCROrder.cs" />
-    <Compile Include="Agent\FormAlert.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormAlert.Designer.cs">
-      <DependentUpon>FormAlert.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormBillMaker1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormBillMaker1.designer.cs">
-      <DependentUpon>FormBillMaker1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormBillPayCheckIn.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormBillPayCheckIn.designer.cs">
-      <DependentUpon>FormBillPayCheckIn.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormBillPayList.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormBillPayList.designer.cs">
-      <DependentUpon>FormBillPayList.cs</DependentUpon>
-    </Compile>
     <Compile Include="Agent\FormBillPDFList.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Agent\FormBillPDFList.designer.cs">
       <DependentUpon>FormBillPDFList.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormComeReportAchieve.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormComeReportAchieve.designer.cs">
-      <DependentUpon>FormComeReportAchieve.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormComeReportList.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormComeReportList.designer.cs">
-      <DependentUpon>FormComeReportList.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormComeReportOutSide.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormComeReportOutSide.designer.cs">
-      <DependentUpon>FormComeReportOutSide.cs</DependentUpon>
     </Compile>
     <Compile Include="Agent\FormComeReportPat.cs">
       <SubType>Form</SubType>
@@ -205,42 +147,6 @@
     </Compile>
     <Compile Include="Agent\FormComeReportTemplate.designer.cs">
       <DependentUpon>FormComeReportTemplate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormDrugAdv.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormDrugAdv.designer.cs">
-      <DependentUpon>FormDrugAdv.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormDrugAdvComment.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormDrugAdvComment.designer.cs">
-      <DependentUpon>FormDrugAdvComment.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormDrugAdvList.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormDrugAdvList.designer.cs">
-      <DependentUpon>FormDrugAdvList.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormDrugAdvTemplate.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormDrugAdvTemplate.designer.cs">
-      <DependentUpon>FormDrugAdvTemplate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormInspectData.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormInspectData.Designer.cs">
-      <DependentUpon>FormInspectData.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\FormMedicalSupport.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormMedicalSupport.Designer.cs">
-      <DependentUpon>FormMedicalSupport.cs</DependentUpon>
     </Compile>
     <Compile Include="Agent\FormOpeNursingAs.cs">
       <SubType>Form</SubType>
@@ -272,33 +178,8 @@
     <Compile Include="Agent\FormPos.designer.cs">
       <DependentUpon>FormPos.cs</DependentUpon>
     </Compile>
-    <Compile Include="Agent\FormQ26.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\FormQ26.designer.cs">
-      <DependentUpon>FormQ26.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\Inspect.cs" />
     <Compile Include="Agent\Invoice.cs" />
-    <Compile Include="Agent\MC500DataListForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\MC500DataListForm.designer.cs">
-      <DependentUpon>MC500DataListForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\MC500Form.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\MC500Form.designer.cs">
-      <DependentUpon>MC500Form.cs</DependentUpon>
-    </Compile>
     <Compile Include="Agent\MWMData.cs" />
-    <Compile Include="Agent\MWMForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\MWMForm.designer.cs">
-      <DependentUpon>MWMForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Agent\MWMOrder.cs" />
     <Compile Include="Agent\MWMSent.cs" />
     <Compile Include="Agent\MWMSettings.cs" />
@@ -329,26 +210,9 @@
       <DependentUpon>OpeOrderWeekListForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Agent\OpeOrderSettings.cs" />
-    <Compile Include="Agent\OushinListForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\OushinListForm.designer.cs">
-      <DependentUpon>OushinListForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\OushinPat.cs" />
-    <Compile Include="Agent\PatLabelSettings.cs" />
-    <Compile Include="Agent\PatOrderSettings.cs" />
     <Compile Include="Agent\PosDemand.cs" />
-    <Compile Include="Agent\PosRegHistory.cs" />
     <Compile Include="Agent\PosRegHistoryDetail.cs" />
     <Compile Include="Agent\Q26.cs" />
-    <Compile Include="Agent\ReceBillForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\ReceBillForm.designer.cs">
-      <DependentUpon>ReceBillForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\ReceBillSettings.cs" />
     <Compile Include="Boundary\CtrlAlphaBox1.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -430,16 +294,10 @@
     <Compile Include="Boundary\CtrlKarteTemplate1.Designer.cs">
       <DependentUpon>CtrlKarteTemplate1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Boundary\CtrlPatInsBox1.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Boundary\CtrlPostItGridView1.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Boundary\CtrlProblemGridView1.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Boundary\CtrlQualBox1.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Boundary\CtrlSectionBox1.cs">
@@ -460,7 +318,6 @@
     <Compile Include="Boundary\CtrlSoapWrite1.Designer.cs">
       <DependentUpon>CtrlSoapWrite1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Boundary\DataGridViewCheckBoxLabelCell.cs" />
     <Compile Include="Boundary\FormAddressGroup.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -570,29 +427,11 @@
     <Compile Include="Boundary\FormDPCData2.Designer.cs">
       <DependentUpon>FormDPCData2.cs</DependentUpon>
     </Compile>
-    <Compile Include="Boundary\FormDPCICD.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Boundary\FormDPCICD.designer.cs">
-      <DependentUpon>FormDPCICD.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Boundary\FormDPCIdChange.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Boundary\FormDPCIdChange.designer.cs">
-      <DependentUpon>FormDPCIdChange.cs</DependentUpon>
-    </Compile>
     <Compile Include="Boundary\FormDPCList.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Boundary\FormDPCList.Designer.cs">
       <DependentUpon>FormDPCList.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Boundary\FormDPCManager.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Boundary\FormDPCManager.designer.cs">
-      <DependentUpon>FormDPCManager.cs</DependentUpon>
     </Compile>
     <Compile Include="Boundary\FormExec.cs">
       <SubType>Form</SubType>
@@ -629,12 +468,6 @@
     </Compile>
     <Compile Include="Boundary\FormFindStaff.designer.cs">
       <DependentUpon>FormFindStaff.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Boundary\FormInCal1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Boundary\FormInCal1.Designer.cs">
-      <DependentUpon>FormInCal1.cs</DependentUpon>
     </Compile>
     <Compile Include="Boundary\FormInCal2.cs">
       <SubType>Form</SubType>
@@ -695,12 +528,6 @@
     </Compile>
     <Compile Include="Boundary\FormOpeOrder.designer.cs">
       <DependentUpon>FormOpeOrder.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Boundary\FormOpeRecord.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Boundary\FormOpeRecord.Designer.cs">
-      <DependentUpon>FormOpeRecord.cs</DependentUpon>
     </Compile>
     <Compile Include="Boundary\FormOrder.cs">
       <SubType>Form</SubType>
@@ -774,12 +601,6 @@
     <Compile Include="Boundary\FormPostIt1.Designer.cs">
       <DependentUpon>FormPostIt1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Boundary\FormPreOrderAgree.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Boundary\FormPreOrderAgree.designer.cs">
-      <DependentUpon>FormPreOrderAgree.cs</DependentUpon>
-    </Compile>
     <Compile Include="Boundary\FormProblem1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -797,12 +618,6 @@
     </Compile>
     <Compile Include="Boundary\FormRsvDetail.Designer.cs">
       <DependentUpon>FormRsvDetail.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Boundary\FormRsvPatList.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Boundary\FormRsvPatList.Designer.cs">
-      <DependentUpon>FormRsvPatList.cs</DependentUpon>
     </Compile>
     <Compile Include="Boundary\FormRsvs.cs">
       <SubType>Form</SubType>
@@ -846,12 +661,6 @@
     <Compile Include="Boundary\FormVitalDaily.Designer.cs">
       <DependentUpon>FormVitalDaily.cs</DependentUpon>
     </Compile>
-    <Compile Include="Boundary\FormVoucher.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Boundary\FormVoucher.designer.cs">
-      <DependentUpon>FormVoucher.cs</DependentUpon>
-    </Compile>
     <Compile Include="Boundary\LoginChange.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -860,12 +669,6 @@
     </Compile>
     <Compile Include="Boundary\CtrlVoucherPanel1.cs">
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Boundary\FormLibSettings.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Boundary\FormLibSettings.Designer.cs">
-      <DependentUpon>FormLibSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="Boundary\CtrlOrderView1.cs">
       <SubType>UserControl</SubType>
@@ -884,12 +687,6 @@
     </Compile>
     <Compile Include="Boundary\StdForm1.cs">
       <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Boundary\StdForm2.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Boundary\StdForm2.Designer.cs">
-      <DependentUpon>StdForm2.cs</DependentUpon>
     </Compile>
     <Compile Include="Boundary\CtrlOrderPanel1.cs">
       <SubType>Component</SubType>
@@ -917,7 +714,6 @@
     <Compile Include="Entity\BaseInfo.cs" />
     <Compile Include="Entity\BaseInfoMaster.cs" />
     <Compile Include="Entity\BaseOrderPathTemplate.cs" />
-    <Compile Include="Entity\Byoto.cs" />
     <Compile Include="Entity\ByotoBed.cs" />
     <Compile Include="Entity\ByotoPat.cs" />
     <Compile Include="Entity\ByotoRoom.cs" />
@@ -929,20 +725,12 @@
     <Compile Include="Entity\DiagMaster.cs" />
     <Compile Include="Entity\DischargeSummary.cs" />
     <Compile Include="Entity\DPCData.cs" />
-    <Compile Include="Entity\DPCDiag2.cs" />
-    <Compile Include="Entity\DPCICD.cs" />
     <Compile Include="Entity\DPCHeader.cs" />
     <Compile Include="Entity\DPCICDNotice.cs" />
     <Compile Include="Entity\DPCItem1.cs" />
     <Compile Include="Entity\DPCItem2.cs" />
-    <Compile Include="Entity\DPCMaster.cs" />
-    <Compile Include="Entity\DPCOpe.cs" />
-    <Compile Include="Entity\DPCOpe1.cs" />
-    <Compile Include="Entity\DPCOpe2.cs" />
     <Compile Include="Entity\DPCOpeMaster.cs" />
-    <Compile Include="Entity\InfectionMaster.cs" />
     <Compile Include="Entity\DiagNan.cs" />
-    <Compile Include="Entity\Intro.cs" />
     <Compile Include="Entity\KarteLog.cs" />
     <Compile Include="Entity\KarteMessage.cs" />
     <Compile Include="Entity\KarteTemplate.cs" />
@@ -967,7 +755,6 @@
     <Compile Include="Entity\PatOpeOrder2.cs" />
     <Compile Include="Entity\ProblemData.cs" />
     <Compile Include="Entity\ProblemMaster.cs" />
-    <Compile Include="Entity\RsvNameMaster.cs" />
     <Compile Include="Entity\SchemaImage.cs" />
     <Compile Include="Entity\SoapDetail.cs" />
     <Compile Include="Entity\SoapHeader.cs" />
@@ -979,7 +766,6 @@
     <Compile Include="Entity\PathMaster.cs" />
     <Compile Include="Entity\PathMasterTask.cs" />
     <Compile Include="Entity\PathMasterTaskDetail.cs" />
-    <Compile Include="Entity\PathTag.cs" />
     <Compile Include="Entity\PatIn.cs" />
     <Compile Include="Entity\PatOrder.cs" />
     <Compile Include="Entity\PatOrderDetail.cs" />
@@ -991,7 +777,6 @@
     <Compile Include="Entity\PostIt.cs" />
     <Compile Include="Entity\PreBarcode.cs" />
     <Compile Include="Entity\PreOrder.cs" />
-    <Compile Include="Entity\PreOrderAgree.cs" />
     <Compile Include="Entity\RsvData.cs" />
     <Compile Include="Entity\RsvMaster.cs" />
     <Compile Include="Entity\Soap.cs" />
@@ -1019,59 +804,10 @@
     <Compile Include="Boundary\StdControlFont1.designer.cs">
       <DependentUpon>StdControlFont1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Agent\MC500.cs" />
-    <Compile Include="Agent\MC500Panel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Agent\MC500Panel.designer.cs">
-      <DependentUpon>MC500Panel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\MC500Panels.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Agent\MC500Panels.designer.cs">
-      <DependentUpon>MC500Panels.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\PatLabelForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\PatLabelForm.designer.cs">
-      <DependentUpon>PatLabelForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\PatLabelLightForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\PatLabelLightForm.designer.cs">
-      <DependentUpon>PatLabelLightForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\PatLabelSeqForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\PatLabelSeqForm.designer.cs">
-      <DependentUpon>PatLabelSeqForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\PatOrderSheetForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\PatOrderSheetForm.designer.cs">
-      <DependentUpon>PatOrderSheetForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\ReceMsgForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\ReceMsgForm.designer.cs">
-      <DependentUpon>ReceMsgForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Agent\ReceStatListForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Agent\ReceStatListForm.designer.cs">
-      <DependentUpon>ReceStatListForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Utility\AppColor.cs" />
     <Compile Include="Utility\AppDataGridView.cs" />
@@ -1090,7 +826,6 @@
     <Compile Include="Utility\DateTimeAgent.cs" />
     <Compile Include="Utility\DB.cs" />
     <Compile Include="Entity\Dict.cs" />
-    <Compile Include="Utility\Enc.cs" />
     <Compile Include="Entity\StdEntity.cs" />
     <Compile Include="Utility\Env.cs" />
     <Compile Include="Boundary\LoginPrompt.cs">
@@ -1113,32 +848,8 @@
     <EmbeddedResource Include="Agent\CanonRKF1Form.resx">
       <DependentUpon>CanonRKF1Form.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FCRForm.resx">
-      <DependentUpon>FCRForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormAlert.resx">
-      <DependentUpon>FormAlert.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormBillMaker1.resx">
-      <DependentUpon>FormBillMaker1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormBillPayCheckIn.resx">
-      <DependentUpon>FormBillPayCheckIn.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormBillPayList.resx">
-      <DependentUpon>FormBillPayList.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Agent\FormBillPDFList.resx">
       <DependentUpon>FormBillPDFList.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormComeReportAchieve.resx">
-      <DependentUpon>FormComeReportAchieve.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormComeReportList.resx">
-      <DependentUpon>FormComeReportList.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormComeReportOutSide.resx">
-      <DependentUpon>FormComeReportOutSide.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Agent\FormComeReportPat.resx">
       <DependentUpon>FormComeReportPat.cs</DependentUpon>
@@ -1151,24 +862,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Agent\FormComeReportTemplate.resx">
       <DependentUpon>FormComeReportTemplate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormDrugAdv.resx">
-      <DependentUpon>FormDrugAdv.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormDrugAdvComment.resx">
-      <DependentUpon>FormDrugAdvComment.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormDrugAdvList.resx">
-      <DependentUpon>FormDrugAdvList.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormDrugAdvTemplate.resx">
-      <DependentUpon>FormDrugAdvTemplate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormInspectData.resx">
-      <DependentUpon>FormInspectData.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormMedicalSupport.resx">
-      <DependentUpon>FormMedicalSupport.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Agent\FormOpeNursingAs.resx">
       <DependentUpon>FormOpeNursingAs.cs</DependentUpon>
@@ -1185,18 +878,6 @@
     <EmbeddedResource Include="Agent\FormPos.resx">
       <DependentUpon>FormPos.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Agent\FormQ26.resx">
-      <DependentUpon>FormQ26.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\MC500DataListForm.resx">
-      <DependentUpon>MC500DataListForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\MC500Form.resx">
-      <DependentUpon>MC500Form.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\MWMForm.resx">
-      <DependentUpon>MWMForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Agent\NidekARK1ListForm.resx">
       <DependentUpon>NidekARK1ListForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -1205,12 +886,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Agent\OpeOrderWeekListForm.resx">
       <DependentUpon>OpeOrderWeekListForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\OushinListForm.resx">
-      <DependentUpon>OushinListForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\ReceBillForm.resx">
-      <DependentUpon>ReceBillForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormAnesRecord.resx">
       <DependentUpon>FormAnesRecord.cs</DependentUpon>
@@ -1296,17 +971,8 @@
     <EmbeddedResource Include="Boundary\FormDPCData2.resx">
       <DependentUpon>FormDPCData2.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Boundary\FormDPCICD.resx">
-      <DependentUpon>FormDPCICD.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Boundary\FormDPCIdChange.resx">
-      <DependentUpon>FormDPCIdChange.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormDPCList.resx">
       <DependentUpon>FormDPCList.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Boundary\FormDPCManager.resx">
-      <DependentUpon>FormDPCManager.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormExec.resx">
       <DependentUpon>FormExec.cs</DependentUpon>
@@ -1325,9 +991,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormFindStaff.resx">
       <DependentUpon>FormFindStaff.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Boundary\FormInCal1.resx">
-      <DependentUpon>FormInCal1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormInCal2.resx">
       <DependentUpon>FormInCal2.cs</DependentUpon>
@@ -1358,9 +1021,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormOpeOrder.resx">
       <DependentUpon>FormOpeOrder.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Boundary\FormOpeRecord.resx">
-      <DependentUpon>FormOpeRecord.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormOrder.resx">
       <DependentUpon>FormOrder.cs</DependentUpon>
@@ -1398,9 +1058,6 @@
     <EmbeddedResource Include="Boundary\FormPostIt1.resx">
       <DependentUpon>FormPostIt1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Boundary\FormPreOrderAgree.resx">
-      <DependentUpon>FormPreOrderAgree.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormProblem1.resx">
       <DependentUpon>FormProblem1.cs</DependentUpon>
     </EmbeddedResource>
@@ -1409,9 +1066,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormRsvDetail.resx">
       <DependentUpon>FormRsvDetail.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Boundary\FormRsvPatList.resx">
-      <DependentUpon>FormRsvPatList.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Boundary\FormRsvs.resx">
       <DependentUpon>FormRsvs.cs</DependentUpon>
@@ -1434,17 +1088,11 @@
     <EmbeddedResource Include="Boundary\FormVitalDaily.resx">
       <DependentUpon>FormVitalDaily.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Boundary\FormVoucher.resx">
-      <DependentUpon>FormVoucher.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Boundary\LoginChange.resx">
       <DependentUpon>LoginChange.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Boundary\LoginPrompt.resx">
       <DependentUpon>LoginPrompt.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Boundary\FormLibSettings.resx">
-      <DependentUpon>FormLibSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Boundary\CtrlOrderView1.resx">
       <DependentUpon>CtrlOrderView1.cs</DependentUpon>
@@ -1464,36 +1112,12 @@
     <EmbeddedResource Include="Boundary\FormString1.resx">
       <DependentUpon>FormString1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Agent\MC500Panel.resx">
-      <DependentUpon>MC500Panel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\MC500Panels.resx">
-      <DependentUpon>MC500Panels.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\PatLabelForm.resx">
-      <DependentUpon>PatLabelForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\PatLabelLightForm.resx">
-      <DependentUpon>PatLabelLightForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\PatLabelSeqForm.resx">
-      <DependentUpon>PatLabelSeqForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\PatOrderSheetForm.resx">
-      <DependentUpon>PatOrderSheetForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Boundary\StdMsgBox.resx">
       <DependentUpon>StdMsgBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\ReceMsgForm.resx">
-      <DependentUpon>ReceMsgForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Agent\ReceStatListForm.resx">
-      <DependentUpon>ReceStatListForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

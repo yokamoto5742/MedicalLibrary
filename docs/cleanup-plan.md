@@ -1,5 +1,12 @@
 # MedicalLibrary 削減計画（2026-07-07）
 
+> **実施済み（2026-07-07）** — フェーズ1完了。147ファイル削除＋csproj整理（コミット `639dd12`）。
+> 検証結果: MedicalLibrary(Release|x86)ビルド成功 / EyeCenter・NidekARK1・CanonRKF1 のRebuild成功 /
+> C:\Shinseikai の配備済みEyeCenter.exe＋新DLLで起動スモークテストOK。
+> NidekARK1・CanonRKF1 は HintPath が存在しない C:\Karte を指していたため C:\Shinseikai 参照に修正（各リポジトリでコミット済み）。
+> **未了: OpeOrder.exe 実バイナリでの参照検証（リリース前必須）とフェーズ2。**
+> 注意: ビルドにより C:\Shinseikai\MedicalLibrary.dll は削減版に置き換わっている。
+
 次回の電子カルテ移行に備え、MedicalLibrary.dll の利用アプリを
 **EyeCenter.exe / OpeOrder.exe / NidekARK1.exe / CanonRKF1.exe** の4本に絞り、
 それ以外のコード・ファイルを削除する。

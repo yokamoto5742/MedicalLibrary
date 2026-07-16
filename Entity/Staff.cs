@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MedicalLibrary.Utility;
+using System.Runtime.CompilerServices;
 
 namespace MedicalLibrary.Entity
 {
@@ -368,6 +369,17 @@ namespace MedicalLibrary.Entity
             return list;
         }
 
+		/// <summary>
+		/// InnoUketsukeLib による認証。
+		/// DLL が無い環境では呼び出し時点で FileNotFoundException が発生するため、
+		/// 呼び出し元の try/catch で捕捉できるよう別メソッドに分離（インライン化禁止）。
+		/// </summary>
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		static bool VerifyInnoUketsukeLib(int i, string pw)
+		{
+			return InnoUketsukeLib.Entity.M_USR.g_Usr1.GetData(i, pw);
+		}
+
         public static Staff Verify(string id, string pw)
         {
             Staff obj = new Staff();
@@ -379,7 +391,7 @@ namespace MedicalLibrary.Entity
 				int.TryParse(id, out i);
 
 				// 認証に失敗したら終了
-				if (!InnoUketsukeLib.Entity.M_USR.g_Usr1.GetData(i, pw)) return obj;
+				if (!VerifyInnoUketsukeLib(i, pw)) return obj;
 			}
 			catch (Exception ex)
 			{

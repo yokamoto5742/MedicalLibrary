@@ -11,16 +11,16 @@ namespace MedicalLibrary.Utility
 {
     public class DB
     {
+        /// <summary>
+        /// コマンドのタイムアウト秒数（0は無制限）。SetCommandTimeout で設定し、以降に生成する DB にも適用される。
+        /// </summary>
+        public static int CommandTimeout { get; private set; } = 0;
+
         public static DB Db1 = new DB();
         public static DB Db2 = new DB();
         public static DB Db3 = new DB();
         public OracleConnection Connection = new OracleConnection();
         public OracleCommand Command = new OracleCommand();
-
-        /// <summary>
-        /// コマンドのタイムアウト秒数（0は無制限）。SetCommandTimeout で設定し、以降に生成する DB にも適用される。
-        /// </summary>
-        public static int CommandTimeout = 0;
 
         /// <summary>
         /// Init で渡された接続文字列。

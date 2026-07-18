@@ -163,20 +163,13 @@ namespace MedicalLibrary.Agent
             List<EyeSummary> list = new List<EyeSummary>();
 
             // ORA-01795ëŒçÙ: INãÂÇÃè„å¿Ç™1000åèÇÃÇΩÇﬂï™äÑÇµÇƒéÊìæÇ∑ÇÈ
-            for (int start = 0; start < pt_list.Count; start += 1000)
+            foreach (string pts in AppString.ConcatLists(pt_list, ","))
             {
-                List<string> part_list = pt_list.GetRange(start, Math.Min(1000, pt_list.Count - start));
+                if (pts.Length == 0) break;
 
-                if (AppString.ConcatList(part_list, ",").Length == 0)
-                {
-                    continue;
-                }
+                string cmd = "select * from EYE_SUMMARY where PATIENT_ID in (" + pts + ")";
 
-                string cmd = "select * from EYE_SUMMARY where PATIENT_ID in (" + AppString.ConcatList(part_list, ",") + ")";
-
-                List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
-
-                foreach (StdClass tmp in tmp_list)
+                foreach (StdClass tmp in StdClass.GetList(DB.Db2, cmd))
                 {
                     list.Add(GetFromStdClass(tmp));
                 }
@@ -292,20 +285,7 @@ namespace MedicalLibrary.Agent
 
             List<StdClass> tmp_list = StdClass.GetList(db == null ? DB.Db2 : db, cmd);
 
-            List<string> pt_list = new List<string>();
-            HashSet<string> pt_set = new HashSet<string>();
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                string pt_id = tmp.GetDataString("PATIENT_ID");
-
-                if (pt_set.Add(pt_id))
-                {
-                    pt_list.Add(pt_id);
-                }
-            }
-
-            Dictionary<string, PatBase> pat_dict = PatBase.GetDict(pt_list, pat_db);
+            Dictionary<string, PatBase> pat_dict = PatBase.GetDict(tmp_list, pat_db);
 
             foreach (StdClass tmp in tmp_list)
             {

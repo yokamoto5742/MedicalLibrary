@@ -578,6 +578,24 @@ namespace MedicalLibrary.Entity
             return dict;
         }
 
+        /// <summary>
+        /// 検索結果リストの PATIENT_ID 列から患者情報の辞書（キー: 患者ID）を取得する。
+        /// </summary>
+        /// <param name="tmp_list">PATIENT_ID 列を持つ検索結果リスト</param>
+        /// <param name="db">使用するDB接続（省略時は DB.Db3）</param>
+        /// <returns></returns>
+        public static Dictionary<string, PatBase> GetDict(List<StdClass> tmp_list, DB db = null)
+        {
+            HashSet<string> pt_set = new HashSet<string>();
+
+            foreach (StdClass tmp in tmp_list)
+            {
+                pt_set.Add(tmp.GetDataString("PATIENT_ID"));
+            }
+
+            return GetDict(new List<string>(pt_set), db);
+        }
+
         public static List<PatBase> GetListByNameKanaBirth(string name = "", string kana = "", string birth = "")
         {
             List<PatBase> list = new List<PatBase>();

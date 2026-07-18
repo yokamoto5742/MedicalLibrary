@@ -515,37 +515,29 @@ namespace MedicalLibrary.Utility
 
             if (forced || !init)
             {
-                try
+                string msg = "";
+
+                string xml_file = AppFile.FilePath("MedicalLibrary_Settings.xml");
+
+                if (File.Exists(xml_file))
                 {
-                    string msg = "";
+                    LibSettings.Read(xml_file);
 
-                    string xml_file = AppFile.FilePath("MedicalLibrary_Settings.xml");
-
-                    if (File.Exists(xml_file))
-                    {
-                        LibSettings.Read(xml_file);
-
-                        // DBアクセスの初期化
-                        DB.Db2.Init(LibSettings.Current.DBConnectionString2);
-                        DB.Db3.Init(LibSettings.Current.DBConnectionString3);
-                    }
-                    else
-                    {
-                        msg += "設定ファイル MedicalLibrary_Settings.xml が存在しません" + Environment.NewLine;
-                    }
-
-                    if (msg.Length > 0)
-                    {
-                        throw new Exception(msg);
-                    }
-
-                    init = true;
+                    // DBアクセスの初期化
+                    DB.Db2.Init(LibSettings.Current.DBConnectionString2);
+                    DB.Db3.Init(LibSettings.Current.DBConnectionString3);
                 }
-                catch (Exception ex)
+                else
                 {
-                    // InnerException を保持して再スローする（元の例外を失うと真の原因が表示できない）
-                    throw new Exception(ex.Message, ex);
+                    msg += "設定ファイル MedicalLibrary_Settings.xml が存在しません" + Environment.NewLine;
                 }
+
+                if (msg.Length > 0)
+                {
+                    throw new Exception(msg);
+                }
+
+                init = true;
             }
         }
     }

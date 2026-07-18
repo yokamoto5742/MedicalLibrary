@@ -606,20 +606,7 @@ namespace MedicalLibrary.Agent
 
             List<StdClass> tmp_list = StdClass.GetList(db == null ? DB.Db2 : db, cmd);
 
-            List<string> pt_list = new List<string>();
-            HashSet<string> pt_set = new HashSet<string>();
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                string pt_id = tmp.GetDataString("PATIENT_ID");
-
-                if (pt_set.Add(pt_id))
-                {
-                    pt_list.Add(pt_id);
-                }
-            }
-
-            Dictionary<string, PatBase> pat_dict = PatBase.GetDict(pt_list, pat_db);
+            Dictionary<string, PatBase> pat_dict = PatBase.GetDict(tmp_list, pat_db);
 
             foreach (StdClass tmp in tmp_list)
             {

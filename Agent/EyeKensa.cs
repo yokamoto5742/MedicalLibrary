@@ -187,8 +187,11 @@ namespace MedicalLibrary.Agent
         /// <param name="start_date"></param>
         /// <param name="end_date"></param>
         /// <param name="pat"></param>
+        /// <param name="limit">取得件数の上限（0は無制限）</param>
+        /// <param name="db">眼科DBへの接続（省略時は DB.Db2）</param>
+        /// <param name="pat_db">患者マスタDBへの接続（省略時は DB.Db3）</param>
         /// <returns></returns>
-        public static List<EyeKensa> LoadByKensasDates(List<string> kensa_id_list, string start_date, string end_date, bool pat = false)
+        public static List<EyeKensa> LoadByKensasDates(List<string> kensa_id_list, string start_date, string end_date, bool pat = false, int limit = 0, DB db = null, DB pat_db = null)
         {
             List<EyeKensa> tmpList = new List<EyeKensa>();
 
@@ -197,23 +200,38 @@ namespace MedicalLibrary.Agent
                 return tmpList;
             }
 
-            string cmd = "";
+            // 患者マスタ（DBリンク先）とは結合せず、眼科DBだけで検索する。
+            // 患者情報は検索結果の患者IDからまとめて取得する（DBリンク越しの結合による負荷・ハング対策）。
+            string cmd = "select * from EYE_KENSA " +
+                " where KENSA_ID in (" + AppString.ConcatList(kensa_id_list, ",") + ") and KENSA_DATE >= " + start_date + " and KENSA_DATE <= " + end_date +
+                " order by KENSA_DATE desc";
+
+            if (limit > 0)
+            {
+                cmd = "select * from (" + cmd + ") where ROWNUM <= " + limit;
+            }
+
+            List<StdClass> tmp_list = StdClass.GetList(db == null ? DB.Db2 : db, cmd);
+
+            Dictionary<string, PatBase> pat_dict = null;
 
             if (pat)
             {
-                cmd = "select EYE_KENSA.*, Trim(tm.P_KANA) as カナ, Trim(tm.P_NAME) as 氏名, tm.P_SEX as 性別, tm.P_BIRTHDAY_AD as 生年月日 " +
-                    " from EYE_KENSA inner join M_PATIENT" + Env.DB_LINK + " tm on EYE_KENSA.PATIENT_ID = tm.P_ID " +
-                    " where KENSA_ID in (" + AppString.ConcatList(kensa_id_list, ",") + ") and KENSA_DATE >= " + start_date + " and KENSA_DATE <= " + end_date +
-                    " order by KENSA_DATE desc";
-            }
-            else
-            {
-                cmd = "select * from EYE_KENSA " +
-                    " where KENSA_ID in (" + AppString.ConcatList(kensa_id_list, ",") + ") and KENSA_DATE >= " + start_date + " and KENSA_DATE <= " + end_date +
-                    " order by KENSA_DATE desc";
-            }
+                List<string> pt_list = new List<string>();
+                HashSet<string> pt_set = new HashSet<string>();
 
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
+                foreach (StdClass tmp in tmp_list)
+                {
+                    string pt_id = tmp.GetDataString("PATIENT_ID");
+
+                    if (pt_set.Add(pt_id))
+                    {
+                        pt_list.Add(pt_id);
+                    }
+                }
+
+                pat_dict = PatBase.GetDict(pt_list, pat_db);
+            }
 
             foreach (StdClass tmp in tmp_list)
             {
@@ -221,11 +239,13 @@ namespace MedicalLibrary.Agent
 
                 if (pat)
                 {
-                    obj._Pat.Id = obj.PtId;
-                    obj._Pat.Kana = tmp.GetDataString("カナ").Trim();
-                    obj._Pat.Name = tmp.GetDataString("氏名").Trim();
-                    obj._Pat.Sex = tmp.GetDataString("性別").Trim();
-                    obj._Pat.Birth = tmp.GetDataString("生年月日").Trim();
+                    // 患者マスタに存在しないIDは除外する（従来の inner join と同じ扱い）
+                    if (!pat_dict.ContainsKey(obj.PtId))
+                    {
+                        continue;
+                    }
+
+                    obj._Pat = pat_dict[obj.PtId];
                 }
 
                 tmpList.Add(obj);

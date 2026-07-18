@@ -162,18 +162,24 @@ namespace MedicalLibrary.Agent
         {
             List<EyeSummary> list = new List<EyeSummary>();
 
-            if (AppString.ConcatList(pt_list, ",").Length == 0)
+            // ORA-01795対策: IN句の上限が1000件のため分割して取得する
+            for (int start = 0; start < pt_list.Count; start += 1000)
             {
-                return list;
-            }
+                List<string> part_list = pt_list.GetRange(start, Math.Min(1000, pt_list.Count - start));
 
-            string cmd = "select * from EYE_SUMMARY where PATIENT_ID in (" + AppString.ConcatList(pt_list, ",") + ")";
+                if (AppString.ConcatList(part_list, ",").Length == 0)
+                {
+                    continue;
+                }
 
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
+                string cmd = "select * from EYE_SUMMARY where PATIENT_ID in (" + AppString.ConcatList(part_list, ",") + ")";
 
-            foreach (StdClass tmp in tmp_list)
-            {
-                list.Add(GetFromStdClass(tmp));
+                List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
+
+                foreach (StdClass tmp in tmp_list)
+                {
+                    list.Add(GetFromStdClass(tmp));
+                }
             }
 
             return list;
@@ -214,8 +220,11 @@ namespace MedicalLibrary.Agent
         /// <param name="kind1">分類1</param>
         /// <param name="kind2">分類2</param>
         /// <param name="kind3">分類3</param>
+        /// <param name="limit">取得件数の上限（0は無制限）</param>
+        /// <param name="db">眼科DBへの接続（省略時は DB.Db2）</param>
+        /// <param name="pat_db">患者マスタDBへの接続（省略時は DB.Db3）</param>
         /// <returns></returns>
-        public static List<EyeSummary> Find(string diag, string kind1, string kind2, string kind3)
+        public static List<EyeSummary> Find(string diag, string kind1, string kind2, string kind3, int limit = 0, DB db = null, DB pat_db = null)
         {
             List<EyeSummary> list = new List<EyeSummary>();
 
@@ -272,24 +281,45 @@ namespace MedicalLibrary.Agent
             {
                 return list;
             }
-            string cmd = "select EYE_SUMMARY.*, Trim(tm.P_NAME) as 氏名, Trim(tm.P_KANA) as カナ, tm.P_SEX as 性別, tm.P_BIRTHDAY_AD as 生年月日 " +
-                " from EYE_SUMMARY inner join M_PATIENT" + Env.DB_LINK + " tm on PATIENT_ID = tm.P_ID";
-            if (param.Length > 0)
+            // 患者マスタ（DBリンク先）とは結合せず、眼科DBだけで検索する。
+            // 患者情報は検索結果の患者IDからまとめて取得する（DBリンク越しの結合による負荷・ハング対策）。
+            string cmd = "select * from EYE_SUMMARY where " + param + " order by PATIENT_ID";
+
+            if (limit > 0)
             {
-                cmd += " where " + param;
+                cmd = "select * from (" + cmd + ") where ROWNUM <= " + limit;
             }
 
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
+            List<StdClass> tmp_list = StdClass.GetList(db == null ? DB.Db2 : db, cmd);
+
+            List<string> pt_list = new List<string>();
+            HashSet<string> pt_set = new HashSet<string>();
+
+            foreach (StdClass tmp in tmp_list)
+            {
+                string pt_id = tmp.GetDataString("PATIENT_ID");
+
+                if (pt_set.Add(pt_id))
+                {
+                    pt_list.Add(pt_id);
+                }
+            }
+
+            Dictionary<string, PatBase> pat_dict = PatBase.GetDict(pt_list, pat_db);
 
             foreach (StdClass tmp in tmp_list)
             {
                 EyeSummary sum = GetFromStdClass(tmp);
 
-                sum._Pat.Id = tmp.GetDataString("PATIENT_ID");
-                sum._Pat.Name = tmp.GetDataString("氏名").Trim();
-                sum._Pat.Kana = tmp.GetDataString("カナ").Trim();
-                sum._Pat.Birth = tmp.GetDataString("生年月日");
-                sum._Pat.Sex = tmp.GetDataString("性別");
+                string pt_id = tmp.GetDataString("PATIENT_ID");
+
+                // 患者マスタに存在しないIDは除外する（従来の inner join と同じ扱い）
+                if (!pat_dict.ContainsKey(pt_id))
+                {
+                    continue;
+                }
+
+                sum._Pat = pat_dict[pt_id];
 
                 list.Add(sum);
             }

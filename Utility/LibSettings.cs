@@ -543,7 +543,8 @@ namespace MedicalLibrary.Utility
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception(ex.Message);
+                    // InnerException を保持して再スローする（元の例外を失うと真の原因が表示できない）
+                    throw new Exception(ex.Message, ex);
                 }
             }
         }

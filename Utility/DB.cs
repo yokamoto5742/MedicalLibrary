@@ -17,6 +17,18 @@ namespace MedicalLibrary.Utility
         public OracleConnection Connection = new OracleConnection();
         public OracleCommand Command = new OracleCommand();
 
+        /// <summary>
+        /// コマンドのタイムアウト秒数（0は無制限）。SetCommandTimeout で設定し、以降に生成する DB にも適用される。
+        /// </summary>
+        public static int CommandTimeout = 0;
+
+        /// <summary>
+        /// Init で渡された接続文字列。
+        /// （接続を開いた後の Connection.ConnectionString はパスワードが除去されるため、
+        /// 　同じ接続先への接続を追加で作る用途にはこちらを使う）
+        /// </summary>
+        public string InitString = "";
+
 
         /// <summary>
         /// Close() 実行時に接続を閉じるかどうか。
@@ -28,6 +40,20 @@ namespace MedicalLibrary.Utility
         {
             Command.Connection = Connection;
             Command.BindByName = true;
+            Command.CommandTimeout = CommandTimeout;
+        }
+
+        /// <summary>
+        /// コマンドのタイムアウト秒数を設定する（0は無制限）。
+        /// 既存の Db1/Db2/Db3 と、以降に生成する DB に適用される。
+        /// </summary>
+        public static void SetCommandTimeout(int seconds)
+        {
+            CommandTimeout = seconds;
+
+            Db1.Command.CommandTimeout = seconds;
+            Db2.Command.CommandTimeout = seconds;
+            Db3.Command.CommandTimeout = seconds;
         }
 
 
@@ -37,6 +63,7 @@ namespace MedicalLibrary.Utility
         /// <param name="con_str"></param>
         public void Init(string connection_string)
         {
+            InitString = connection_string;
             Connection.ConnectionString = connection_string;
         }
 

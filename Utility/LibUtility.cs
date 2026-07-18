@@ -120,14 +120,23 @@ namespace MedicalLibrary.Utility
         {
             string s = ex.Message;
 
-            if (ex.TargetSite.Name.Length > 0)
+            // 型初期化子例外などでは実際の原因が InnerException に入っているため辿って表示する
+            for (Exception inner = ex.InnerException; inner != null; inner = inner.InnerException)
+            {
+                s += Environment.NewLine;
+                s += "[InnerException]" + Environment.NewLine;
+                s += inner.Message;
+            }
+
+            // JITコンパイル時の例外などでは TargetSite / StackTrace が null のことがある
+            if (ex.TargetSite != null && ex.TargetSite.Name.Length > 0)
             {
                 s += Environment.NewLine;
                 s += "[TargetSite]" + Environment.NewLine;
                 s += ex.TargetSite.Name;
             }
 
-            if (ex.StackTrace.Length > 0)
+            if (ex.StackTrace != null && ex.StackTrace.Length > 0)
             {
                 s += Environment.NewLine;
                 s += "[StackTrace]" + Environment.NewLine;

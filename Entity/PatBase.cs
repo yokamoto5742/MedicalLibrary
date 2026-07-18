@@ -524,13 +524,18 @@ namespace MedicalLibrary.Entity
         }
 
 
-        public static List<PatBase> GetList(List<string> pt_list)
+        public static List<PatBase> GetList(List<string> pt_list, DB db = null)
         {
             List<PatBase> list = new List<PatBase>();
 
             if (pt_list.Count == 0)
             {
                 return list;
+            }
+
+            if (db == null)
+            {
+                db = DB.Db3;
             }
 
             foreach (string pts in AppString.ConcatLists(pt_list, ",", "", 1000))
@@ -540,7 +545,7 @@ namespace MedicalLibrary.Entity
                 string cmd = "select * from M_PATIENT " +
                     " where P_ID in (" + pts + ")";
 
-                List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
+                List<StdClass> tmp_list = StdClass.GetList(db, cmd);
 
                 foreach (StdClass tmp in tmp_list)
                 {
@@ -549,6 +554,28 @@ namespace MedicalLibrary.Entity
             }
 
             return list;
+        }
+
+        /// <summary>
+        /// 患者IDリストから患者情報の辞書（キー: 患者ID）を取得する。
+        /// IN句の1000件制限を避けるため分割して取得する。
+        /// </summary>
+        /// <param name="pt_list">患者IDリスト</param>
+        /// <param name="db">使用するDB接続（省略時は DB.Db3）</param>
+        /// <returns></returns>
+        public static Dictionary<string, PatBase> GetDict(List<string> pt_list, DB db = null)
+        {
+            Dictionary<string, PatBase> dict = new Dictionary<string, PatBase>();
+
+            foreach (PatBase pat in GetList(pt_list, db))
+            {
+                if (!dict.ContainsKey(pat.Id))
+                {
+                    dict.Add(pat.Id, pat);
+                }
+            }
+
+            return dict;
         }
 
         public static List<PatBase> GetListByNameKanaBirth(string name = "", string kana = "", string birth = "")

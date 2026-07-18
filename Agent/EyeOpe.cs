@@ -504,8 +504,11 @@ namespace MedicalLibrary.Agent
         /// <param name="record21"></param>
         /// <param name="record22"></param>
         /// <param name="record23"></param>
+        /// <param name="limit">取得件数の上限（0は無制限）</param>
+        /// <param name="db">眼科DBへの接続（省略時は DB.Db2）</param>
+        /// <param name="pat_db">患者マスタDBへの接続（省略時は DB.Db3）</param>
         /// <returns></returns>
-        public static List<EyeOpe> GetList(string start_date, string end_date, string diag, string ope, string doctor, string record11, string record12, string record13, string record21, string record22, string record23)
+        public static List<EyeOpe> GetList(string start_date, string end_date, string diag, string ope, string doctor, string record11, string record12, string record13, string record21, string record22, string record23, int limit = 0, DB db = null, DB pat_db = null)
         {
             List<EyeOpe> tmpList = new List<EyeOpe>();
 
@@ -589,24 +592,49 @@ namespace MedicalLibrary.Agent
             {
                 record_sql2 = " and EYE_OPE_RECORD.CONT like '%" + record22 + "," + record23 + "%'";
             }
-            string cmd = "select EYE_OPE.*, Trim(tm.P_KANA) as カナ, Trim(tm.P_NAME) as 氏名, tm.P_SEX as 性別, tm.P_BIRTHDAY_AD as 生年月日, EYE_OPE_RECORD.CONT as 記録, EYE_OPE_PASS.CONT as 経過 " +
-                " from EYE_OPE inner join M_PATIENT" + Env.DB_LINK + " tm on PATIENT_ID = tm.P_ID left join EYE_OPE_RECORD on EYE_OPE.ID = EYE_OPE_RECORD.ID left join EYE_OPE_PASS on EYE_OPE.ID = EYE_OPE_PASS.ID " +
+            // 患者マスタ（DBリンク先）とは結合せず、眼科DBだけで検索する。
+            // 患者情報は検索結果の患者IDからまとめて取得する（DBリンク越しの結合による負荷・ハング対策）。
+            string cmd = "select EYE_OPE.*, EYE_OPE_RECORD.CONT as REC_CONT, EYE_OPE_PASS.CONT as PASS_CONT " +
+                " from EYE_OPE left join EYE_OPE_RECORD on EYE_OPE.ID = EYE_OPE_RECORD.ID left join EYE_OPE_PASS on EYE_OPE.ID = EYE_OPE_PASS.ID " +
                 " where EYE_OPE.STATUS != 0 " + date_sql + diag_sql + ope_sql + doctor_sql + record_sql1 + record_sql2 +
                 " order by OPE_DATE desc, OPE_TIME desc";
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
+
+            if (limit > 0)
+            {
+                cmd = "select * from (" + cmd + ") where ROWNUM <= " + limit;
+            }
+
+            List<StdClass> tmp_list = StdClass.GetList(db == null ? DB.Db2 : db, cmd);
+
+            List<string> pt_list = new List<string>();
+            HashSet<string> pt_set = new HashSet<string>();
+
+            foreach (StdClass tmp in tmp_list)
+            {
+                string pt_id = tmp.GetDataString("PATIENT_ID");
+
+                if (pt_set.Add(pt_id))
+                {
+                    pt_list.Add(pt_id);
+                }
+            }
+
+            Dictionary<string, PatBase> pat_dict = PatBase.GetDict(pt_list, pat_db);
 
             foreach (StdClass tmp in tmp_list)
             {
                 EyeOpe obj = GetFromStdClass(tmp);
 
-                obj._Pat.Id = obj.PtId;
-                obj._Pat.Kana = tmp.GetDataString("カナ");
-                obj._Pat.Name = tmp.GetDataString("氏名");
-                obj._Pat.Sex = tmp.GetDataString("性別");
-                obj._Pat.Birth = tmp.GetDataString("生年月日");
+                // 患者マスタに存在しないIDは除外する（従来の inner join と同じ扱い）
+                if (!pat_dict.ContainsKey(obj.PtId))
+                {
+                    continue;
+                }
 
-                obj.OpeRecord = tmp.GetDataString("記録");
-                obj.OpePass = tmp.GetDataString("経過");
+                obj._Pat = pat_dict[obj.PtId];
+
+                obj.OpeRecord = tmp.GetDataString("REC_CONT");
+                obj.OpePass = tmp.GetDataString("PASS_CONT");
 
                 tmpList.Add(obj);
             }

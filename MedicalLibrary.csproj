@@ -1014,6 +1014,7 @@
     <None Include="CLAUDE.md" />
     <None Include="docs\cleanup-plan.md" />
     <None Include="docs\DLL移植調査.md" />
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

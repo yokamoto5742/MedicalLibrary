@@ -248,14 +248,6 @@ msbuild MedicalLibrary.csproj /p:Configuration=Release /p:Platform=x86
 1. ディレクトリを作成、または
 2. `Utility/Env.cs` の定数を環境に合わせて修正
 
-## 関連資料
-
-- `docs/CHANGELOG.md` — バージョン履歴・変更内容
-- `CLAUDE.md` — 開発ガイドライン
-- `.claude/rules/coding-guidelines.md` — コード規約詳細
-- `.claude/rules/commit.md` — コミットメッセージ規約
-- `.claude/rules/response-style.md` — レビュー・パッチ提出スタイル
-
 ## ライセンス
 
 社内利用を前提とした非公開プロジェクトです。ライセンスファイルは存在しません。

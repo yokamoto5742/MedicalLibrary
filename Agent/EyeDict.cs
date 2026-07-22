@@ -73,7 +73,7 @@ namespace MedicalLibrary.Agent
             {
                 EyeSet = new DataSet();
 
-                string file = AppFile.FilePath("EyeCenter.xml");
+                string file = AppFile.FilePath("EyeData.xml");
 
                 if (File.Exists(file))
                 {

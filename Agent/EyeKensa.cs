@@ -147,8 +147,9 @@ namespace MedicalLibrary.Agent
 
             if (pat)
             {
-                cmd = "select EYE_KENSA.*, Trim(tm.P_KANA) as カナ, Trim(tm.P_NAME) as 氏名, tm.P_SEX as 性別, tm.P_BIRTHDAY_AD as 生年月日 " +
-                    " from EYE_KENSA inner join M_PATIENT" + Env.DB_LINK + " tm on EYE_KENSA.PATIENT_ID = tm.P_ID " +
+                // 患者マスタ（DBリンク先）とは結合せず、眼科DB単独で検索する。
+                // 患者情報は検索結果の患者IDからまとめて取得する（DBリンク越しの結合による負荷・ハング対策）。
+                cmd = "select * from EYE_KENSA " +
                     " where PATIENT_ID = " + patient_id + " and KENSA_ID = " + kensa_id +
                     " order by KENSA_DATE desc";
             }
@@ -161,17 +162,26 @@ namespace MedicalLibrary.Agent
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
 
+            Dictionary<string, PatBase> pat_dict = null;
+
+            if (pat)
+            {
+                pat_dict = PatBase.GetDict(tmp_list);
+            }
+
             foreach (StdClass tmp in tmp_list)
             {
                 EyeKensa obj = GetFromStdClass(tmp);
 
                 if (pat)
                 {
-                    obj._Pat.Id = obj.PtId;
-                    obj._Pat.Kana = tmp.GetDataString("カナ").Trim();
-                    obj._Pat.Name = tmp.GetDataString("氏名").Trim();
-                    obj._Pat.Sex = tmp.GetDataString("性別").Trim();
-                    obj._Pat.Birth = tmp.GetDataString("生年月日").Trim();
+                    // 患者マスタに存在しないIDは除外する（従来の inner join と同一挙動）
+                    if (!pat_dict.ContainsKey(obj.PtId))
+                    {
+                        continue;
+                    }
+
+                    obj._Pat = pat_dict[obj.PtId];
                 }
 
                 tmpList.Add(obj);

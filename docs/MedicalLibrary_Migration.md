@@ -58,17 +58,15 @@ private static void init()
 
 ## 2. 連携先カルテのDBスキーマ依存（最大の作業量）
 
-`Env.DB_LINK` 経由でカルテ側テーブルを直接 JOIN している SQL が **7ファイル**に存在する
-（2026-07 の未使用コード削除で `DrugAdv.cs`・`OushinPat.cs`・`MWMOrder.cs`・`OpeNursingData.cs` は削除済み）。
+`Env.DB_LINK` 経由でカルテ側テーブルを直接 JOIN している SQL が **4ファイル**に存在する
+（2026-07 の未使用コード削除で `DrugAdv.cs`・`OushinPat.cs`・`MWMOrder.cs`・`OpeNursingData.cs` は削除済み。
+2026-07-23 に `EyeKensa.cs`・`EyeOpe.cs`・`EyeSummary.cs` の `M_PATIENT` 結合は `PatBase.GetDict` 経由の2段階取得に切替済みで解消）。
 
 | ファイル | 参照しているカルテ側テーブル |
 |---|---|
 | `Agent/BillPay.cs`（496, 593行） | `M_PATIENT` |
 | `Agent/ComeReportData.cs`（331〜903行、7箇所） | `NTオーダーヘッダー`、`D_ORDER_HEADER` |
 | `Agent/ComeReportOrder.cs`（283〜658行、8箇所） | `D_ORDER_HEADER`、`D_ORDER_DETAIL`、`M_PATIENT` |
-| `Agent/EyeKensa.cs`（151行） | `M_PATIENT` |
-| `Agent/EyeOpe.cs`（361, 426行） | `M_PATIENT` |
-| `Agent/EyeSummary.cs`（140, 192行） | `M_PATIENT` |
 | `Entity/DiagDPC.cs`（139行） | `D_NYUIN`（`Db == DB.Db2` のときのみリンク付与） |
 
 例（`Agent/BillPay.cs:496`）:

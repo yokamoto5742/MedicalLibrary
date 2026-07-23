@@ -355,23 +355,26 @@ namespace MedicalLibrary.Agent
                 cond_list.Add("OPE_TIME <= " + time2);
             }
 
-            string cmd = "select EYE_OPE.*, " +
-                " Trim(tm.P_KANA) as カナ, Trim(tm.P_NAME) as 氏名, " +
-                " tm.P_SEX 性別, tm.P_BIRTHDAY_AD 生年月日 " +
-                " from EYE_OPE left join M_PATIENT" + Env.DB_LINK + " tm on EYE_OPE.PATIENT_ID = tm.P_ID " +
+            // 患者マスタ（DBリンク先）とは結合せず、眼科DB単独で検索する。
+            // 患者情報は検索結果の患者IDからまとめて取得する（DBリンク越しの結合による負荷・ハング対策）。
+            string cmd = "select * from EYE_OPE " +
                 " where " + AppString.ConcatList(cond_list, " and ") + " and STATUS != 0 " +
                 " order by OPE_KIND, OPE_DATE, OPE_TIME";
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
+
+            Dictionary<string, PatBase> pat_dict = PatBase.GetDict(tmp_list);
 
             foreach (StdClass tmp in tmp_list)
             {
                 EyeOpe obj = GetFromStdClass(tmp);
 
                 obj._Pat.Id = tmp.GetDataString("PATIENT_ID");
-                obj._Pat.Kana = tmp.GetDataString("カナ").TrimEnd();
-                obj._Pat.Name = tmp.GetDataString("氏名").TrimEnd();
-                obj._Pat.Sex = tmp.GetDataString("性別");
-                obj._Pat.Birth = tmp.GetDataString("生年月日");
+
+                // 患者マスタに存在するIDのみ患者情報を設定する（従来の left join と同一挙動）
+                if (pat_dict.ContainsKey(obj.PtId))
+                {
+                    obj._Pat = pat_dict[obj.PtId];
+                }
 
                 list.Add(obj);
             }
@@ -420,23 +423,26 @@ namespace MedicalLibrary.Agent
                 cond_list.Add("OPE_DATE <= " + DateTime.Now.AddDays(7).ToString("yyyyMMdd"));
             }
 
-            string cmd = "select EYE_OPE.*, " +
-                " Trim(tm.P_KANA) as カナ, Trim(tm.P_NAME) as 氏名, " +
-                " tm.P_SEX 性別, tm.P_BIRTHDAY_AD 生年月日 " +
-                " from EYE_OPE left join M_PATIENT" + Env.DB_LINK + " tm on EYE_OPE.PATIENT_ID = tm.P_ID " +
+            // 患者マスタ（DBリンク先）とは結合せず、眼科DB単独で検索する。
+            // 患者情報は検索結果の患者IDからまとめて取得する（DBリンク越しの結合による負荷・ハング対策）。
+            string cmd = "select * from EYE_OPE " +
                 " where " + AppString.ConcatList(cond_list, " and ") + " and STATUS != 0 " +
                 " order by OPE_KIND, OPE_DATE, OPE_TIME";
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
+
+            Dictionary<string, PatBase> pat_dict = PatBase.GetDict(tmp_list);
 
             foreach (StdClass tmp in tmp_list)
             {
                 EyeOpe obj = GetFromStdClass(tmp);
 
                 obj._Pat.Id = tmp.GetDataString("PATIENT_ID");
-                obj._Pat.Kana = tmp.GetDataString("カナ").TrimEnd();
-                obj._Pat.Name = tmp.GetDataString("氏名").TrimEnd();
-                obj._Pat.Sex = tmp.GetDataString("性別");
-                obj._Pat.Birth = tmp.GetDataString("生年月日");
+
+                // 患者マスタに存在するIDのみ患者情報を設定する（従来の left join と同一挙動）
+                if (pat_dict.ContainsKey(obj.PtId))
+                {
+                    obj._Pat = pat_dict[obj.PtId];
+                }
 
                 list.Add(obj);
             }

@@ -73,7 +73,13 @@ namespace MedicalLibrary.Agent
             {
                 EyeSet = new DataSet();
 
-                string file = AppFile.FilePath("EyeData.xml");
+                // 実行ファイル自身のフォルダを優先して探す（電子カルテ登録ボタン経由の起動はカレントディレクトリが exe のフォルダと一致しないため）
+                string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EyeData.xml");
+
+                if (!File.Exists(file))
+                {
+                    file = AppFile.FilePath("EyeData.xml");
+                }
 
                 if (File.Exists(file))
                 {

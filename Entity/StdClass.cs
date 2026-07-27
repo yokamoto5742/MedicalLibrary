@@ -60,13 +60,19 @@ namespace MedicalLibrary.Entity
 
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
-                    if (reader.GetOracleValue(i).ToString() != "null")
+                    // GetOracleValue は呼ぶたびに新しいオブジェクトを返す（CLOB/BLOB はネイティブの
+                    // LOBロケータを持つ）ため、1列につき1回だけ呼び、使い終わったら解放する。
+                    // 2回呼んでいると大量件数の取得でネイティブ資源が倍のペースで枯渇する。
+                    object value = reader.GetOracleValue(i);
+                    string s = value.ToString();
+
+                    obj.DataDict[reader.GetName(i)] = s.Equals("null") ? "" : s;
+
+                    IDisposable disposable = value as IDisposable;
+
+                    if (disposable != null)
                     {
-                        obj.DataDict[reader.GetName(i)] = reader.GetOracleValue(i).ToString();
-                    }
-                    else
-                    {
-                        obj.DataDict[reader.GetName(i)] = "";
+                        disposable.Dispose();
                     }
                 }
 

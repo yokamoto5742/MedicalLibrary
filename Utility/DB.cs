@@ -99,6 +99,36 @@ namespace MedicalLibrary.Utility
         }
 
         /// <summary>
+        /// 接続を破棄する。
+        /// </summary>
+        /// <remarks>
+        /// 呼び出し側（exe）が参照する Oracle.DataAccess のバージョンは MedicalLibrary と
+        /// 異なることがあり、Connection / Command フィールドに直接アクセスすると
+        /// 実行環境によって型が一致せず MissingFieldException になる。
+        /// そのため Oracle 型に触れる操作はこのクラスのメソッドとして公開する。
+        /// </remarks>
+        public void DisposeConnection()
+        {
+            Connection.Dispose();
+        }
+
+        /// <summary>
+        /// 実行中のSQLをキャンセルする（別スレッドから呼び出してよい）。
+        /// </summary>
+        public void CancelCommand()
+        {
+            Command.Cancel();
+        }
+
+        /// <summary>
+        /// LONG 型の列の取得サイズを設定する（-1 で全体を取得）。
+        /// </summary>
+        public void SetInitialLongFetchSize(int size)
+        {
+            Command.InitialLONGFetchSize = size;
+        }
+
+        /// <summary>
         /// Select SQL を直接実行して結果を文字列で取得する。
         /// Open/Close も含めて実行されるので、直接SQLを書くだけでよい。
         /// </summary>

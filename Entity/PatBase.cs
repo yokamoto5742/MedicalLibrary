@@ -538,11 +538,17 @@ namespace MedicalLibrary.Entity
                 db = DB.Db3;
             }
 
+            // 検索結果の全患者をまとめて取得するため、select * だと
+            // 患者マスタの未使用列（LOB/LONG を含む）まで 32bit プロセスに抱え込むことになる。
+            // GetFromStdClass が参照する列だけを取得する（列を増やすときは両方を直すこと）。
+            string columns = "P_ID, P_NAME, P_KANA, P_SEX, P_BIRTHDAY_AD, TEL, POST, ADDR_1, ADDR_2, " +
+                " IN_HOSPITAL, HOKEN_NOW, PROPERTY_2, PROPERTY_3, PROPERTY_4";
+
             foreach (string pts in AppString.ConcatLists(pt_list, ",", "", 1000))
             {
                 if (pts.Length == 0) break;
 
-                string cmd = "select * from M_PATIENT " +
+                string cmd = "select " + columns + " from M_PATIENT " +
                     " where P_ID in (" + pts + ")";
 
                 List<StdClass> tmp_list = StdClass.GetList(db, cmd);

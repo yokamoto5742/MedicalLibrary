@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Data.Common;
-using Oracle.DataAccess.Client;
+using Oracle.ManagedDataAccess.Client;
 using MedicalLibrary.Entity;
 
 namespace MedicalLibrary.Utility

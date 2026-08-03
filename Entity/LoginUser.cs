@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using Oracle.DataAccess.Client;
+using Oracle.ManagedDataAccess.Client;
 using MedicalLibrary.Boundary;
 using MedicalLibrary.Utility;
 

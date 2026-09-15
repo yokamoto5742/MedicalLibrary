@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Oracle.DataAccess.Client;
+using Oracle.ManagedDataAccess.Client;
 using MedicalLibrary.Utility;
 
 namespace MedicalLibrary.Entity
@@ -60,13 +60,20 @@ namespace MedicalLibrary.Entity
 
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
+                    // NULL 判定は IsDBNull で行う。ToString() が "null" になるかはドライバの実装依存で、
+                    // 値そのものが "null" という文字列の列を空文字に潰してしまう危険もある。
+                    if (reader.IsDBNull(i))
+                    {
+                        obj.DataDict[reader.GetName(i)] = "";
+                        continue;
+                    }
+
                     // GetOracleValue は呼ぶたびに新しいオブジェクトを返す（CLOB/BLOB はネイティブの
                     // LOBロケータを持つ）ため、1列につき1回だけ呼び、使い終わったら解放する。
                     // 2回呼んでいると大量件数の取得でネイティブ資源が倍のペースで枯渇する。
                     object value = reader.GetOracleValue(i);
-                    string s = value.ToString();
 
-                    obj.DataDict[reader.GetName(i)] = s.Equals("null") ? "" : s;
+                    obj.DataDict[reader.GetName(i)] = value.ToString();
 
                     IDisposable disposable = value as IDisposable;
 
@@ -489,13 +496,22 @@ namespace MedicalLibrary.Entity
 
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        if (reader.GetOracleValue(i).ToString() != "null")
-                        {
-                            obj.DataDict[reader.GetName(i)] = reader.GetOracleValue(i).ToString();
-                        }
-                        else
+                        // NULL 判定は IsDBNull で行う（理由は同ファイルの Select 側のコメント参照）
+                        if (reader.IsDBNull(i))
                         {
                             obj.DataDict[reader.GetName(i)] = "";
+                            continue;
+                        }
+
+                        object value = reader.GetOracleValue(i);
+
+                        obj.DataDict[reader.GetName(i)] = value.ToString();
+
+                        IDisposable disposable = value as IDisposable;
+
+                        if (disposable != null)
+                        {
+                            disposable.Dispose();
                         }
                     }
 

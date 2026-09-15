@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
-using Oracle.DataAccess.Client;
+using Oracle.ManagedDataAccess.Client;
 using MedicalLibrary.Utility;
 
 namespace MedicalLibrary.Entity

@@ -7,6 +7,12 @@
 
 ## [Unreleased]
 
+### 削除
+- EyeCenter.exe / NidekARK1.exe / CanonRKF1.exe から到達しないコードをファイル単位で削除（フェーズ4、`docs/cleanup-plan-phase4.md`）
+  - .cs 251ファイル・.resx 72ファイル（計323ファイル、約9.4万行）を削除し、csproj から該当項目を除外
+  - 主な削除機能: カルテ本体UI（`FormPat` / `FormControl` 等）、オーダ・会計伝票、手術オーダ（`FormOpeOrder` / `OpeOrderData` / `OpeOrderMaster` / `OpeOrderPathTemplate` / `PathMaster`）、クリニカルパス、SOAP・カルテ記載、病名・DPC、入院・病棟、予約、バイタル、請求（`Bill` / `BillPay`）、来院報告（`ComeReport*`）、`AppColor` / `CsvWriter`
+  - MedicalLibrary.dll（Release|x86）が約2.5MBから約380KBに縮小
+
 ## [1.1.0] - 2026-07-04
 
 ### 追加

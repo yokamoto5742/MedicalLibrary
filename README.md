@@ -2,7 +2,7 @@
 
 ## 概要
 
-眼科向け電子カルテシステムの .NET クラスライブラリです。患者記録、医学情報、診断、処方、手術記録、検査機器連携、SOAPチャート、眼科特有のワークフローなどを提供します。
+眼科向け電子カルテシステムの .NET クラスライブラリです。患者基本情報、ログイン、眼科検査・手術予約/記録・サマリー、検査機器（Nidek / Canon）連携など、眼科特有のワークフローを提供します。
 
 このプロジェクトはスタンドアロンアプリケーションではなく、以下の3つの外部アプリケーションで使用されるコンポーネントライブラリです：
 
@@ -74,9 +74,6 @@ msbuild MedicalLibrary.csproj /p:Configuration=Debug /p:Platform=x86
 // 患者情報の取得（PatBase: Entity/PatBase.cs）
 var pat = MedicalLibrary.Entity.PatBase.Load(pt_id);
 
-// 診断マスタの検索（DiagMaster: Entity/DiagMaster.cs）
-var diag_list = MedicalLibrary.Entity.DiagMaster.FindList(diag_name);
-
 // 手術記録の取得（EyeOpeRecord: Agent/EyeOpeRecord.cs）
 var ope = MedicalLibrary.Agent.EyeOpeRecord.Load(ope_id);
 ```
@@ -102,23 +99,22 @@ db.ExecuteNonQuery("update ... where ...", param_list);
 MedicalLibrary/
 ├── Entity/              — ドメインモデル（MedicalLibrary.Entity）
 │   ├── PatBase.cs      — 患者基本情報
-│   ├── Diag.cs         — 診断
-│   ├── DiagMaster.cs   — 診断マスタ
-│   ├── PatOrder.cs     — 患者オーダー
+│   ├── LoginUser.cs    — ログインユーザー
+│   ├── Staff.cs        — 職員
 │   └── ...
-├── Boundary/            — WinForms UI コンポーネント
-│   ├── Form*.cs        — ダイアログ/フォーム
-│   ├── Ctrl*.cs        — カスタムコントロール
-│   ├── Std*.cs         — 標準UIコンポーネント
+├── Boundary/            — WinForms UI コンポーネント（EyeCenter が使用）
+│   ├── FormFindPat.cs  — 患者検索ダイアログ
+│   ├── LoginPrompt.cs  — ログイン画面（LoginChange.cs: ユーザー切替）
+│   ├── StdControlPat1.cs — 患者情報表示コントロール
 │   └── ...
 ├── Agent/               — 業務ロジック・機能モジュール
-│   ├── Bill.cs         — 請求関連
 │   ├── EyeDict.cs      — 眼科辞書・マスタ
-│   ├── EyeDoc.cs       — SOAP チャート処理
+│   ├── EyeDoc.cs       — 帳票（オペ録・申し送り書）
 │   ├── EyeOpe.cs       — 手術管理
 │   ├── EyeOpeRecord.cs — 手術記録
 │   ├── EyeKensa.cs     — 検査処理
-│   ├── ComeReportOrder.cs — 来院報告
+│   ├── NidekARK1ListForm.cs — NidekARK1.exe 用画面
+│   ├── CanonRKF1Form.cs — CanonRKF1.exe 用画面
 │   └── ...
 ├── Utility/             — インフラ・ユーティリティ
 │   ├── DB.cs           — Oracle DB アクセス（DB.Db1/Db2/Db3）
@@ -127,12 +123,12 @@ MedicalLibrary/
 │   ├── AppString.cs    — 文字列ユーティリティ
 │   ├── AppDateTime.cs  — 日付時刻ユーティリティ
 │   ├── AppFile.cs      — ファイル操作ユーティリティ
-│   ├── CsvWriter.cs    — CSV エクスポート機能
 │   ├── Launcher.cs     — 外部プロセス起動
 │   └── ...
 ├── Properties/          — アセンブリ情報・リソース
 ├── docs/
-│   └── CHANGELOG.md    — 変更履歴
+│   ├── CHANGELOG.md    — 変更履歴
+│   └── cleanup-plan-phase4.md — フェーズ4削減計画・実施結果
 ├── MedicalLibrary.csproj
 ├── CLAUDE.md           — 開発ガイドライン（プロジェクト固有）
 └── README.md           — このファイル
@@ -148,23 +144,21 @@ var pat = PatBase.Load(pt_id);
 Console.WriteLine($"患者名: {pat.Name}");
 ```
 
-**Diag** / **DiagMaster** — 診断情報。患者の診断・診断マスタの検索
+**LoginUser** / **Staff** — ログインユーザー・職員情報
 
 ### Agent（業務ロジック）
 
 **EyeDict** — 眼科データ辞書・マスタデータの取得・管理
 
-**EyeDoc** — SOAP チャート。眼科診察記録（Subjective, Objective, Assessment, Plan）
+**EyeDoc** — 帳票。オペ録・申し送り書の印刷・Excel 出力
 
 **EyeOpeRecord** — 手術記録。手術内容・所見などを管理
 
 **EyeKensa** — 検査情報。視力検査、眼圧検査など各種検査データ
 
-**ComeReportOrder** — 来院報告書の発行・管理
-
 **EyeOpe** — 手術スケジュール・待機一覧・院内完結フロー
 
-**Bill** / **BillPay** — 患者請求・支払い管理
+**NidekARK1ListForm** / **CanonRKF1Form** — 検査機器連携アプリ（NidekARK1.exe / CanonRKF1.exe）の画面
 
 ### Utility（インフラ）
 
@@ -175,8 +169,6 @@ Console.WriteLine($"患者名: {pat.Name}");
 **Env.cs** — 環境変数・マシン固有のパス（`C:\shinseikai` 等）定義
 
 **AppString** / **AppDateTime** / **AppFile** — 汎用ユーティリティ
-
-**CsvWriter.cs** — CSV エクスポート機能（UTF-8 / Shift-JIS 出力対応）
 
 ## 開発情報
 
@@ -205,13 +197,12 @@ Console.WriteLine($"患者名: {pat.Name}");
 
 ### コード削減履歴
 
-2026年7月のコード削減フェーズにおいて：
+1. **フェーズ1〜3（2026年7月）**: 3アプリ（EyeCenter, NidekARK1, CanonRKF1）専用化。460ファイル → 316ファイルに削減
+2. **OpeOrder.exe 廃止（2026年7月）**: OpeOrder.exe は実行不可にし、専用コード27ファイルを削除
+3. **INNO コンパイルシンボル削除（2026年7月）**: 旧システムの条件分岐を整理。INNO（Shinseikai）コードパスは現在無条件で有効
+4. **フェーズ4（2026年9月）**: ビルド済みバイナリの IL 到達可能性解析により、3アプリから到達しないコードをファイル単位で削除。.cs 316 → 65、.resx 81 → 9（計323ファイル削除）。手術オーダー UI（`FormOpeOrder`, `OpeOrderData`, `OpeOrderMaster` 等）も EyeCenter から到達しないため削除
 
-1. **フェーズ1〜3**: 3アプリ（EyeCenter, NidekARK1, CanonRKF1）専用化。460ファイル → 316ファイルに削減
-2. **OpeOrder.exe 廃止**: OpeOrder.exe は実行不可にし、専用コード27ファイルを削除（ただしEyeCenter からアクセス可能な手術オーダーUI である `FormOpeOrder`, `OpeOrderData`, `OpeOrderMaster` は意図的に保持）
-3. **INNO コンパイルシンボル削除**: 旧システムの条件分岐を整理。INNO（Shinseikai）コードパスは現在無条件で有効
-
-詳細は `docs/cleanup-plan.md` を参照してください。
+詳細は `docs/cleanup-plan-phase4.md` を参照してください。
 
 ## トラブルシューティング
 

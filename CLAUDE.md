@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A Japanese electronic medical record (電子カルテ / "Karte") **class library** — patient records, orders, SOAP charts, ophthalmology (眼科) workflows, device integrations. It builds to `MedicalLibrary.dll` and is consumed by exactly three external apps: `EyeCenter.exe`, `NidekARK1.exe`, `CanonRKF1.exe`; it is **not** a standalone application. Code unreachable from those apps was removed in 2026-07 (see `docs/cleanup-plan.md`). OpeOrder.exe was retired in 2026-07 (フェーズ3) and its dedicated code deleted; the surgical-order UI still reachable from EyeCenter (`FormOpeOrder`, `OpeOrderData`/`OpeOrderMaster`, `OpeOrderPathTemplate`/`PathMaster`) is intentionally retained.
+A Japanese electronic medical record (電子カルテ / "Karte") **class library** — patient records, orders, SOAP charts, ophthalmology (眼科) workflows, device integrations. It builds to `MedicalLibrary.dll` and is consumed by exactly three external apps: `EyeCenter.exe`, `NidekARK1.exe`, `CanonRKF1.exe`; it is **not** a standalone application. Code unreachable from those apps was removed in 2026-07 (フェーズ1〜3, incl. retiring OpeOrder.exe) and 2026-09 (フェーズ4: IL-based reachability analysis, file-level deletion of 323 files incl. the OpeOrder/SOAP/order/DPC/billing UI and entities — see `docs/cleanup-plan-phase4.md`). Unused methods/types inside retained files were intentionally left in place.
 
 - **No `Main` and no entry point.** Launch/interop helpers for external exes live in `Utility/Launcher.cs`, `InnoProgram.cs`.
 - **No test suite, no CI, no linter.** There is nothing to "run a single test."
@@ -37,7 +37,7 @@ msbuild MedicalLibrary.csproj /p:Configuration=Release /p:Platform=x86
 
 ## Architecture & gotchas
 
-- **Layered by top-level folder / namespace:** `Entity/` (domain model, `MedicalLibrary.Entity`), `Boundary/` (WinForms UI: `Form*` dialogs, `Ctrl*`/`Std*` controls), `Agent/` (feature/business-logic modules + forms), `Utility/` (infrastructure: `DB.cs`, `Env.cs`, `LibSettings.cs`).
+- **Layered by top-level folder / namespace:** `Entity/` (domain model, `MedicalLibrary.Entity`), `Boundary/` (WinForms UI used by EyeCenter: `FormFindPat`, `FormString1`, `LoginPrompt`/`LoginChange`, `StdControlPat1`, `StdForm1`), `Agent/` (眼科 feature modules `Eye*`, plus `NidekARK1ListForm`/`CanonRKF1Form` for the device apps), `Utility/` (infrastructure: `DB.cs`, `Env.cs`, `LibSettings.cs`).
 - **DB access is via global static singletons** `DB.Db1`/`Db2`/`Db3` (`Utility/DB.cs`) with one shared `OracleCommand` (`BindByName=true`); entities reach the DB through the static `StdEntity.Db` (= `Db3`). Not thread-safe by design — Open/Close/`Parameters.Clear` ordering matters.
 - **Hardcoded absolute paths** in `Utility/Env.cs` (`C:\macs`, `c:\karte`, `c:\innokarte`, `c:\shinseikai`) and **hardcoded Oracle credentials** in `Utility/LibSettings.cs` (serialized to/from `Setting.xml`). The app assumes this on-disk layout.
 

@@ -1,49 +1,57 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+このファイルは、本リポジトリのコードを操作する際に Claude Code (claude.ai/code) へガイダンスを提供するためのものです。
 
-## What this is
+## 概要
 
-A Japanese electronic medical record (電子カルテ / "Karte") **class library** — patient records, orders, SOAP charts, ophthalmology (眼科) workflows, device integrations. It builds to `MedicalLibrary.dll` and is consumed by exactly three external apps: `EyeCenter.exe`, `NidekARK1.exe`, `CanonRKF1.exe`; it is **not** a standalone application. Code unreachable from those apps was removed in 2026-07 (フェーズ1〜3, incl. retiring OpeOrder.exe) and 2026-09 (フェーズ4: IL-based reachability analysis, file-level deletion of 323 files incl. the OpeOrder/SOAP/order/DPC/billing UI and entities — see `docs/cleanup-plan-phase4.md`). Unused methods/types inside retained files were intentionally left in place.
+日本の電子カルテ用**クラスライブラリ**です。患者情報、オーダ、SOAPカルテ、眼科ワークフロー、検査機器連携などを扱います。`MedicalLibrary.dll` としてビルドされ、外部の3つのアプリケーション（`EyeCenter.exe`、`NidekARK1.exe`、`CanonRKF1.exe`）からのみ参照されます。本リポジトリ自体は単体で動作するスタンドアロンアプリケーションでは**ありません**。これらのアプリから参照されていないコードは、2026年7月（フェーズ1〜3、OpeOrder.exe の廃止を含む）および 2026年9月（フェーズ4: ILベースの到達可能性解析に基づき、OpeOrder/SOAP/オーダ/DPC/医事会計のUIおよびエンティティを含む323ファイルをファイル単位で削除。詳細は `docs/cleanup-plan-phase4.md` を参照）に削除されました。なお、残されたファイル内に存在する未使用のメソッドや型については、意図的にそのまま残蔽されています。
 
-- **No `Main` and no entry point.** Launch/interop helpers for external exes live in `Utility/Launcher.cs`, `InnoProgram.cs`.
-- **No test suite, no CI, no linter.** There is nothing to "run a single test."
-- Target: **.NET Framework 4.8** (legacy — not .NET Core/5+). C# + Windows Forms. Old-style (non-SDK) MSBuild `.csproj`.
+* **`Main` メソッドおよびエントリポイントは存在しません。** 外部EXEの起動・連携用ヘルパーは `Utility/Launcher.cs` および `InnoProgram.cs` に配置されています。
+* **テストスイート、CI、リンターはありません。** 単体テストを実行する環境は用意されていません。
+* ターゲット: **.NET Framework 4.8**（レガシー環境であり、.NET Core/5+ ではありません）。C# + Windows Forms構成です。旧形式（非SDK形式）の MSBuild `.csproj` を使用しています。
 
-## Build
+## ビルド
 
-The only platform is **x86** (Shinseikai deployment; output goes to `C:\shinseikai\`):
+プラットフォームは **x86** のみです（本番環境へのデプロイを想定、出力先は `C:\shinseikai\`）:
 
 ```
 msbuild MedicalLibrary.csproj /p:Configuration=Release /p:Platform=x86
+
 ```
 
-- `dotnet build` is **not** supported (non-SDK csproj, GAC/HintPath references). Use `msbuild` (VS 2022+) only.
-- x86 is required — the native Oracle ODP.NET client is 32-bit.
-- Reference `HintPath`s climb ~7 levels up to sibling `Karte`/`Shinseikai` folders and an Oracle 11.2 client folder. Builds assume those external DLLs/folders are present on the machine.
-- The former `INNO` compile symbol and the AnyCPU/IJI configurations were removed in 2026-07: the INNO (Shinseikai) code paths are now unconditional — `StdEntity.Db` is `DB.Db3` and the DB link is `@INNO.WORLD`.
+* `dotnet build` は**サポートされていません**（非SDKスタイルのcsproj、GAC/HintPath参照のため）。Visual Studio 2022以降の `msbuild` のみを使用してください。
+* ネイティブの Oracle ODP.NET クライアントが32ビットであるため、x86構成が必須です。
+* 参照アセンブリの `HintPath` は、相対パスで約7階層上の隣接する `Karte`/`Shinseikai` フォルダ、および Oracle 11.2 クライアントフォルダを参照しています。ビルド環境のマシン上にこれらの外部DLLやフォルダが存在することを前提としています。
+* かつて存在した `INNO` コンパイルシンボルおよび AnyCPU/IJI 構成は 2026年7月に削除されました。現在は INNO（新星会）向けのコードパスが無条件で適用されます（`StdEntity.Db` は `DB.Db3`、DBリンクは `@INNO.WORLD`）。
 
-## Editing rules
+## 編集ルール
 
-- **Preserve each file's existing encoding.** Files are a mix of Shift-JIS/CP932 and UTF-8-with-BOM, all containing Japanese comments/`<summary>` docs. Do not re-encode — it corrupts the Japanese text.
-- Comments and XML doc comments are written in **Japanese**; match that when adding docs.
+* **各ファイルの既存エンコーディングを維持してください。** ファイルは Shift-JIS (CP932) と UTF-8 (BOM付き) が混在しており、いずれも日本語コメントや `<summary>` ドキュメントを含んでいます。文字コードを変更しないでください（日本語の文字化けの原因となります）。
+* コメントや XML ドキュメントコメントは**日本語**で記述されています。ドキュメントを追加する際もそれに合わせてください。
 
-## Code style (deviations from C# defaults)
+## コードスタイル（C#のデフォルト規則からの相違点）
 
-- **`snake_case` for method parameters and local variables** (`connection_string`, `param_list`, `con_str`).
-- `snake_case` private static fields (`legacy_home`, `db_link`); **`ALL_CAPS` public properties** for env constants (`LEGACY_HOME`, `AGENT_HOME`, `DB_LINK`).
-- Types, methods, and public singletons are PascalCase. 4-space indent, Allman braces.
-- No `.editorconfig` or analyzer ruleset (x86 configs even set `CodeAnalysisIgnoreBuiltInRules=true`).
+* **メソッドの引数およびローカル変数には `snake_case` を使用します**（例: `connection_string`、`param_list`、`con_str`）。
+* private static フィールドには `snake_case`（例: `legacy_home`、`db_link`）、環境定数の public プロパティには **`ALL_CAPS`**（例: `LEGACY_HOME`、`AGENT_HOME`、`DB_LINK`）を使用します。
+* 型名、メソッド名、public シングルトンは PascalCase です。インデントは半角スペース4つ、波括弧はオールマンスタイル（Allman braces）を採用しています。
+* `.editorconfig` やアナライザーのルールセットはありません（x86構成では `CodeAnalysisIgnoreBuiltInRules=true` に設定されています）。
 
-## Architecture & gotchas
+## アーキテクチャと留意事項
 
-- **Layered by top-level folder / namespace:** `Entity/` (domain model, `MedicalLibrary.Entity`), `Boundary/` (WinForms UI used by EyeCenter: `FormFindPat`, `FormString1`, `LoginPrompt`/`LoginChange`, `StdControlPat1`, `StdForm1`), `Agent/` (眼科 feature modules `Eye*`, plus `NidekARK1ListForm`/`CanonRKF1Form` for the device apps), `Utility/` (infrastructure: `DB.cs`, `Env.cs`, `LibSettings.cs`).
-- **DB access is via global static singletons** `DB.Db1`/`Db2`/`Db3` (`Utility/DB.cs`) with one shared `OracleCommand` (`BindByName=true`); entities reach the DB through the static `StdEntity.Db` (= `Db3`). Not thread-safe by design — Open/Close/`Parameters.Clear` ordering matters.
-- **Hardcoded absolute paths** in `Utility/Env.cs` (`C:\macs`, `c:\karte`, `c:\innokarte`, `c:\shinseikai`) and **hardcoded Oracle credentials** in `Utility/LibSettings.cs` (serialized to/from `Setting.xml`). The app assumes this on-disk layout.
+* **トップレベルフォルダ／名前空間によるレイヤー構造:**
+* `Entity/`（ドメインモデル、`MedicalLibrary.Entity`）
+* `Boundary/`（EyeCenter で使用される WinForms UI: `FormFindPat`、`FormString1`、`LoginPrompt`/`LoginChange`、`StdControlPat1`、`StdForm1`）
+* `Agent/`（眼科機能モジュール群 `Eye*`、および検査機器アプリ用の `NidekARK1ListForm`/`CanonRKF1Form`）
+* `Utility/`（インフラストラクチャ層: `DB.cs`、`Env.cs`、`LibSettings.cs`）
 
-## Conventions
 
-Additional project rules are in `.claude/rules/` (loaded automatically):
-- `coding-guidelines.md` — minimal, surgical changes; surface assumptions before implementing.
-- `commit.md` — commit messages use emoji prefixes (`✨ feat`, `🐛 fix`, `📝 docs`, `♻️ refactor`, `✅ test`), described in Japanese.
-- `response-style.md` — return diffs/patches, not prose; keep changes minimal; apply edits directly.
+* **DBアクセスはグローバルな静的シングルトン経由:** `Utility/DB.cs` 内の `DB.Db1`/`Db2`/`Db3` を使用し、1つの共有 `OracleCommand`（`BindByName=true`）を用います。エンティティは静的な `StdEntity.Db`（＝`Db3`）経由でDBにアクセスします。設計上スレッドセーフではないため、Open/Close/`Parameters.Clear` の実行順序に注意が必要です。
+* **絶対パスのハードコード:** `Utility/Env.cs` 内のパス設定（`C:\macs`、`c:\karte`、`c:\innokarte`、`c:\shinseikai`）や、`Utility/LibSettings.cs` 内の **Oracle 認証情報**（`Setting.xml` との間でシリアライズ/デシリアライズ）がハードコードされています。このディスク配置構成が前提となっています。
+
+## 開発規約
+
+追加のプロジェクトルールは `.claude/rules/` に格納されています（自動的に読み込まれます）:
+
+* `coding-guidelines.md` — 影響を最小限に抑えた局所的な変更を行うこと。実装前に前提事項を明示すること。
+* `commit.md` — コミットメッセージには絵文字プレフィックス（`✨ feat`、`🐛 fix`、`📝 docs`、`♻️ refactor`、`✅ test`）を使用し、日本語で記述すること。
+* `response-style.md` — 長文の説明ではなく差分/パッチ形式で出力すること。変更は最小限にとどめ、直接編集を適用すること。

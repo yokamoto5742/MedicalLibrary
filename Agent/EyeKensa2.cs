@@ -190,6 +190,66 @@ namespace MedicalLibrary.Agent
         }
 
         /// <summary>
+        /// データベースからロードする。（検索）
+        /// </summary>
+        /// <param name="kensa_id"></param>
+        /// <param name="start_date"></param>
+        /// <param name="end_date"></param>
+        /// <param name="pat"></param>
+        /// <param name="limit">取得件数の上限（0は無制限）</param>
+        /// <param name="db">眼科DBへの接続（省略時は DB.Db2）</param>
+        /// <param name="pat_db">患者マスタDBへの接続（省略時は DB.Db3）</param>
+        /// <returns></returns>
+        public static List<EyeKensa2> LoadByKensaDates(string kensa_id, string start_date, string end_date, bool pat = false, int limit = 0, DB db = null, DB pat_db = null)
+        {
+            List<EyeKensa2> tmpList = new List<EyeKensa2>();
+
+            if (kensa_id.Length == 0 || start_date.Length != 8 || end_date.Length != 8)
+            {
+                return tmpList;
+            }
+
+            // 患者マスタ（DBリンク先）とは結合せず、眼科DBだけで検索する。
+            string cmd = "select * from EYE_KENSA2 " +
+                " where KENSA_ID = " + kensa_id + " and KENSA_DATE >= " + start_date + " and KENSA_DATE <= " + end_date +
+                " order by KENSA_DATE desc, PATIENT_ID, KENSA_SEQ";
+
+            if (limit > 0)
+            {
+                cmd = "select * from (" + cmd + ") where ROWNUM <= " + limit;
+            }
+
+            List<StdClass> tmp_list = StdClass.GetList(db == null ? DB.Db2 : db, cmd);
+
+            Dictionary<string, PatBase> pat_dict = null;
+
+            if (pat)
+            {
+                pat_dict = PatBase.GetDict(tmp_list, pat_db);
+            }
+
+            foreach (StdClass tmp in tmp_list)
+            {
+                EyeKensa2 obj = GetFromStdClass(tmp);
+
+                if (pat)
+                {
+                    // 患者マスタに存在しないIDは除外する
+                    if (!pat_dict.ContainsKey(obj.PtId))
+                    {
+                        continue;
+                    }
+
+                    obj._Pat = pat_dict[obj.PtId];
+                }
+
+                tmpList.Add(obj);
+            }
+
+            return tmpList;
+        }
+
+        /// <summary>
         /// データベースからロードする。
         /// </summary>
         /// <param name="patient_id"></param>

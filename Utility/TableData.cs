@@ -79,26 +79,55 @@ namespace MedicalLibrary.Utility
 
             if (dialog_show || file.Length == 0)
             {
-                SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+                save_file = SelectSaveFile(file);
 
-                if (file.Length > 0)
-                {
-                    saveFileDialog1.FileName = file;
-                }
-
-                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                {
-                    save_file = saveFileDialog1.FileName;
-                }
-                else
+                if (save_file.Length == 0)
                 {
                     return false;
                 }
             }
 
+            return CSVWrite(save_file, append, title_print);
+        }
+
+        /// <summary>
+        /// 保存先を選ぶダイアログを表示する。
+        /// </summary>
+        /// <param name="file">初期ファイル名</param>
+        /// <returns>選ばれたファイル名（キャンセル時は空文字）</returns>
+        public static string SelectSaveFile(string file)
+        {
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+
+            if (file.Length > 0)
+            {
+                saveFileDialog1.FileName = file;
+            }
+
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                return saveFileDialog1.FileName;
+            }
+
+            return "";
+        }
+
+        /// <summary>
+        /// CSVファイルに書き込む（ダイアログは表示しない）。
+        /// progress が OperationCanceledException を投げた場合は、書きかけのファイルを削除して再送出する。
+        /// </summary>
+        /// <param name="save_file">保存ファイル名</param>
+        /// <param name="append">true 追記, false 上書き</param>
+        /// <param name="title_print">カラム名を印字するかどうか</param>
+        /// <param name="progress">進捗の通知先（省略可）。1000行ごとに通知する</param>
+        /// <returns></returns>
+        public bool CSVWrite(string save_file, bool append, bool title_print = true, Action<string> progress = null)
+        {
+            StreamWriter writer = null;
+
             try
             {
-                StreamWriter writer = new StreamWriter(save_file, append, Encoding.GetEncoding("shift-jis"));
+                writer = new StreamWriter(save_file, append, Encoding.GetEncoding("shift-jis"));
 
                 if (title_print)
                 {
@@ -121,6 +150,8 @@ namespace MedicalLibrary.Utility
                     }
                 }
 
+                int count = 0;
+
                 foreach (TableDataRecord record in this.RecordList)
                 {
                     foreach (string r in record.DataList)
@@ -129,11 +160,30 @@ namespace MedicalLibrary.Utility
                     }
 
                     writer.WriteLine();
+
+                    count++;
+
+                    if (progress != null && count % 1000 == 0)
+                    {
+                        progress("CSVに書き込み中 " + count.ToString("#,0") + " / " + this.RecordList.Count.ToString("#,0") + "行");
+                    }
                 }
 
                 writer.Close();
 
                 return true;
+            }
+            catch (OperationCanceledException)
+            {
+                // 中止時は書きかけのファイルを残さない（追記時は既存の内容ごと消えるため残す）
+                writer.Close();
+
+                if (!append)
+                {
+                    File.Delete(save_file);
+                }
+
+                throw;
             }
             catch (Exception ex)
             {
@@ -142,7 +192,14 @@ namespace MedicalLibrary.Utility
             }
         }
 
-        public bool ExcelOpen(bool title_print = true)
+        /// <summary>
+        /// Excelを起動して出力する。
+        /// progress が OperationCanceledException を投げた場合は、書きかけのブックを表示したまま再送出する。
+        /// </summary>
+        /// <param name="title_print">カラム名を印字するかどうか</param>
+        /// <param name="progress">進捗の通知先（省略可）。1000行ごとに通知する</param>
+        /// <returns></returns>
+        public bool ExcelOpen(bool title_print = true, Action<string> progress = null)
         {
             Excel.Application app = new Excel.Application();
             app.Visible = false;
@@ -219,10 +276,21 @@ namespace MedicalLibrary.Utility
                     }
 
                     y += rows;
+
+                    if (progress != null)
+                    {
+                        progress("Excelに書き込み中 " + (start + rows).ToString("#,0") + " / " + this.RecordList.Count.ToString("#,0") + "行");
+                    }
                 }
 
                 app.Visible = true;
                 return true;
+            }
+            catch (OperationCanceledException)
+            {
+                // 中止時もブックは閉じずに表示する（非表示の Excel プロセスを残さないため）
+                app.Visible = true;
+                throw;
             }
             catch (Exception ex)
             {

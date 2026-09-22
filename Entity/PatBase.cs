@@ -524,7 +524,7 @@ namespace MedicalLibrary.Entity
         }
 
 
-        public static List<PatBase> GetList(List<string> pt_list, DB db = null)
+        public static List<PatBase> GetList(List<string> pt_list, DB db = null, Action<string> progress = null)
         {
             List<PatBase> list = new List<PatBase>();
 
@@ -548,6 +548,11 @@ namespace MedicalLibrary.Entity
             {
                 if (pts.Length == 0) break;
 
+                if (progress != null)
+                {
+                    progress("患者情報を取得中 " + list.Count.ToString("#,0") + " / " + pt_list.Count.ToString("#,0") + "人");
+                }
+
                 string cmd = "select " + columns + " from M_PATIENT " +
                     " where P_ID in (" + pts + ")";
 
@@ -568,12 +573,13 @@ namespace MedicalLibrary.Entity
         /// </summary>
         /// <param name="pt_list">患者IDリスト</param>
         /// <param name="db">使用するDB接続（省略時は DB.Db3）</param>
+        /// <param name="progress">進捗の通知先（省略可）</param>
         /// <returns></returns>
-        public static Dictionary<string, PatBase> GetDict(List<string> pt_list, DB db = null)
+        public static Dictionary<string, PatBase> GetDict(List<string> pt_list, DB db = null, Action<string> progress = null)
         {
             Dictionary<string, PatBase> dict = new Dictionary<string, PatBase>();
 
-            foreach (PatBase pat in GetList(pt_list, db))
+            foreach (PatBase pat in GetList(pt_list, db, progress))
             {
                 if (!dict.ContainsKey(pat.Id))
                 {
@@ -589,8 +595,9 @@ namespace MedicalLibrary.Entity
         /// </summary>
         /// <param name="tmp_list">PATIENT_ID 列を持つ検索結果リスト</param>
         /// <param name="db">使用するDB接続（省略時は DB.Db3）</param>
+        /// <param name="progress">進捗の通知先（省略可）</param>
         /// <returns></returns>
-        public static Dictionary<string, PatBase> GetDict(List<StdClass> tmp_list, DB db = null)
+        public static Dictionary<string, PatBase> GetDict(List<StdClass> tmp_list, DB db = null, Action<string> progress = null)
         {
             HashSet<string> pt_set = new HashSet<string>();
 
@@ -599,7 +606,7 @@ namespace MedicalLibrary.Entity
                 pt_set.Add(tmp.GetDataString("PATIENT_ID"));
             }
 
-            return GetDict(new List<string>(pt_set), db);
+            return GetDict(new List<string>(pt_set), db, progress);
         }
 
         public static List<PatBase> GetListByNameKanaBirth(string name = "", string kana = "", string birth = "")

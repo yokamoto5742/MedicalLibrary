@@ -234,8 +234,9 @@ namespace MedicalLibrary.Agent
         /// <param name="limit">取得件数の上限（0は無制限）</param>
         /// <param name="db">眼科DBへの接続（省略時は DB.Db2）</param>
         /// <param name="pat_db">患者マスタDBへの接続（省略時は DB.Db3）</param>
+        /// <param name="progress">進捗の通知先（省略可）</param>
         /// <returns></returns>
-        public static List<EyeSummary> Find(string diag, string kind1, string kind2, string kind3, int limit = 0, DB db = null, DB pat_db = null)
+        public static List<EyeSummary> Find(string diag, string kind1, string kind2, string kind3, int limit = 0, DB db = null, DB pat_db = null, Action<string> progress = null)
         {
             List<EyeSummary> list = new List<EyeSummary>();
 
@@ -301,9 +302,9 @@ namespace MedicalLibrary.Agent
                 cmd = "select * from (" + cmd + ") where ROWNUM <= " + limit;
             }
 
-            List<StdClass> tmp_list = StdClass.GetList(db == null ? DB.Db2 : db, cmd);
+            List<StdClass> tmp_list = StdClass.GetList(db == null ? DB.Db2 : db, cmd, null, progress);
 
-            Dictionary<string, PatBase> pat_dict = PatBase.GetDict(tmp_list, pat_db);
+            Dictionary<string, PatBase> pat_dict = PatBase.GetDict(tmp_list, pat_db, progress);
 
             foreach (StdClass tmp in tmp_list)
             {

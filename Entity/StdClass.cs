@@ -11,7 +11,8 @@ namespace MedicalLibrary.Entity
     {
         public Dictionary<string, Object> DataDict = new Dictionary<string, Object>();
 
-        public static List<StdClass> GetList(DB db, string sql_command, List<StdDbColumn> param_list = null)
+        /// <param name="progress">進捗の通知先（省略可）。検索開始時と1000件ごとに通知する</param>
+        public static List<StdClass> GetList(DB db, string sql_command, List<StdDbColumn> param_list = null, Action<string> progress = null)
         {
             List<StdClass> list = new List<StdClass>();
 
@@ -52,6 +53,11 @@ namespace MedicalLibrary.Entity
                 }
             }
 
+            if (progress != null)
+            {
+                progress("DBを検索しています...");
+            }
+
             OracleDataReader reader = db.Command.ExecuteReader();
 
             while (reader.Read())
@@ -84,6 +90,11 @@ namespace MedicalLibrary.Entity
                 }
 
                 list.Add(obj);
+
+                if (progress != null && list.Count % 1000 == 0)
+                {
+                    progress("検索結果を取得中 " + list.Count.ToString("#,0") + "件");
+                }
             }
 
             reader.Close();

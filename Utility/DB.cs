@@ -129,6 +129,15 @@ namespace MedicalLibrary.Utility
         }
 
         /// <summary>
+        /// 1回の通信で受け取るデータ量（バイト）を設定する。
+        /// 大きくすると大量件数の取得で通信の往復回数が減る（既定は 128KB）。
+        /// </summary>
+        public void SetFetchSize(long size)
+        {
+            Command.FetchSize = size;
+        }
+
+        /// <summary>
         /// Select SQL を直接実行して結果を文字列で取得する。
         /// Open/Close も含めて実行されるので、直接SQLを書くだけでよい。
         /// </summary>

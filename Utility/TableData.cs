@@ -179,17 +179,46 @@ namespace MedicalLibrary.Utility
                     }
                 }
 
-                foreach (TableDataRecord record in this.RecordList)
-                {
-                    x = 1;
+                // セル単位の代入は1回ごとにExcelとのプロセス間通信が発生して遅いため、
+                // 1000行ずつ2次元配列にまとめて一括代入する。
+                const int chunk_rows = 1000;
 
-                    foreach (string r in record.DataList)
+                for (int start = 0; start < this.RecordList.Count; start += chunk_rows)
+                {
+                    int rows = Math.Min(chunk_rows, this.RecordList.Count - start);
+                    int cols = 0;
+
+                    for (int i = 0; i < rows; i++)
                     {
-                        sheet.Cells[y, x] = r;
-                        x++;
+                        cols = Math.Max(cols, this.RecordList[start + i].DataList.Count);
                     }
 
-                    y++;
+                    if (cols > 0)
+                    {
+                        object[,] values = new object[rows, cols];
+
+                        for (int i = 0; i < rows; i++)
+                        {
+                            List<string> list = this.RecordList[start + i].DataList;
+
+                            for (int j = 0; j < list.Count; j++)
+                            {
+                                values[i, j] = list[j];
+                            }
+                        }
+
+                        Excel.Range from = (Excel.Range)(sheet.Cells[y, 1]);
+                        Excel.Range to = (Excel.Range)(sheet.Cells[y + rows - 1, cols]);
+                        Excel.Range range = sheet.get_Range(from, to);
+
+                        range.Value2 = values;
+
+                        Marshal.ReleaseComObject(range);
+                        Marshal.ReleaseComObject(to);
+                        Marshal.ReleaseComObject(from);
+                    }
+
+                    y += rows;
                 }
 
                 app.Visible = true;

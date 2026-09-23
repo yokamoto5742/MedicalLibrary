@@ -135,11 +135,6 @@
     <Compile Include="Boundary\StdControlPat1.designer.cs">
       <DependentUpon>StdControlPat1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Utility\AppDataGridView.cs" />
     <Compile Include="Utility\AppDateTime.cs" />
     <Compile Include="Utility\AppFile.cs" />
@@ -193,10 +188,6 @@
     <EmbeddedResource Include="Boundary\FormString1.resx">
       <DependentUpon>FormString1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include=".claude\agents\changelog-updater.md" />
@@ -209,7 +200,7 @@
     <None Include=".claude\settings.local.json" />
     <None Include="CLAUDE.md" />
     <None Include="docs\CHANGELOG.md" />
-    <None Include="docs\cleanup-plan-phase4.md" />
+    <None Include="docs\dead_code_removal_guide.md" />
     <None Include="docs\LICENSE" />
     <None Include="README.md" />
   </ItemGroup>

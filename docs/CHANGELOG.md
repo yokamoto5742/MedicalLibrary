@@ -7,6 +7,26 @@
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-09-23
+
+### 追加
+- レフケラ検査の値をエクスポート機能を追加
+- TableData クラスに CSV・Excel 出力の進捗通知と中止処理を追加
+  - Excel 出力は .xlsx 形式での保存に対応
+  - 進捗通知コールバックにより、UI の進捗表示が可能
+  - OperationCanceledException で出力中止を実装
+
+### 変更
+- 検索処理に進捗通知の引数を追加
+- 検査結果検索の速度を向上
+- Utility/TableData.cs の SelectSaveFile メソッドに filter パラメータを追加し、保存ダイアログのファイルフィルタをカスタマイズ可能に
+- Utility/TableData.cs の ExcelOpen メソッドを ExcelWrite に改名し、Excel 出力ファイルの保存処理を統合
+
+### 削除
+- `docs/cleanup-plan-phase4.md` を削除
+
+## [1.2.0] - 2026-09-15
+
 ### 削除
 - EyeCenter.exe / NidekARK1.exe / CanonRKF1.exe から到達しないコードをファイル単位で削除（フェーズ4、`docs/cleanup-plan-phase4.md`）
   - .cs 251ファイル・.resx 72ファイル（計323ファイル、約9.4万行）を削除し、csproj から該当項目を除外

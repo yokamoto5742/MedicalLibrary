@@ -94,14 +94,20 @@ namespace MedicalLibrary.Utility
         /// 保存先を選ぶダイアログを表示する。
         /// </summary>
         /// <param name="file">初期ファイル名</param>
+        /// <param name="filter">ファイルの種類のフィルタ（省略可）</param>
         /// <returns>選ばれたファイル名（キャンセル時は空文字）</returns>
-        public static string SelectSaveFile(string file)
+        public static string SelectSaveFile(string file, string filter = "")
         {
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
 
             if (file.Length > 0)
             {
                 saveFileDialog1.FileName = file;
+            }
+
+            if (filter.Length > 0)
+            {
+                saveFileDialog1.Filter = filter;
             }
 
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
@@ -193,19 +199,38 @@ namespace MedicalLibrary.Utility
         }
 
         /// <summary>
-        /// Excelを起動して出力する。
-        /// progress が OperationCanceledException を投げた場合は、書きかけのブックを表示したまま再送出する。
+        /// Excelを表示せずに出力し、xlsx 形式で保存して閉じる。
+        /// progress が OperationCanceledException を投げた場合は、保存せずに閉じて再送出する。
         /// </summary>
+        /// <param name="save_file">保存先のファイル名</param>
         /// <param name="title_print">カラム名を印字するかどうか</param>
         /// <param name="progress">進捗の通知先（省略可）。1000行ごとに通知する</param>
         /// <returns></returns>
-        public bool ExcelOpen(bool title_print = true, Action<string> progress = null)
+        public bool ExcelWrite(string save_file, bool title_print = true, Action<string> progress = null)
+        {
+            try
+            {
+                return excelWrite(save_file, title_print, progress);
+            }
+            finally
+            {
+                // Cells 等の一時的な COM 参照が残ると Quit 後も Excel が終了しないため、
+                // excelWrite を抜けて参照が不要になった時点で回収する
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+        }
+
+        private bool excelWrite(string save_file, bool title_print, Action<string> progress)
         {
             Excel.Application app = new Excel.Application();
             app.Visible = false;
+            // 上書きの確認は保存ダイアログで済んでいるため、Excel 側の確認は出さない
+            app.DisplayAlerts = false;
 
             Excel.Workbook work = (Excel.Workbook)(app.Workbooks.Add(Type.Missing));
             Excel.Worksheet sheet = (Excel.Worksheet)(work.ActiveSheet);
+            sheet.Name = "一覧";
 
             try
             {
@@ -283,13 +308,12 @@ namespace MedicalLibrary.Utility
                     }
                 }
 
-                app.Visible = true;
+                // 51 = xlOpenXMLWorkbook (.xlsx)
+                work.SaveAs(save_file, 51, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
                 return true;
             }
             catch (OperationCanceledException)
             {
-                // 中止時もブックは閉じずに表示する（非表示の Excel プロセスを残さないため）
-                app.Visible = true;
                 throw;
             }
             catch (Exception ex)
@@ -299,11 +323,26 @@ namespace MedicalLibrary.Utility
             }
             finally
             {
+                // 保存済み・中止・エラーのいずれでも、非表示の Excel プロセスを残さない
+                try
+                {
+                    work.Close(false, Type.Missing, Type.Missing);
+                }
+                catch
+                {
+                }
+
+                try
+                {
+                    app.Quit();
+                }
+                catch
+                {
+                }
+
                 Marshal.ReleaseComObject(sheet);
                 Marshal.ReleaseComObject(work);
                 Marshal.ReleaseComObject(app);
-
-                GC.Collect();
             }
         }
 

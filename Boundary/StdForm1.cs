@@ -39,25 +39,6 @@ namespace MedicalLibrary.Boundary
             this.Font = this.Fnt.Ft;
         }
 
-        /// <summary>
-        /// エラーメッセージがあれば表示する。なければ標準結果を表示する。
-        /// </summary>
-        /// <param name="sr"></param>
-        /// <returns></returns>
-        public StdReturn Msg1(StdReturn sr)
-        {
-            if (sr.ErrExist)
-            {
-                MessageBox.Show(sr.Err, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-            else if (sr.MsgExist)
-            {
-//                MessageBox.Show(sr.Msg);
-            }
-
-            return sr;
-        }
-
         public virtual void FontSet(AppFont f)
         {
             this.Fnt = f;

@@ -84,14 +84,5 @@ namespace MedicalLibrary.Agent
 
             return tmpOpe;
         }
-
-        /// <summary>
-        /// データベースから削除する。
-        /// </summary>
-        /// <param name="ope_id">手術記録ID</param>
-        public static void Delete(string ope_id)
-        {
-            DB.Db2.ExecuteNonQuery("update EYE_OPE_DOCTOR set STATUS = 0 where ID = " + ope_id);
-        }
     }
 }

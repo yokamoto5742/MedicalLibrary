@@ -138,38 +138,6 @@ namespace MedicalLibrary.Utility
         }
 
         /// <summary>
-        /// Select SQL を直接実行して結果を文字列で取得する。
-        /// Open/Close も含めて実行されるので、直接SQLを書くだけでよい。
-        /// </summary>
-        /// <param name="command_text"></param>
-        /// <returns></returns>
-        public string ExecuteSelect(string command_text)
-        {
-            string result = "";
-
-            Open();
-
-            this.Command.CommandText = command_text;
-            OracleDataReader reader = Command.ExecuteReader();
-
-            while (reader.Read())
-            {
-                result += Environment.NewLine;
-
-                for (int i = 0; i < reader.FieldCount; i++)
-                {
-                    result += reader[i] + ",";
-                }
-            }
-
-            reader.Close();
-
-            Close();
-
-            return result;
-        }
-
-        /// <summary>
         /// Update/Delete SQL を直接実行する。
         /// Open/Close も含めて実行されるので、直接SQLを書くだけでよい。
         /// </summary>
@@ -232,56 +200,5 @@ namespace MedicalLibrary.Utility
             return result;
         }
 
-        public int NextVal(string sequence)
-        {
-            int i = -1;
-
-            if (sequence.Length == 0)
-            {
-                return i;
-            }
-
-            this.Open();
-
-            this.Command.CommandText = "select " + sequence + ".nextval SEQ from DUAL"; ;
-            OracleDataReader reader = Command.ExecuteReader();
-
-            while (reader.Read())
-            {
-                int.TryParse(reader["SEQ"].ToString(), out i);
-                break;
-            }
-
-            reader.Close();
-            this.Close();
-
-            return i;
-        }
-
-        public int CurrVal(string sequence)
-        {
-            int i = -1;
-
-            if (sequence.Length == 0)
-            {
-                return i;
-            }
-
-            this.Open();
-
-            this.Command.CommandText = "select " + sequence + ".currval SEQ from DUAL"; ;
-            OracleDataReader reader = Command.ExecuteReader();
-
-            while (reader.Read())
-            {
-                int.TryParse(reader["SEQ"].ToString(), out i);
-                break;
-            }
-
-            reader.Close();
-            this.Close();
-
-            return i;
-        }
     }
 }

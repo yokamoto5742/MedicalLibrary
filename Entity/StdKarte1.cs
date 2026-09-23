@@ -16,19 +16,6 @@ namespace MedicalLibrary.Entity
 
         protected PatBase _Pat = new PatBase();
 
-        public PatBase Pat
-        {
-            get
-            {
-                if (!this._Pat.Id.Equals(this.PtId) || this._Pat.Name.Length == 0)
-                {
-                    this._Pat = PatBase.Load(this.PtId);
-                }
-
-                return this._Pat;
-            }
-        }
-
         /// <summary>
         /// 登録日
         /// </summary>
@@ -40,79 +27,14 @@ namespace MedicalLibrary.Entity
         public int RegTime = 0;
 
         /// <summary>
-        /// 登録日時
-        /// </summary>
-        public string RegDateTime
-        {
-            get
-            {
-                string s = DateTimeAgent.DateFormat(this.RegDate, DateTimeAgent.DateFormatKind.LONG) +
-                    " " + DateTimeAgent.TimeFormat(this.RegTime.ToString().PadLeft(6, '0').Substring(0, 4));
-
-                return s;
-            }
-        }
-
-        /// <summary>
-        /// 登録日時
-        /// yy/MM/dd HH:mm
-        /// </summary>
-        public string RegDateTimeShort
-        {
-            get
-            {
-                string s = DateTimeAgent.DateFormat(this.RegDate, DateTimeAgent.DateFormatKind.SHORT) +
-                    " " + DateTimeAgent.TimeFormat(this.RegTime.ToString().PadLeft(6, '0').Substring(0, 4));
-
-                return s;
-            }
-        }
-
-        /// <summary>
         /// 登録者コード
         /// </summary>
         public string RegStaffCode = "";
 
         /// <summary>
-        /// 登録者
-        /// </summary>
-        public string RegStaffName
-        {
-            get
-            {
-                string s = "";
-
-                if (Dict.StaffDict.ContainsKey(RegStaffCode))
-                {
-                    s = Dict.StaffDict[RegStaffCode].Name;
-                }
-
-                return s;
-            }
-        }
-
-        /// <summary>
         /// 代行登録者コード
         /// </summary>
         public string RegStaffCode2 = "";
-
-        /// <summary>
-        /// 代行登録者
-        /// </summary>
-        public string RegStaffName2
-        {
-            get
-            {
-                string s = "";
-
-                if (Dict.StaffDict.ContainsKey(RegStaffCode2))
-                {
-                    s = Dict.StaffDict[RegStaffCode2].Name;
-                }
-
-                return s;
-            }
-        }
 
         /// <summary>
         /// 更新日
@@ -125,79 +47,14 @@ namespace MedicalLibrary.Entity
         public int UpTime = 0;
 
         /// <summary>
-        /// 更新日時
-        /// </summary>
-        public string UpDateTime
-        {
-            get
-            {
-                string s = DateTimeAgent.DateFormat(this.UpDate, DateTimeAgent.DateFormatKind.LONG) +
-                    " " + DateTimeAgent.TimeFormat(this.UpTime.ToString().PadLeft(6, '0').Substring(0, 4));
-
-                return s;
-            }
-        }
-
-        /// <summary>
-        /// 更新日時
-        /// yy/MM/dd HH:mm
-        /// </summary>
-        public string UpDateTimeShort
-        {
-            get
-            {
-                string s = DateTimeAgent.DateFormat(this.UpDate, DateTimeAgent.DateFormatKind.SHORT) +
-                    " " + DateTimeAgent.TimeFormat(this.UpTime.ToString().PadLeft(6, '0').Substring(0, 4));
-
-                return s;
-            }
-        }
-
-        /// <summary>
         /// 更新者コード
         /// </summary>
         public string UpStaffCode = "";
 
         /// <summary>
-        /// 更新者
-        /// </summary>
-        public string UpStaffName
-        {
-            get
-            {
-                string s = "";
-
-                if (Dict.StaffDict.ContainsKey(UpStaffCode))
-                {
-                    s = Dict.StaffDict[UpStaffCode].Name;
-                }
-
-                return s;
-            }
-        }
-
-        /// <summary>
         /// 代行更新者コード
         /// </summary>
         public string UpStaffCode2 = "";
-
-        /// <summary>
-        /// 代行更新者
-        /// </summary>
-        public string UpStaffName2
-        {
-            get
-            {
-                string s = "";
-
-                if (Dict.StaffDict.ContainsKey(UpStaffCode2))
-                {
-                    s = Dict.StaffDict[UpStaffCode2].Name;
-                }
-
-                return s;
-            }
-        }
 
 
         public void BaseFromStdClass(StdClass tmp)

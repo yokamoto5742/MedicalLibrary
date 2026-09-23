@@ -121,14 +121,11 @@
     </Compile>
     <Compile Include="Entity\Allergy.cs" />
     <Compile Include="Entity\BaseInfo.cs" />
-    <Compile Include="Entity\KarteLog.cs" />
     <Compile Include="Entity\PatContact.cs" />
     <Compile Include="Entity\InfectionData.cs" />
-    <Compile Include="Entity\PatIns.cs" />
     <Compile Include="Entity\PatIn.cs" />
     <Compile Include="Entity\Staff.cs" />
     <Compile Include="Entity\StdKarte1.cs" />
-    <Compile Include="Entity\StdMaster1.cs" />
     <Compile Include="Boundary\StdControlPat1.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -136,7 +133,6 @@
       <DependentUpon>StdControlPat1.cs</DependentUpon>
     </Compile>
     <Compile Include="Utility\AppDataGridView.cs" />
-    <Compile Include="Utility\AppDateTime.cs" />
     <Compile Include="Utility\AppFile.cs" />
     <Compile Include="Utility\AppFont.cs" />
     <Compile Include="Utility\InnoProgram.cs" />

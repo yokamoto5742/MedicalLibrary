@@ -167,24 +167,6 @@ namespace MedicalLibrary.Boundary
             this.PatFormat();
         }
 
-        public void FontSet(AppFont f)
-        {
-            this.Font = f.Ft;
-
-            foreach (Control c in this.Controls)
-            {
-                if (c.GetType().Name.StartsWith("Label") ||
-                    c.GetType().Name.StartsWith("TextBox") ||
-                    c.GetType().Name.StartsWith("ComboBox") ||
-                    c.GetType().Name.StartsWith("CheckBox") ||
-                    c.GetType().Name.StartsWith("Button") ||
-                    c.GetType().Name.StartsWith("DataGridView"))
-                {
-                    c.Font = f.Ft;
-                }
-            }
-        }
-
         private void PatIdBox1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)

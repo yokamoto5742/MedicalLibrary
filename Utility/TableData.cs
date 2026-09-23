@@ -66,31 +66,6 @@ namespace MedicalLibrary.Utility
         }
 
         /// <summary>
-        /// CSVファイルに保存する
-        /// </summary>
-        /// <param name="file">保存ファイル名</param>
-        /// <param name="append">true 追記, false 上書き</param>
-        /// <param name="title_print">カラム名を印字するかどうか</param>
-        /// <param name="dialog_show">SaveFileDialogを表示するかどうか</param>
-        /// <returns></returns>
-        public bool CSVSave(string file, bool append, bool title_print = true, bool dialog_show = true)
-        {
-            string save_file = file;
-
-            if (dialog_show || file.Length == 0)
-            {
-                save_file = SelectSaveFile(file);
-
-                if (save_file.Length == 0)
-                {
-                    return false;
-                }
-            }
-
-            return CSVWrite(save_file, append, title_print);
-        }
-
-        /// <summary>
         /// 保存先を選ぶダイアログを表示する。
         /// </summary>
         /// <param name="file">初期ファイル名</param>
@@ -346,101 +321,6 @@ namespace MedicalLibrary.Utility
             }
         }
 
-        public bool ExcelSave(string file, bool title_print = true, bool dialog_show = true)
-        {
-            string save_file = file;
-
-            if (dialog_show)
-            {
-                SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-
-                if (file.Length > 0)
-                {
-                    saveFileDialog1.FileName = file;
-                }
-
-                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                {
-                    save_file = saveFileDialog1.FileName;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            Excel.Application app = new Excel.Application();
-            app.Visible = false;
-
-            Excel.Workbook work = (Excel.Workbook)(app.Workbooks.Add(Type.Missing));
-            Excel.Worksheet sheet = (Excel.Worksheet)(work.ActiveSheet);
-
-            try
-            {
-                int x = 1;
-                int y = 1;
-
-                if (title_print)
-                {
-                    // 先頭行にはカラム名を入れていく。
-                    foreach (string s in this.Title)
-                    {
-                        sheet.Cells[y, x] = s;
-                        x++;
-                    }
-
-                    y++;
-
-                    // ２番目のカラム名リストが存在する場合
-                    if (this.Title2.Count > 0)
-                    {
-                        foreach (string s in this.Title2)
-                        {
-                            sheet.Cells[y, x] = s;
-                            x++;
-                        }
-
-                        y++;
-                    }
-                }
-
-                foreach (TableDataRecord record in this.RecordList)
-                {
-                    x = 1;
-
-                    foreach (string r in record.DataList)
-                    {
-                        sheet.Cells[y, x] = r;
-                        x++;
-                    }
-
-                    y++;
-                }
-
-                if (save_file.Length > 0)
-                {
-                    work.SaveAs(save_file, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                LibUtility.Except(ex);
-                return false;
-            }
-            finally
-            {
-//                work.Close();
-//                app.Quit();
-
-                Marshal.ReleaseComObject(sheet);
-                Marshal.ReleaseComObject(work);
-                Marshal.ReleaseComObject(app);
-
-//                GC.Collect();
-            }
-        }
 /*
         /// <summary>
         /// CSV保存時にカラム名を出力するかどうか

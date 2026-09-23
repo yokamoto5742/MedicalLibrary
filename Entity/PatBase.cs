@@ -216,45 +216,9 @@ namespace MedicalLibrary.Entity
         public string Dept = "";
 
         /// <summary>
-        /// 診療科名
-        /// </summary>
-        public string DeptName
-        {
-            get
-            {
-                string result = "";
-
-                if (Dict.DeptDict.ContainsKey(Dept))
-                {
-                    result = Dict.DeptDict[Dept].ShortName;
-                }
-
-                return result;
-            }
-        }
-
-        /// <summary>
         /// 医師コード
         /// </summary>
         public string Doctor = "";
-
-        /// <summary>
-        /// 医師名
-        /// </summary>
-        public string DoctorName
-        {
-            get
-            {
-                string result = "";
-
-                if (Dict.DoctorDict.ContainsKey(Doctor))
-                {
-                    result = Dict.DoctorDict[Doctor].Name;
-                }
-
-                return result;
-            }
-        }
 
 
         /// <summary>
@@ -268,101 +232,15 @@ namespace MedicalLibrary.Entity
         /// </summary>
         public string InsKind = "";
 
-        public string InsKindName
-        {
-            get
-            {
-                string s = "";
-
-                if (this.InsKind.Length > 0)
-                {
-                    if (Insurance.Dict.ContainsKey(this.InsKind))
-                    {
-                        s = Insurance.Dict[this.InsKind].ShortName;
-                    }
-                }
-                else if (this.Ins.Length > 0)
-                {
-                    s = this.GetIns(this.Ins).KindNameShort;
-                }
-
-                return s;
-            }
-        }
-
-        /// <summary>
-        /// 保険略称を取得
-        /// </summary>
-        /// <param name="ins"></param>
-        /// <returns></returns>
-        public PatIns GetIns(string ins)
-        {
-            PatIns pins = new PatIns();
-            int i = -1;
-
-            if (int.TryParse(this.Ins, out i) &&
-                this.InsDict.ContainsKey(i))
-            {
-                pins = this.InsDict[i];
-            }
-
-            return pins;
-        }
-
-        private Dictionary<int, PatIns> insDict;
-
-        public Dictionary<int, PatIns> InsDict
-        {
-            get
-            {
-                if (insDict == null || insDict.Count == 0)
-                {
-                    insDict = PatIns.GetDict(this.Id);
-                }
-
-                return insDict;
-            }
-        }
-
         /// <summary>
         /// 備考
         /// </summary>
         public string NoteCode = "";
 
-        public Note Note1
-        {
-            get
-            {
-                Note obj = new Note();
-
-                if (Note.Dict.ContainsKey(this.NoteCode))
-                {
-                    obj = (Note)Note.Dict[this.NoteCode];
-                }
-
-                return obj;
-            }
-        }
-
         /// <summary>
         /// 他施設
         /// </summary>
         public string FacilityCode = "";
-
-        public Facility Facility1
-        {
-            get
-            {
-                Facility obj = new Facility();
-
-                if (Facility.Dict.ContainsKey(this.FacilityCode))
-                {
-                    obj = (Facility)Facility.Dict[this.FacilityCode];
-                }
-
-                return obj;
-            }
-        }
 
         /// <summary>
         /// 表示する患者情報（氏名, カナ, 性別, 生年月日, 年齢）
@@ -402,62 +280,6 @@ namespace MedicalLibrary.Entity
 
                 return s;
             }
-        }
-
-        /// <summary>
-        /// 表示する患者情報（氏名, カナ, 性別, 生年月日, 基準日での年齢）
-        /// </summary>
-        /// <param name="crit_date">基準日</param>
-        /// <param name="lang">生年月日</param>
-        /// <param name="kana">カナ</param>
-        /// <returns></returns>
-        public string GetInfo1(string crit_date = "", AppDateTime.LANG lang = AppDateTime.LANG.ENG, bool kana = true)
-        {
-            string s = "";
-
-            if (this.Name.Length > 0)
-            {
-                s += Name;
-
-                if (kana && this.Kana.Length > 0)
-                {
-                    s += " (" + this.Kana + ")";
-                }
-
-                s += " 様";
-            }
-
-            if (this.SexName.Length > 0)
-            {
-                s += " " + this.SexName;
-            }
-
-            if (this.Birth.Length == 8)
-            {
-                s += " ";
-
-                if (lang == AppDateTime.LANG.JPN)
-                {
-                    s += this.BirthStringJ;
-                }
-                else
-                {
-                    s += this.BirthString;
-                }
-
-                s += "生";
-            }
-
-            if (this.AgeCalc(crit_date).Length > 0)
-            {
-                s += " " + this.AgeCalc(crit_date) + "歳";
-            }
-            else
-            {
-                s += " " + this.Age + "歳";
-            }
-
-            return s;
         }
 
         public string Tel = "";
@@ -753,29 +575,6 @@ namespace MedicalLibrary.Entity
             return p;
         }
 
-        /// <summary>
-        /// Pat.csv 削除
-        /// </summary>
-        /// <param name="force">true: 強制的に削除, false: 電子カルテが動いていなければ削除</param>
-        public static void DeletePatCSV(bool force = false)
-        {
-            string processName = "InnoKarte";
-            string patFile = Env.INNO_HOME + @"\Pat.csv";
-            string patFile2 = Env.INNO_HOME + @"\Pat2.csv";
-            if (force || System.Diagnostics.Process.GetProcessesByName(processName).Length == 0)
-            {
-                if (File.Exists(patFile))
-                {
-                    System.IO.File.Delete(patFile);
-                }
-
-                if (File.Exists(patFile2))
-                {
-                    System.IO.File.Delete(patFile2);
-                }
-            }
-        }
-
 
         /// <summary>
         /// Pat.csv 生成
@@ -862,185 +661,5 @@ namespace MedicalLibrary.Entity
         }
 
 
-        public class Facility : StdMaster1
-        {
-            public Facility()
-            {
-
-            }
-
-            public Facility(StdMaster1 m)
-                : base()
-            {
-
-            }
-
-            static Dictionary<string, Facility> dict = new Dictionary<string, Facility>();
-
-            public static Dictionary<string, Facility> Dict
-            {
-                get
-                {
-                    if (dict.Count == 0)
-                    {
-                        foreach (StdMaster1 m in StdMaster1.GetDict("M_PROPERTY_3").Values)
-                        {
-                            Facility obj = new Facility();
-
-                            obj.Code = m.Code;
-                            obj.Name = m.Name;
-                            obj.Short = m.Short;
-
-                            if (!dict.ContainsKey(obj.Code))
-                            {
-                                dict.Add(obj.Code, obj);
-                            }
-                        }
-                    }
-
-                    return dict;
-                }
-            }
-        }
-
-        public class Note : StdMaster1
-        {
-            public Note()
-            {
-
-            }
-
-            public Note(StdMaster1 m)
-                : base()
-            {
-
-            }
-
-            public string BillMark
-            {
-                get
-                {
-                    string s = "";
-
-                    if (this.Code.Equals("1"))
-                    {
-                        // 分割払い
-                        s = "◎";
-                    }
-                    else if (this.Code.Equals("2"))
-                    {
-                        // 口座引き落とし
-                        s = "☆";
-                    }
-
-                    return s;
-                }
-            }
-
-            public string PatListMark
-            {
-                get
-                {
-                    string s = "";
-
-                    if (this.Code.Equals("1"))
-                    {
-                        // 分割払い
-                        s = "◎";
-                    }
-                    else if (this.Code.Equals("2"))
-                    {
-                        // 口座引き落とし
-                        s = "☆";
-                    }
-                    else if (this.Code.Equals("3"))
-                    {
-                        // 透析
-                        s = "◇";
-                    }
-                    else if (this.Code.Equals("10"))
-                    {
-                        // 地域包括診療科
-                        s = "○";
-                    }
-
-                    return s;
-                }
-            }
-
-            public string OushinMark
-            {
-                get
-                {
-                    string s = "";
-
-                    if (this.Code.Equals("2"))
-                    {
-                        // 口座引き落とし
-                        s = "☆";
-                    }
-                    else if (this.Code.Equals("5"))
-                    {
-                        // 往診・在宅
-                        s = "□";
-                    }
-
-                    return s;
-                }
-            }
-
-            public string ReceBillMark
-            {
-                get
-                {
-                    string s = "";
-
-                    if (this.Code.Equals("2"))
-                    {
-                        // 口座引き落とし
-                        s = "引";
-                    }
-                    else if (this.Code.Equals("3"))
-                    {
-                        // 透析
-                        s = "透";
-                    }
-                    else if (this.Code.Equals("5"))
-                    {
-                        // 往診・在宅
-                        s = "在";
-                    }
-
-                    return s;
-                }
-            }
-
-            static Dictionary<string, Note> dict = new Dictionary<string, Note>();
-
-            public static Dictionary<string, Note> Dict
-            {
-                get
-                {
-                    if (dict.Count == 0)
-                    {
-                        foreach (StdMaster1 m in StdMaster1.GetDict("M_PROPERTY_4").Values)
-                        {
-                            Note obj = new Note();
-
-                            obj.Code = m.Code;
-                            obj.Name = m.Name;
-                            obj.Short = m.Short;
-
-                            if (!dict.ContainsKey(obj.Code))
-                            {
-                                dict.Add(obj.Code, obj);
-                            }
-                        }
-                    }
-
-                    return dict;
-                }
-            }
-        }
     }
 }

@@ -104,48 +104,6 @@ namespace MedicalLibrary.Entity
         }
 
 
-        /// <summary>
-        /// DataDict から指定されたキーに該当するオブジェクトを取得する
-        /// </summary>
-        /// <param name="key">キー</param>
-        /// <returns></returns>
-        public Object GetData(string key)
-        {
-            Object obj = new object();
-
-            if (this.DataDict.ContainsKey(key))
-            {
-                obj = this.DataDict[key];
-            }
-
-            return obj;
-        }
-
-
-        /// <summary>
-        /// DataDict から指定されたキーに該当するオブジェクトを指定された型に変換して取得する
-        /// </summary>
-        /// <param name="key">キー</param>
-        /// <param name="t">変換先の型</param>
-        /// <returns></returns>
-        public Object GetData(string key, Type t)
-        {
-            Object obj = new object();
-
-            try
-            {
-                if (this.DataDict.ContainsKey(key))
-                {
-                    obj = Convert.ChangeType(this.DataDict[key], t);
-                }
-            }
-            catch (Exception ex)
-            {
-                LibUtility.Except(ex);
-            }
-
-            return obj;
-        }
 
 
         /// <summary>
@@ -185,61 +143,7 @@ namespace MedicalLibrary.Entity
         }
 
 
-        /// <summary>
-        /// DataDict から指定されたキーに該当するオブジェクトを long 型に変換して取得する
-        /// </summary>
-        /// <param name="key">キー</param>
-        /// <param name="default_val">デフォルト値</param>
-        /// <returns></returns>
-        public long GetDataLong(string key, long default_val = -1)
-        {
-            long i = default_val;
 
-            if (this.DataDict.ContainsKey(key) && this.DataDict[key].ToString().Length > 0)
-            {
-                long.TryParse(this.DataDict[key].ToString(), out i);
-            }
-
-            return i;
-        }
-
-
-        /// <summary>
-        /// DataDict から指定されたキーに該当するオブジェクトを double 型に変換して取得する
-        /// </summary>
-        /// <param name="key">キー</param>
-        /// <param name="default_val">デフォルト値</param>
-        /// <returns></returns>
-        public double GetDataDouble(string key, double default_val = -1)
-        {
-            double i = default_val;
-
-            if (this.DataDict.ContainsKey(key) && this.DataDict[key].ToString().Length > 0)
-            {
-                double.TryParse(this.DataDict[key].ToString(), out i);
-            }
-
-            return i;
-        }
-
-
-        /// <summary>
-        /// DataDict から指定されたキーに該当するオブジェクトを float 型に変換して取得する
-        /// </summary>
-        /// <param name="key">キー</param>
-        /// <param name="default_val">デフォルト値</param>
-        /// <returns></returns>
-        public float GetDataFloat(string key, float default_val = -1)
-        {
-            float i = default_val;
-
-            if (this.DataDict.ContainsKey(key) && this.DataDict[key].ToString().Length > 0)
-            {
-                float.TryParse(this.DataDict[key].ToString(), out i);
-            }
-
-            return i;
-        }
     }
 
     public class StdDbClass
@@ -255,38 +159,6 @@ namespace MedicalLibrary.Entity
         /// Select 句で指定する個々のカラム。
         /// </summary>
         public List<string> SelectList = new List<string>();
-
-        /// <summary>
-        /// Select 句。Select では必須。
-        /// </summary>
-        public string SelectState
-        {
-            get
-            {
-                string s = "";
-
-                foreach (string ss in SelectList)
-                {
-                    if (s.Length > 0)
-                    {
-                        s += ", ";
-                    }
-
-                    s += ss;
-                }
-
-                if (s.Length > 0)
-                {
-                    s = "select " + s + " ";
-                }
-                else
-                {
-                    s = "select * ";
-                }
-
-                return s;
-            }
-        }
 
         /// <summary>
         /// Update/Insert で登録するデータのリスト。
@@ -337,65 +209,9 @@ namespace MedicalLibrary.Entity
         public List<string> OrderByList = new List<string>();
 
         /// <summary>
-        /// Order By 句。Select の時のみ。
-        /// </summary>
-        public string OrderByState
-        {
-            get
-            {
-                string s = "";
-
-                foreach (string ss in OrderByList)
-                {
-                    if (s.Length > 0)
-                    {
-                        s += ", ";
-                    }
-
-                    s += ss;
-                }
-
-                if (s.Length > 0)
-                {
-                    s = " order by " + s;
-                }
-
-                return s;
-            }
-        }
-
-        /// <summary>
         /// Group By 句で指定する個々の条件。Select の時のみ。
         /// </summary>
         public List<string> GroupByList = new List<string>();
-
-        /// <summary>
-        /// Group By 句。Select の時のみ。
-        /// </summary>
-        public string GroupByState
-        {
-            get
-            {
-                string s = "";
-
-                foreach (string ss in GroupByList)
-                {
-                    if (s.Length > 0)
-                    {
-                        s += ", ";
-                    }
-
-                    s += ss;
-                }
-
-                if (s.Length > 0)
-                {
-                    s = " group by " + s;
-                }
-
-                return s;
-            }
-        }
 
         public StdDbClass()
         {
@@ -406,140 +222,6 @@ namespace MedicalLibrary.Entity
             this.Db = db;
         }
 
-
-        /// <summary>
-        /// テーブルの構造を取得してクラスを生成
-        /// </summary>
-        /// <param name="db"></param>
-        /// <param name="table_name"></param>
-        /// <returns></returns>
-        public static StdDbClass Load(DB db, string table_name)
-        {
-            StdDbClass obj = new StdDbClass();
-            obj.Table = table_name;
-
-            List<StdDbColumn> tmp_list = StdDbColumn.GetList(db, table_name);
-
-            foreach (StdDbColumn tmp in tmp_list)
-            {
-//                obj.DataDict.Add(tmp.Name, tmp);
-                obj.DataList.Add(tmp);
-            }
-
-            return obj;
-        }
-
-        /// <summary>
-        /// Select SQL
-        /// </summary>
-        /// <param name="execute">true: 実行する, false: 実行しない</param>
-        /// <param name="max">Where 指定が無い場合に取得するデータの最大値</param>
-        /// <param name="close">true: close 実行, false: close しない</param>
-        /// <returns></returns>
-        public List<StdClass> SelectSQL(bool execute = true, int max = 1000, bool close = true)
-        {
-            List<StdClass> list = new List<StdClass>();
-
-            StdReturn sr = new StdReturn();
-
-            if (this.Table.Length == 0)
-            {
-                sr.Errs.Add("テーブルの指定がありません");
-            }
-
-            if (sr.ErrExist)
-            {
-                return list;
-            }
-
-            string where_state = this.WhereState;
-
-            if (this.WhereState.Length == 0)
-            {
-                if (max > 0)
-                {
-                    where_state = " where rownum <= " + max;
-                }
-            }
-
-            string cmd = this.SelectState + " from " + this.Table + where_state + this.OrderByState + this.GroupByState;
-
-            Db.Command.CommandText = cmd;
-
-            foreach (StdDbColumn obj in this.ParamList)
-            {
-                if (obj.Value.ToString().Length > 0)
-                {
-                    if (obj.DataType == StdDbType.NUMBER)
-                    {
-                        if (obj.Value != null && obj.Value.ToString().Length > 0)
-                        {
-                            Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = obj.Value;
-                        }
-                        else
-                        {
-                            Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = DBNull.Value;
-                        }
-                    }
-                    else if (obj.DataType == StdDbType.VARCHAR2)
-                    {
-                        Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Varchar2).Value = obj.Value;
-                    }
-                    else if (obj.DataType == StdDbType.CHAR)
-                    {
-                        Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Char).Value = obj.Value;
-                    }
-                    else if (obj.DataType == StdDbType.DATE)
-                    {
-                        Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Date).Value = obj.Value;
-                    }
-                }
-            }
-
-            if (execute)
-            {
-                Db.Open();
-                OracleDataReader reader = Db.Command.ExecuteReader();
-                
-                while (reader.Read())
-                {
-                    StdClass obj = new StdClass();
-
-                    for (int i = 0; i < reader.FieldCount; i++)
-                    {
-                        // NULL 判定は IsDBNull で行う（理由は同ファイルの Select 側のコメント参照）
-                        if (reader.IsDBNull(i))
-                        {
-                            obj.DataDict[reader.GetName(i)] = "";
-                            continue;
-                        }
-
-                        object value = reader.GetOracleValue(i);
-
-                        obj.DataDict[reader.GetName(i)] = value.ToString();
-
-                        IDisposable disposable = value as IDisposable;
-
-                        if (disposable != null)
-                        {
-                            disposable.Dispose();
-                        }
-                    }
-
-                    list.Add(obj);
-                }
-
-                reader.Close();
-
-                if (close)
-                {
-                    Db.Close();
-                }
-            }
-
-            sr.Msgs.Add(cmd);
-            return list;
-        }
 
         /// <summary>
         /// Update SQL
@@ -800,81 +482,6 @@ namespace MedicalLibrary.Entity
             return sr;
         }
 
-        /// <summary>
-        /// Delete SQL
-        /// </summary>
-        /// <param name="execute">true: 実行する, false: 実行しない</param>
-        /// <param name="close">true: close 実行, false: close しない</param>
-        /// <returns></returns>
-        public StdReturn DeleteSQL(bool execute = true, bool close = true)
-        {
-            StdReturn sr = new StdReturn();
-            string cmd = "";
-
-            if (this.Table.Length == 0)
-            {
-                sr.Errs.Add("対象のテーブルがありません");
-            }
-
-            if (this.WhereState.Length == 0)
-            {
-                sr.Errs.Add("削除レコードを指定する Where 文がありません");
-            }
-
-            if (sr.ErrExist)
-            {
-                return sr;
-            }
-
-            foreach (StdDbColumn obj in this.ParamList)
-            {
-                if (obj.Value.ToString().Length > 0)
-                {
-                    if (obj.DataType == StdDbType.NUMBER)
-                    {
-                        if (obj.Value != null && obj.Value.ToString().Length > 0)
-                        {
-                            Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = obj.Value;
-                        }
-                        else
-                        {
-                            Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = DBNull.Value;
-                        }
-                    }
-                    else if (obj.DataType == StdDbType.VARCHAR2)
-                    {
-                        Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Varchar2).Value = obj.Value;
-                    }
-                    else if (obj.DataType == StdDbType.CHAR)
-                    {
-                        Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Char).Value = obj.Value;
-                    }
-                    else if (obj.DataType == StdDbType.DATE)
-                    {
-                        Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Date).Value = obj.Value;
-                    }
-                }
-            }
-
-            cmd = "delete from " + this.Table + this.WhereState;
-
-            Db.Command.CommandText = cmd;
-
-            if (execute)
-            {
-                Db.Open();
-                sr.IntValue = Db.Command.ExecuteNonQuery();
-
-                if (close)
-                {
-                    Db.Close();
-                }
-            }
-
-            sr.Msgs.Add(cmd);
-            return sr;
-        }
-
     }
 
 
@@ -939,76 +546,6 @@ namespace MedicalLibrary.Entity
             this.Scale = scale;
             this.Nullable = nullable;
         }
-
-        /// <summary>
-        /// テーブルの構造を取得する
-        /// </summary>
-        /// <param name="db"></param>
-        /// <param name="table_name"></param>
-        /// <returns></returns>
-        public static List<StdDbColumn> GetList(DB db, string table_name)
-        {
-            List<StdDbColumn> list = new List<StdDbColumn>();
-
-            db.Open();
-
-            db.Command.CommandText = "select a.COLUMN_NAME, a.DATA_TYPE" +
-                " ,nvl(a.DATA_PRECISION, a.CHAR_COL_DECL_LENGTH) as length " +
-                " ,a.DATA_SCALE " +
-                " ,a.NULLABLE " +
-                " from user_tab_columns a " +
-                " where a.TABLE_NAME = '" + table_name + "'" +
-                " order by a.COLUMN_ID ";
-
-            OracleDataReader reader = db.Command.ExecuteReader();
-
-            while (reader.Read())
-            {
-                StdDbColumn obj = new StdDbColumn();
-
-                obj.Name = reader["COLUMN_NAME"].ToString();
-
-                string c = reader["DATA_TYPE"].ToString();
-
-                if (c.Equals("NUMBER", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    obj.DataType = StdDbType.NUMBER;
-                }
-                else if (c.Equals("VARCHAR2", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    obj.DataType = StdDbType.VARCHAR2;
-                }
-                else if (c.Equals("CHAR", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    obj.DataType = StdDbType.CHAR;
-                }
-                else if (c.Equals("DATE", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    obj.DataType = StdDbType.DATE;
-                }
-
-                int.TryParse(reader["LENGTH"].ToString(), out obj.Length);
-                int.TryParse(reader["DATA_SCALE"].ToString(), out obj.Scale);
-
-                c = reader["NULLABLE"].ToString();
-
-                if (c.Equals("N", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    obj.Nullable = false;
-                }
-                else
-                {
-                    obj.Nullable = true;
-                }
-
-                list.Add(obj);
-            }
-
-            reader.Close();
-            db.Close();
-
-            return list;
-        }
     }
 
     /// <summary>
@@ -1029,35 +566,10 @@ namespace MedicalLibrary.Entity
     /// </summary>
     public class StdReturn
     {
-        public Object Value;
-
         /// <summary>
         /// エラーのリスト
         /// </summary>
         public List<string> Errs = new List<string>();
-
-        /// <summary>
-        /// エラー文（改行で接続）
-        /// </summary>
-        public string Err
-        {
-            get
-            {
-                string s = "";
-
-                foreach (string ss in this.Errs)
-                {
-                    if (s.Length > 0)
-                    {
-                        s += Environment.NewLine;
-                    }
-
-                    s += ss;
-                }
-
-                return s;
-            }
-        }
 
         /// <summary>
         /// エラーの有無
@@ -1076,53 +588,9 @@ namespace MedicalLibrary.Entity
         public List<string> Msgs = new List<string>();
 
         /// <summary>
-        /// メッセージ文（改行で接続）
-        /// </summary>
-        public string Msg
-        {
-            get
-            {
-                string s = "";
-
-                foreach (string ss in this.Msgs)
-                {
-                    if (s.Length > 0)
-                    {
-                        s += Environment.NewLine;
-                    }
-
-                    s += ss;
-                }
-
-                return s;
-            }
-        }
-
-        /// <summary>
-        /// メッセージの有無
-        /// </summary>
-        public bool MsgExist
-        {
-            get
-            {
-                return this.Msgs.Count() > 0 ? true : false;
-            }
-        }
-
-        /// <summary>
         /// 戻り値。整数型
         /// </summary>
         public int IntValue = 0;
 
-        /// <summary>
-        /// 戻り値。倍精度浮動小数点数
-        /// </summary>
-        public double DoubleValue = 0.0;
-
-        /// <summary>
-        /// 終了値。
-        /// 0: 正常終了
-        /// </summary>
-        public int Exit = 0;
     }
 }

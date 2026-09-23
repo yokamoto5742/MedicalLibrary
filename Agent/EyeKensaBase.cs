@@ -38,24 +38,6 @@ namespace MedicalLibrary.Agent
         public string KensaId = "";
 
         /// <summary>
-        /// 検査名
-        /// </summary>
-        public string KensaName
-        {
-            get
-            {
-                string result = "";
-
-                if (EyeKensaMaster.Dict.ContainsKey(KensaId))
-                {
-                    result = EyeKensaMaster.Dict[KensaId].Name;
-                }
-
-                return result;
-            }
-        }
-
-        /// <summary>
         /// 検査略称
         /// </summary>
         public string KensaShort
@@ -82,24 +64,6 @@ namespace MedicalLibrary.Agent
         /// スタッフ
         /// </summary>
         public string Staff = "";
-
-        /// <summary>
-        /// スタッフ名
-        /// </summary>
-        public string StaffName
-        {
-            get
-            {
-                string result = "";
-
-                if (Dict.StaffDict.ContainsKey(Staff))
-                {
-                    result = Dict.StaffDict[Staff].Name;
-                }
-
-                return result;
-            }
-        }
 
         /// <summary>
         /// 保存日

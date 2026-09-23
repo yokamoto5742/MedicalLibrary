@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MedicalLibrary.Entity;
@@ -27,50 +26,6 @@ namespace MedicalLibrary.Entity
         public string Kana = "";
 
         public string Birth = "";
-
-        public string BirthString
-        {
-            get
-            {
-                return DateTimeAgent.DateFormat(Birth, DateTimeAgent.DateFormatKind.LONG);
-            }
-        }
-
-        public string BirthStringJ
-        {
-            get
-            {
-                return DateTimeAgent.DateFormat(Birth, DateTimeAgent.DateFormatKind.J1);
-            }
-        }
-
-        string age = "";
-
-        /// <summary>
-        /// 年齢
-        /// </summary>
-        public string Age
-        {
-            get
-            {
-                string result = "";
-
-                if (age.Length > 0)
-                {
-                    result = age;
-                }
-                else if (Birth.Length == 8)
-                {
-                    result = DateTimeAgent.AgeCalc(Birth, DateTime.Now.ToString("yyyyMMdd")).ToString();
-                }
-
-                return result;
-            }
-            set
-            {
-                age = value;
-            }
-        }
 
         /// <summary>
         /// 続柄
@@ -195,24 +150,6 @@ namespace MedicalLibrary.Entity
         /// </summary>
         public string ResidentCode = "";
 
-        /// <summary>
-        /// 同別居
-        /// </summary>
-        public string ResidentVal
-        {
-            get
-            {
-                string s = "";
-
-                if (PatContactResident.Dict.ContainsKey(this.ResidentCode))
-                {
-                    s = PatContactResident.Dict[this.ResidentCode].Val;
-                }
-
-                return s;
-            }
-        }
-
 
         /// <summary>
         /// 介護役割
@@ -225,28 +162,6 @@ namespace MedicalLibrary.Entity
         /// </summary>
         public string Cont = "";
 
-
-        public static PatContact Load(string pt_id, int seq = 1)
-        {
-            PatContact obj = new PatContact();
-
-            if (pt_id.Length == 0)
-            {
-                return obj;
-            }
-            string cmd = "select * from M_PATIENT_FAMILY t " +
-                " where t.P_ID = " + pt_id +
-                " and t.P_SEQ = " + seq;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-            foreach (StdClass tmp in tmp_list)
-            {
-                obj = GetFromStdClass(tmp);
-                break;
-            }
-
-            return obj;
-        }
 
         public static List<PatContact> GetList(string pt_id)
         {
@@ -294,56 +209,7 @@ namespace MedicalLibrary.Entity
             return obj;
         }
 
-        static int GetMaxSEQ(string pt_id)
-        {
-            int seq = 0;
 
-            if (pt_id.Length == 0)
-            {
-                return seq;
-            }
-            string cmd = "select max(P_SEQ) 連番 from M_PATIENT_FAMILY t " +
-                " where t.P_ID = " + pt_id;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-            foreach (StdClass tmp in tmp_list)
-            {
-                if (tmp.DataDict["連番"].ToString().Length > 0)
-                {
-                    seq = int.Parse(tmp.DataDict["連番"].ToString());
-                }
-
-                break;
-            }
-
-            return seq;
-        }
-
-        public StdReturn Insert()
-        {
-            StdReturn sr = new StdReturn();
-
-            StdDbClass obj = new StdDbClass();
-            return sr;
-        }
-
-
-        public StdReturn Update()
-        {
-            StdReturn sr = new StdReturn();
-
-            StdDbClass obj = new StdDbClass();
-            return sr;
-        }
-
-
-        public StdReturn Delete()
-        {
-            StdReturn sr = new StdReturn();
-
-            StdDbClass obj = new StdDbClass();
-            return sr;
-        }
     }
 
 
@@ -443,44 +309,6 @@ namespace MedicalLibrary.Entity
                     dict.Add("2", new PatContactKind("2", "勤務先"));
                     dict.Add("3", new PatContactKind("3", "携帯"));
                     dict.Add("4", new PatContactKind("4", "その他"));
-                }
-
-                return dict;
-            }
-        }
-    }
-
-    /// <summary>
-    /// 同別居
-    /// </summary>
-    public class PatContactResident
-    {
-        public string Code = "";
-
-        public string Val = "";
-
-        public override string ToString()
-        {
-            return this.Val;
-        }
-
-        public PatContactResident(string code, string val)
-        {
-            this.Code = code;
-            this.Val = val;
-        }
-
-        static Dictionary<string, PatContactResident> dict = new Dictionary<string, PatContactResident>();
-
-        public static Dictionary<string, PatContactResident> Dict
-        {
-            get
-            {
-                if (dict.Count == 0)
-                {
-                    dict.Add("0", new PatContactResident("0", ""));
-                    dict.Add("1", new PatContactResident("1", "同居"));
-                    dict.Add("2", new PatContactResident("2", "別居"));
                 }
 
                 return dict;

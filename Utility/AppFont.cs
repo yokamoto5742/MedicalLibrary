@@ -94,29 +94,5 @@ namespace MedicalLibrary.Utility
 
 
         public static AppFont DefaultFont = F10;
-
-        static List<AppFont> fontList = new List<AppFont>();
-
-        public static List<AppFont> FontList
-        {
-            get
-            {
-                if (fontList.Count == 0)
-                {
-                    fontList.Add(F9);
-                    fontList.Add(F10);
-                    fontList.Add(F11);
-                    fontList.Add(F12);
-                    fontList.Add(F14);
-                }
-
-                return fontList;
-            }
-        }
-
-        public static Font GetStrikeoutFont(Font f)
-        {
-            return new Font(f.FontFamily.Name, f.Size, FontStyle.Strikeout);
-        }
     }
 }

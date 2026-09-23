@@ -28,41 +28,6 @@ namespace MedicalLibrary.Utility
         public static PatBase CurrentPat = new PatBase();
 
         /// <summary>
-        /// ホスト名
-        /// </summary>
-        public static string HostName
-        {
-            get
-            {
-                return Dns.GetHostName();
-            }
-        }
-
-        /// <summary>
-        /// IPv4アドレス
-        /// </summary>
-        public static string IP4
-        {
-            get
-            {
-                string s = "";
-
-                IPAddress[] addresses = Dns.GetHostAddresses(Dns.GetHostName());
-
-                foreach (IPAddress address in addresses)
-                {
-                    if (address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-                    {
-                        s = address.ToString();
-                        break;
-                    }
-                }
-
-                return s;
-            }
-        }
-
-        /// <summary>
         /// 予約カレンダーに表示する日数
         /// </summary>
         public static int RsvDays = 28;

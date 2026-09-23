@@ -128,41 +128,6 @@ namespace MedicalLibrary.Agent
         }
 
         /// <summary>
-        /// すべて取得する
-        /// </summary>
-        /// <returns></returns>
-        public static List<EyeSummary> LoadAll()
-        {
-            List<EyeSummary> list = new List<EyeSummary>();
-
-            // 患者マスタ（DBリンク先）とは結合せず、眼科DB単独で検索する。
-            // 患者情報は検索結果の患者IDからまとめて取得する（DBリンク越しの結合による負荷・ハング対策）。
-            string cmd = "select * from EYE_SUMMARY";
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
-
-            Dictionary<string, PatBase> pat_dict = PatBase.GetDict(tmp_list);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                EyeSummary obj = GetFromStdClass(tmp);
-
-                string pt_id = tmp.GetDataString("PATIENT_ID");
-
-                // 患者マスタに存在しないIDは除外する（従来の inner join と同一挙動）
-                if (!pat_dict.ContainsKey(pt_id))
-                {
-                    continue;
-                }
-
-                obj._Pat = pat_dict[pt_id];
-
-                list.Add(obj);
-            }
-
-            return list;
-        }
-
-        /// <summary>
         /// 患者コードのリストで検索する。
         /// </summary>
         /// <param name="pt_list"></param>

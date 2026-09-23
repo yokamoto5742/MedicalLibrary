@@ -11,33 +11,8 @@ namespace MedicalLibrary.Entity
     {
         static Dictionary<string, string> inOutDict;
 
-        public static Dictionary<string, string> InOutDict
-        {
-            get
-            {
-                if (inOutDict == null || inOutDict.Count == 0)
-                {
-                    InitDict();
-                }
-
-                return inOutDict;
-            }
-        }
-
         static Dictionary<string, Ward> wardDict;
 
-        public static Dictionary<string, Ward> WardDict
-        {
-            get
-            {
-                if (wardDict == null || wardDict.Count == 0)
-                {
-                    InitDict();
-                }
-
-                return wardDict;
-            }
-        }
 /*
         static Dictionary<string, string> wardShortDict;
 
@@ -57,33 +32,7 @@ namespace MedicalLibrary.Entity
 
         static Dictionary<string, string> kouiDict;
 
-        public static Dictionary<string, string> KouiDict
-        {
-            get
-            {
-                if (kouiDict == null || kouiDict.Count == 0)
-                {
-                    InitDict();
-                }
-
-                return kouiDict;
-            }
-        }
-
         static Dictionary<string, Sekou> sekouDict;
-
-        public static Dictionary<string, Sekou> SekouDict
-        {
-            get
-            {
-                if (sekouDict == null || sekouDict.Count == 0)
-                {
-                    InitDict();
-                }
-
-                return sekouDict;
-            }
-        }
 
         static Dictionary<string, Dept> deptDict;
 
@@ -151,71 +100,13 @@ namespace MedicalLibrary.Entity
         static Dictionary<string, Section> sectionDict;
 
         /// <summary>
-        /// èäëÆ
-        /// </summary>
-        public static Dictionary<string, Section> SectionDict
-        {
-            get
-            {
-                if (sectionDict == null || sectionDict.Count == 0)
-                {
-                    InitDict();
-                }
-
-                return sectionDict;
-            }
-        }
-
-        /// <summary>
         /// éëäi
         /// </summary>
         static Dictionary<string, Qual> qualDict;
 
-        /// <summary>
-        /// éëäi
-        /// </summary>
-        public static Dictionary<string, Qual> QualDict
-        {
-            get
-            {
-                if (qualDict == null || qualDict.Count == 0)
-                {
-                    InitDict();
-                }
-
-                return qualDict;
-            }
-        }
-
         static Dictionary<string, string> soapDict;
 
-        public static Dictionary<string, string> SoapDict
-        {
-            get
-            {
-                if (soapDict == null || soapDict.Count == 0)
-                {
-                    InitDict();
-                }
-
-                return soapDict;
-            }
-        }
-
         static Dictionary<string, string> soapShortDict;
-
-        public static Dictionary<string, string> SoapShortDict
-        {
-            get
-            {
-                if (soapShortDict == null || soapShortDict.Count == 0)
-                {
-                    InitDict();
-                }
-
-                return soapShortDict;
-            }
-        }
 
         private static void InitDict()
         {
@@ -461,17 +352,6 @@ namespace MedicalLibrary.Entity
         public int SEQ = 0;
         public string Code = "";
 
-        /// <summary>
-        /// É[ÉçñÑÇﬂÉRÅ[Éh
-        /// </summary>
-        public string Code2
-        {
-            get
-            {
-                return this.Code.PadLeft(2, '0');
-            }
-        }
-
         public string Name = "";
         public string Short = "";
         public string DeptCode = "";
@@ -568,21 +448,6 @@ namespace MedicalLibrary.Entity
         {
             return this.FullName;
         }
-
-        public static Dept Load(string code)
-        {
-            Dept obj = new Dept();
-
-            foreach (string key in Dict.DeptDict.Keys)
-            {
-                if (key.Equals(code))
-                {
-                    obj = Dict.DeptDict[key];
-                }
-            }
-
-            return obj;
-        }
     }
 
     public class Doctor
@@ -609,21 +474,6 @@ namespace MedicalLibrary.Entity
         public override string ToString()
         {
             return this.Name;
-        }
-
-        public static Doctor Load(string code)
-        {
-            Doctor obj = new Doctor();
-
-            foreach (string key in Dict.DoctorDict.Keys)
-            {
-                if (key.Equals(code))
-                {
-                    obj = Dict.DoctorDict[key];
-                }
-            }
-
-            return obj;
         }
     }
 
@@ -668,21 +518,6 @@ namespace MedicalLibrary.Entity
         {
             return this.FullName;
         }
-
-        public static Section Load(string code)
-        {
-            Section obj = new Section();
-
-            foreach (string key in Dict.SectionDict.Keys)
-            {
-                if (key.Equals(code))
-                {
-                    obj = Dict.SectionDict[key];
-                }
-            }
-
-            return obj;
-        }
     }
 
     /// <summary>
@@ -706,98 +541,6 @@ namespace MedicalLibrary.Entity
         public override string ToString()
         {
             return this.FullName;
-        }
-
-        public static Qual Load(string code)
-        {
-            Qual obj = new Qual();
-
-            foreach (string key in Dict.QualDict.Keys)
-            {
-                if (key.Equals(code))
-                {
-                    obj = Dict.QualDict[key];
-                }
-            }
-
-            return obj;
-        }
-    }
-
-    public class Insurance
-    {
-        public int Code;
-        public string FullName;
-        public string ShortName;
-        public string Kana;
-        public int Kind1;
-
-        public Insurance()
-        {
-            this.Code = 0;
-            this.FullName = "";
-            this.ShortName = "";
-            this.Kana = "";
-            this.Kind1 = 0;
-        }
-
-        public override string ToString()
-        {
-            return this.FullName;
-        }
-
-        static Dictionary<string, Insurance> dict = new Dictionary<string, Insurance>();
-
-        public static Dictionary<string, Insurance> Dict
-        {
-            get
-            {
-                if (dict.Count == 0)
-                {
-                    Init();
-                }
-
-                return dict;
-            }
-        }
-
-        static void Init()
-        {
-            dict.Clear();
-
-            string cmd = "select * from M_HOKEN t " +
-                " order by t.CODE";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                Insurance obj = new Insurance();
-
-                int.TryParse(tmp.DataDict["CODE"].ToString(), out obj.Code);
-                obj.FullName = tmp.DataDict["NAME"].ToString().Trim();
-                obj.ShortName = tmp.DataDict["S_NAME"].ToString().Trim();
-                obj.Kana = tmp.DataDict["KANA"].ToString().Trim();
-                int.TryParse(tmp.DataDict["VAL_3"].ToString(), out obj.Kind1);
-
-                if (!dict.ContainsKey(obj.Code.ToString()))
-                {
-                    dict.Add(obj.Code.ToString(), obj);
-                }
-            }
-        }
-
-
-        public static Insurance Load(string code)
-        {
-            Insurance obj = new Insurance();
-
-            if (Dict.ContainsKey(code))
-            {
-                obj = Dict[code];
-            }
-
-            return obj;
         }
     }
 }

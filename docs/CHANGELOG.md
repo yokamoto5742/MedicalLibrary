@@ -7,6 +7,14 @@
 
 ## [Unreleased]
 
+### 削除
+- 3アプリ（EyeCenter.exe / NidekARK1.exe / CanonRKF1.exe）と本DLL自身の IL から参照されないメンバーを、メンバー単位で削除（フェーズ5、`docs/dead_code_removal_guide.md` に準拠）
+  - 未参照の public/private メソッド・プロパティ・フィールド 約250件（`TableData.CSVSave` / `ExcelSave`、`Env.DB_LINK`、`Launcher` の未使用起動メソッド、`WinAPI` の未使用 P/Invoke など）
+  - 未参照の型: `BaseInfoFixed`、`PatBase.Facility` / `Note`、`PatContactResident`、`PatInDPCWard`、`PatInRoomGroup`、`Insurance`、`WinAPI.SHFILEINFO` など
+  - 型ごと未使用になった `Entity/KarteLog.cs`、`Entity/PatIns.cs`、`Entity/StdMaster1.cs`、`Utility/AppDateTime.cs` を削除
+- 使われていないアセンブリ参照（itextsharp の HintPath 参照と PackageReference、System.Xml.Linq、System.Data.DataSetExtensions）を削除
+- テンプレートのままの `Properties/Resources.resx` / `Resources.Designer.cs` と、参照のない `ai1.ico` / `ai2.ico` / `gif-load.gif` を削除
+
 ## [1.2.1] - 2026-09-23
 
 ### 追加

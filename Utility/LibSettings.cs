@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.IO;
 using System.Xml;
@@ -52,18 +51,6 @@ namespace MedicalLibrary.Utility
         /// </summary>
         public string OrderReceApiInterval = "4";
 
-        public int OrderReceApiIntervalInt
-        {
-            get
-            {
-                int i = 4;
-
-                int.TryParse(this.OrderReceApiInterval, out i);
-
-                return i;
-            }
-        }
-
         /// <summary>
         /// シェーマのフォルダ
         /// </summary>
@@ -113,18 +100,6 @@ namespace MedicalLibrary.Utility
         /// DPC調整係数
         /// </summary>
         public string DPCValue = "";
-
-        public float DPCValueFloat
-        {
-            get
-            {
-                float f = 1.0F;
-
-                float.TryParse(this.DPCValue, out f);
-
-                return f;
-            }
-        }
 
         /// <summary>
         /// ログフォルダ
@@ -178,41 +153,6 @@ namespace MedicalLibrary.Utility
         /// </summary>
         [XmlElement(ElementName = "Proas")]
         public Proas Proas = new Proas();
-
-        /// <summary>
-        /// このPCの設定
-        /// </summary>
-        public PC PC
-        {
-            get
-            {
-                PC pc = new PC();
-
-                foreach (PC p in this.PCS.PCList)
-                {
-                    if (Environment.MachineName.Equals(p.Name))
-                    {
-                        pc = p;
-                        break;
-                    }
-                }
-
-                // 該当PCの設定がない場合はデフォルトを使用
-                if (pc.Name.Length == 0)
-                {
-                    foreach (PC p in this.PCS.PCList)
-                    {
-                        if (p.Name.Length == 0)
-                        {
-                            pc = p;
-                            break;
-                        }
-                    }
-                }
-
-                return pc;
-            }
-        }
 
         /// <summary>
         /// アプリケーション設定ファイルの読み込み
@@ -631,65 +571,6 @@ namespace MedicalLibrary.Utility
             }
         }
 
-        /// <summary>
-        /// 身長（栄養・排泄）
-        /// </summary>
-        public string Height2
-        {
-            get
-            {
-                string s = "";
-
-                foreach (BaseInfoCode bc in this.BaseInfoCodeList)
-                {
-                    if (bc.Name.Equals("Height2"))
-                    {
-                        s = bc.Code;
-                        break;
-                    }
-                }
-
-                return s;
-            }
-        }
-
-        /// <summary>
-        /// 体重（栄養・排泄）
-        /// </summary>
-        public string Weight2
-        {
-            get
-            {
-                string s = "";
-
-                foreach (BaseInfoCode bc in this.BaseInfoCodeList)
-                {
-                    if (bc.Name.Equals("Weight2"))
-                    {
-                        s = bc.Code;
-                        break;
-                    }
-                }
-
-                return s;
-            }
-        }
-
-        public string CodeByName(string name)
-        {
-            string s = "";
-
-            foreach (BaseInfoCode bc in this.BaseInfoCodeList)
-            {
-                if (bc.Name.Equals(name))
-                {
-                    s = bc.Code;
-                    break;
-                }
-            }
-
-            return s;
-        }
     }
 
     public class BaseInfoCode
@@ -770,14 +651,6 @@ namespace MedicalLibrary.Utility
         public string From2 = "530";
 
         public string To2 = "355";
-
-        public List<string> ToList2
-        {
-            get
-            {
-                return this.To2.Split(',').ToList<string>();
-            }
-        }
     }
 
     /// <summary>
@@ -791,14 +664,6 @@ namespace MedicalLibrary.Utility
         public string From = "530";
 
         public string To = "355";
-
-        public List<string> ToList
-        {
-            get
-            {
-                return this.To.Split(',').ToList<string>();
-            }
-        }
     }
 
     /// <summary>
@@ -810,13 +675,5 @@ namespace MedicalLibrary.Utility
         public string From = "530";
 
         public string To = "355";
-
-        public List<string> ToList
-        {
-            get
-            {
-                return this.To.Split(',').ToList<string>();
-            }
-        }
     }
 }

@@ -17,10 +17,8 @@ namespace MedicalLibrary.Entity
         /// 代行入力の場合、本当の入力者
         /// </summary>
         static string id2 = "";
-        static string name2 = "";
 
         static string section_id = "";
-        static string qual_id = "";
         static string dept_id = "";
         static string doctor_id = "";
 
@@ -56,60 +54,11 @@ namespace MedicalLibrary.Entity
             }
         }
 
-        /// <summary>
-        /// 代行入力の場合、本当の入力者の氏名
-        /// </summary>
-        public static string Name2
-        {
-            get
-            {
-                return name2;
-            }
-        }
-
         public static string SectionId
         {
             get
             {
                 return section_id;
-            }
-        }
-
-        public static string SectionName
-        {
-            get
-            {
-                string s = "";
-
-                if (Dict.SectionDict.ContainsKey(section_id))
-                {
-                    s = Dict.SectionDict[section_id].ShortName;
-                }
-
-                return s;
-            }
-        }
-
-        public static string QualId
-        {
-            get
-            {
-                return qual_id;
-            }
-        }
-
-        public static string QualName
-        {
-            get
-            {
-                string s = "";
-
-                if (Dict.QualDict.ContainsKey(qual_id))
-                {
-                    s = Dict.QualDict[qual_id].ShortName;
-                }
-
-                return s;
             }
         }
 
@@ -160,24 +109,6 @@ namespace MedicalLibrary.Entity
         }
 
         /// <summary>
-        /// 管理者か否か
-        /// </summary>
-        public static bool IsAdmin
-        {
-            get
-            {
-                bool b = false;
-
-                if (id.Equals("519"))
-                {
-                    b = true;
-                }
-
-                return b;
-            }
-        }
-
-        /// <summary>
         /// 医師か否か
         /// </summary>
         public static bool IsDoctor
@@ -192,98 +123,6 @@ namespace MedicalLibrary.Entity
                 }
 
                 return result;
-            }
-        }
-
-        /// <summary>
-        /// 看護部か否か
-        /// </summary>
-        public static bool IsNurse
-        {
-            get
-            {
-                bool result = false;
-
-                if (section_id.Equals("11"))
-                {
-                    result = true;
-                }
-
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// 薬剤課か否か
-        /// </summary>
-        public static bool IsDrug
-        {
-            get
-            {
-                bool result = false;
-
-                if (section_id.Equals("21"))
-                {
-                    result = true;
-                }
-
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// リハビリ課か否か
-        /// </summary>
-        public static bool IsReha
-        {
-            get
-            {
-                bool result = false;
-
-                if (section_id.Equals("25"))
-                {
-                    result = true;
-                }
-                
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// DPCスタッフ（338 山本洋介、355 荒谷真由美、827 関口佳津子、所属 = 9 診療支援課）
-        /// </summary>
-        public static bool IsDPC
-        {
-            get
-            {
-                bool result = false;
-
-                if (id.Equals("519") || id.Equals("338") || id.Equals("355") || id.Equals("827") ||
-                    section_id.Equals("9"))
-                {
-                    result = true;
-                }
-
-                return result;
-            }
-        }
-
-        public static Staff LoginStaff
-        {
-            get
-            {
-                Staff s = new Staff();
-
-                int.TryParse(id, out s.Code);
-                s.Name = name;
-
-                int.TryParse(qual_id, out s.QualCode);
-                int.TryParse(section_id, out s.SectionCode);
-
-                int.TryParse(dept_id, out s.DeptCode);
-                int.TryParse(doctor_id, out s.DoctorCode);
-
-                return s;
             }
         }
 
@@ -327,10 +166,8 @@ namespace MedicalLibrary.Entity
             name = "";
 
             id2 = "";
-            name2 = "";
 
             section_id = "";
-            qual_id = "";
 
             dept_id = "";
             doctor_id = "";
@@ -464,7 +301,6 @@ namespace MedicalLibrary.Entity
                 id = tmp.DataDict["コード"].ToString();
                 name = tmp.DataDict["氏名"].ToString();
                 section_id = tmp.DataDict["所属"].ToString();
-                qual_id = tmp.DataDict["資格"].ToString();
 
                 if (tmp.DataDict["科コード"].ToString().Length > 0 && tmp.DataDict["科コード"].ToString() != "0")
                 {
@@ -515,7 +351,6 @@ namespace MedicalLibrary.Entity
                     id = tmp.DataDict["コード"].ToString();
                     name = tmp.DataDict["氏名"].ToString();
                     section_id = tmp.DataDict["所属"].ToString();
-                    qual_id = tmp.DataDict["資格"].ToString();
 
                     if (tmp.DataDict["科コード"].ToString().Length > 0 && tmp.DataDict["科コード"].ToString() != "0")
                     {
@@ -530,7 +365,6 @@ namespace MedicalLibrary.Entity
                 else if (tmp.DataDict["コード"].ToString().Equals(_id2))
                 {
                     id2 = tmp.DataDict["コード"].ToString();
-                    name2 = tmp.DataDict["氏名"].ToString();
                 }
             }
         }

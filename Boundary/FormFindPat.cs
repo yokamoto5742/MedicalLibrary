@@ -32,16 +32,6 @@ namespace MedicalLibrary.Boundary
             table.Columns.Add("“d˜b");
         }
 
-        public static string FindPatId()
-        {
-            FormFindPat f = new FormFindPat();
-            f.ShowDialog();
-            string s = f.GetPatId();
-            f.Dispose();
-
-            return s;
-        }
-
         public static PatBase FindPat()
         {
             FormFindPat f = new FormFindPat();
@@ -197,18 +187,6 @@ namespace MedicalLibrary.Boundary
             Clipboard.SetText(ListView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString());
 
             this.Close();
-        }
-
-        public string GetPatId()
-        {
-            string s = "";
-
-            if (this.ListView1.CurrentRow != null)
-            {
-                s = this.ListView1.CurrentRow.Cells["ID"].Value.ToString();
-            }
-
-            return s;
         }
 
         public PatBase GetPat()

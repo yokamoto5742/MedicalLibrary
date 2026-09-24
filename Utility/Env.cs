@@ -16,8 +16,6 @@ namespace MedicalLibrary.Utility
         static string inno_home = "";
         static string shin_home = "";
 
-        static string db_link = "";
-
         public static string LEGACY_HOME
         {
             get
@@ -95,24 +93,6 @@ namespace MedicalLibrary.Utility
             }
         }
 
-        public static string DB_LINK
-        {
-            get
-            {
-                if (db_link == null || db_link.Length == 0)
-                {
-                    init();
-                }
-
-                return db_link;
-            }
-            set
-            {
-                // ƒAƒvƒŠ‚É‚æ‚Á‚Ä‚Í‰Šúİ’è‚É•ÏX‚·‚éê‡‚ª‚ ‚é
-                db_link = value;
-            }
-        }
-
         private static void init()
         {
             legacy_home = @"C:\macs";
@@ -120,8 +100,6 @@ namespace MedicalLibrary.Utility
             karte_home = @"c:\karte";
             inno_home = @"c:\innokarte";
             shin_home = @"c:\shinseikai";
-
-            db_link = "@INNO.WORLD";
         }
     }
 }

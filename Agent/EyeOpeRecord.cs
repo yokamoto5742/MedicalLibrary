@@ -110,37 +110,5 @@ namespace MedicalLibrary.Agent
             return obj;
         }
 
-        /// <summary>
-        /// データベースから全データをロードする。
-        /// </summary>
-        public static List<EyeOpeRecord> LoadAll()
-        {
-            List<EyeOpeRecord> list = new List<EyeOpeRecord>();
-
-            string cmd = "select EYE_OPE.*, EYE_OPE_RECORD.* " +
-                " from EYE_OPE_RECORD " +
-                " inner join EYE_OPE on EYE_OPE_RECORD.ID = EYE_OPE.ID";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                EyeOpeRecord obj = GetFromStdClass(tmp);
-                obj.Ope = EyeOpe.GetFromStdClass(tmp);
-
-                list.Add(obj);
-            }
-
-            return list;
-        }
-
-        /// <summary>
-        /// データベースから削除する。
-        /// </summary>
-        /// <param name="ope_id">手術記録ID</param>
-        public static void Delete(string ope_id)
-        {
-            DB.Db2.ExecuteNonQuery("update EYE_OPE_RECORD set STATUS = 0 where ID = " + ope_id);
-        }
     }
 }

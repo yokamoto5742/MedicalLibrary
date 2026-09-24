@@ -27,7 +27,6 @@
 
 - Oracle ODP.NET 11.2 32bit クライアント（`C:\app\Administrator\product\11.2.0\client\odp.net\bin\2.x\Oracle.DataAccess.dll`）
 - Interop.Excel.dll（`..\..\..\..\Karte\Interop.Excel.dll`）
-- itextsharp 5.5.5（`..\..\..\..\Karte\itextsharp.dll`）
 - System.Windows.Forms, System.Drawing, System.Data 他標準ライブラリ
 
 また、実行時には以下のディレクトリ構造が必要です：
@@ -120,7 +119,6 @@ MedicalLibrary/
 │   ├── Env.cs          — 環境変数・パス定義
 │   ├── LibSettings.cs  — 設定管理（Setting.xml）
 │   ├── AppString.cs    — 文字列ユーティリティ
-│   ├── AppDateTime.cs  — 日付時刻ユーティリティ
 │   ├── AppFile.cs      — ファイル操作ユーティリティ
 │   ├── Launcher.cs     — 外部プロセス起動
 │   └── ...
@@ -167,7 +165,7 @@ Console.WriteLine($"患者名: {pat.Name}");
 
 **Env.cs** — 環境変数・マシン固有のパス（`C:\shinseikai` 等）定義
 
-**AppString** / **AppDateTime** / **AppFile** — 汎用ユーティリティ
+**AppString** / **AppFile** — 汎用ユーティリティ
 
 ## 開発情報
 
@@ -177,7 +175,7 @@ Console.WriteLine($"患者名: {pat.Name}");
 
 - **パラメータ・ローカル変数**: `snake_case`（例：`connection_string`, `param_list`）
 - **プライベート静的フィールド**: `snake_case`（例：`legacy_home`）
-- **パブリック定数/プロパティ**: `ALL_CAPS`（例：`DB_LINK`, `LEGACY_HOME`）
+- **パブリック定数/プロパティ**: `ALL_CAPS`（例：`AGENT_HOME`, `LEGACY_HOME`）
 - **型・メソッド・パブリックシングルトン**: `PascalCase`
 - **インデント**: 4スペース、Allman ブレース
 - **コメント・XMLドキュメント**: 日本語で記述

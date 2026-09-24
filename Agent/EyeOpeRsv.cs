@@ -84,56 +84,6 @@ namespace MedicalLibrary.Agent
         }
 
         /// <summary>
-        /// 指定した日・種別・枠の診療・休診情報を取得する。
-        /// </summary>
-        /// <param name="ope_date"></param>
-        /// <param name="ope_waku"></param>
-        /// <param name="ope_kind"></param>
-        /// <returns></returns>
-        public static EyeOpeRsv Load(string ope_date, string ope_waku, string ope_kind)
-        {
-            if (ope_date.Length != 8)
-            {
-                throw new Exception("日付が正しくありません");
-            }
-
-            if (ope_waku.Length < 3 || ope_waku.Length > 9)
-            {
-                throw new Exception("枠が正しくありません");
-            }
-
-            if (ope_kind.Length < 1 || ope_kind.Length > 2)
-            {
-                throw new Exception("種別が正しくありません");
-            }
-
-            EyeOpeRsv tmpRsv = new EyeOpeRsv();
-
-            string cmd = "select RSV_KIND, COMT from EYE_OPE_RSV " +
-                " where OPE_DATE = :OPE_DATE and OPE_WAKU = :OPE_WAKU and OPE_KIND = :OPE_KIND";
-
-            List<StdDbColumn> param_list = new List<StdDbColumn>();
-            param_list.Add(new StdDbColumn("OPE_DATE", StdDbType.NUMBER, ope_date));
-            param_list.Add(new StdDbColumn("OPE_WAKU", StdDbType.VARCHAR2, ope_waku));
-            param_list.Add(new StdDbColumn("OPE_KIND", StdDbType.NUMBER, ope_kind));
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd, param_list);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                tmpRsv.OpeDate = ope_date;
-                tmpRsv.OpeWaku = ope_waku;
-                tmpRsv.OpeKind = ope_kind;
-                tmpRsv.RsvKind = tmp.DataDict["RSV_KIND"].ToString();
-                tmpRsv.Comment = tmp.DataDict["COMT"].ToString();
-
-                break;
-            }
-
-            return tmpRsv;
-        }
-
-        /// <summary>
         /// 指定した期間・種別の診療・休診情報リストを取得する。
         /// </summary>
         /// <param name="start_date"></param>

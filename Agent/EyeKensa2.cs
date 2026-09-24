@@ -131,35 +131,6 @@ namespace MedicalLibrary.Agent
         }
 
         /// <summary>
-        /// データベースからロードする。（履歴）
-        /// </summary>
-        /// <param name="patient_id"></param>
-        /// <param name="kensa_id"></param>
-        /// <returns></returns>
-        public static List<EyeKensa2> LoadByPatKensa(string patient_id, string kensa_id)
-        {
-            List<EyeKensa2> tmpList = new List<EyeKensa2>();
-
-            if (patient_id.Length == 0 || kensa_id.Length == 0)
-            {
-                return tmpList;
-            }
-
-            string cmd = "select * from EYE_KENSA2 " +
-                " where PATIENT_ID = " + patient_id + " and KENSA_ID = " + kensa_id +
-                " order by KENSA_DATE desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                tmpList.Add(GetFromStdClass(tmp));
-            }
-
-            return tmpList;
-        }
-
-        /// <summary>
         /// データベースからロードする。
         /// </summary>
         /// <param name="patient_id"></param>

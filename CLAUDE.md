@@ -4,7 +4,7 @@
 
 ## 概要
 
-日本の電子カルテ用**クラスライブラリ**です。患者情報、オーダ、SOAPカルテ、眼科ワークフロー、検査機器連携などを扱います。`MedicalLibrary.dll` としてビルドされ、外部の3つのアプリケーション（`EyeCenter.exe`、`NidekARK1.exe`、`CanonRKF1.exe`）からのみ参照されます。本リポジトリ自体は単体で動作するスタンドアロンアプリケーションでは**ありません**。これらのアプリから参照されていないコードは、2026年7月（フェーズ1〜3、OpeOrder.exe の廃止を含む）および 2026年9月（フェーズ4: ILベースの到達可能性解析に基づき、OpeOrder/SOAP/オーダ/DPC/医事会計のUIおよびエンティティを含む323ファイルをファイル単位で削除。詳細は `docs/cleanup-plan-phase4.md` を参照）に削除されました。なお、残されたファイル内に存在する未使用のメソッドや型については、意図的にそのまま残蔽されています。
+日本の電子カルテ用**クラスライブラリ**です。患者情報、オーダ、SOAPカルテ、眼科ワークフロー、検査機器連携などを扱います。`MedicalLibrary.dll` としてビルドされ、外部の3つのアプリケーション（`EyeCenter.exe`、`NidekARK1.exe`、`CanonRKF1.exe`）からのみ参照されます。本リポジトリ自体は単体で動作するスタンドアロンアプリケーションでは**ありません**。これらのアプリから参照されていないコードは、2026年7月（フェーズ1〜3、OpeOrder.exe の廃止を含む）および 2026年9月（フェーズ4: ILベースの到達可能性解析に基づき、OpeOrder/SOAP/オーダ/DPC/医事会計のUIおよびエンティティを含む323ファイルをファイル単位で削除。詳細は `docs/cleanup-plan-phase4.md` を参照）に削除されました。さらに 2026年9月（フェーズ5: `docs/dead_code_removal_guide.md` に基づき、3アプリおよび本DLL自身のILから参照されない public/private のメンバー・型をメンバー単位で削除）に、残されたファイル内の未使用メソッドや型も削除しました。public メンバーを追加・削除する際は、3アプリ側のソースと IL での参照を確認してください。
 
 * **`Main` メソッドおよびエントリポイントは存在しません。** 外部EXEの起動・連携用ヘルパーは `Utility/Launcher.cs` および `InnoProgram.cs` に配置されています。
 * **テストスイート、CI、リンターはありません。** 単体テストを実行する環境は用意されていません。
@@ -22,7 +22,7 @@ msbuild MedicalLibrary.csproj /p:Configuration=Release /p:Platform=x86
 * `dotnet build` は**サポートされていません**（非SDKスタイルのcsproj、GAC/HintPath参照のため）。Visual Studio 2022以降の `msbuild` のみを使用してください。
 * ネイティブの Oracle ODP.NET クライアントが32ビットであるため、x86構成が必須です。
 * 参照アセンブリの `HintPath` は、相対パスで約7階層上の隣接する `Karte`/`Shinseikai` フォルダ、および Oracle 11.2 クライアントフォルダを参照しています。ビルド環境のマシン上にこれらの外部DLLやフォルダが存在することを前提としています。
-* かつて存在した `INNO` コンパイルシンボルおよび AnyCPU/IJI 構成は 2026年7月に削除されました。現在は INNO（新星会）向けのコードパスが無条件で適用されます（`StdEntity.Db` は `DB.Db3`、DBリンクは `@INNO.WORLD`）。
+* かつて存在した `INNO` コンパイルシンボルおよび AnyCPU/IJI 構成は 2026年7月に削除されました。現在は INNO（新星会）向けのコードパスが無条件で適用されます（`StdEntity.Db` は `DB.Db3`）。
 
 ## 編集ルール
 
@@ -32,7 +32,7 @@ msbuild MedicalLibrary.csproj /p:Configuration=Release /p:Platform=x86
 ## コードスタイル（C#のデフォルト規則からの相違点）
 
 * **メソッドの引数およびローカル変数には `snake_case` を使用します**（例: `connection_string`、`param_list`、`con_str`）。
-* private static フィールドには `snake_case`（例: `legacy_home`、`db_link`）、環境定数の public プロパティには **`ALL_CAPS`**（例: `LEGACY_HOME`、`AGENT_HOME`、`DB_LINK`）を使用します。
+* private static フィールドには `snake_case`（例: `legacy_home`、`agent_home`）、環境定数の public プロパティには **`ALL_CAPS`**（例: `LEGACY_HOME`、`AGENT_HOME`、`KARTE_HOME`）を使用します。
 * 型名、メソッド名、public シングルトンは PascalCase です。インデントは半角スペース4つ、波括弧はオールマンスタイル（Allman braces）を採用しています。
 * `.editorconfig` やアナライザーのルールセットはありません（x86構成では `CodeAnalysisIgnoreBuiltInRules=true` に設定されています）。
 

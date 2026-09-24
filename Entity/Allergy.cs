@@ -218,30 +218,5 @@ namespace MedicalLibrary.Entity
             return obj;
         }
 
-        public StdReturn Save()
-        {
-            StdReturn sr = new StdReturn();
-
-            if (this.PtId.Length == 0 || this.GroupCode.Length == 0 || this.SEQ == 0)
-            {
-                return sr;
-            }
-
-            StdDbClass obj = new StdDbClass();
-            return sr;
-        }
-
-        public StdReturn Delete()
-        {
-            StdReturn sr = new StdReturn();
-
-            if (this.PtId.Length == 0 || this.GroupCode.Length == 0 || this.SEQ == 0)
-            {
-                return sr;
-            }
-
-            StdDbClass obj = new StdDbClass();
-            return sr;
-        }
     }
 }

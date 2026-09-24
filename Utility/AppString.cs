@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,9 +8,6 @@ namespace MedicalLibrary.Utility
 {
     public class AppString
     {
-        static char[] zen = { '０', '１', '２', '３', '４', '５', '６', '７', '８', '９', 'Ａ', 'Ｂ', 'Ｃ', 'Ｄ', 'Ｅ', 'Ｆ', 'Ｇ', 'Ｈ', 'Ｉ', 'Ｊ', 'Ｋ', 'Ｌ', 'Ｍ', 'Ｎ', 'Ｏ', 'Ｐ', 'Ｑ', 'Ｒ', 'Ｓ', 'Ｔ', 'Ｕ', 'Ｖ', 'Ｗ', 'Ｘ', 'Ｙ', 'Ｚ', 'ａ', 'ｂ', 'ｃ', 'ｄ', 'ｅ', 'ｆ', 'ｇ', 'ｈ', 'ｉ', 'ｊ', 'ｋ', 'ｌ', 'ｍ', 'ｎ', 'ｏ', 'ｐ', 'ｑ', 'ｒ', 'ｓ', 'ｔ', 'ｕ', 'ｖ', 'ｗ', 'ｘ', 'ｙ', 'ｚ', '！', '”', '＃', '＄', '％', '＆', '’', '（', '）', '＝', '－', '＋', '＊', '＾', '～', '￥', '｜', '「', '」', '｛', '｝', '＠', '‘', '；', '：', '、', '．', '＜', '＞', '？', '／', '＿' };
-        static char[] han = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '=', '-', '+', '*', '^', '~', '\\', '|', '[', ']', '{', '}', '@', '`', ';', ':', ',', '.', '<', '>', '?', '/', '_' };
-
         /// <summary>
         /// 全角文字列を半角に変換する
         /// </summary>
@@ -43,112 +39,6 @@ namespace MedicalLibrary.Utility
 
             return ret;
  */
-        }
-
-        /// <summary>
-        /// 半角文字列を全角に変換する
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static string HanToZen(string s)
-        {
-            return Strings.StrConv(s, VbStrConv.Wide);
-
-/*
-            string ret = "";
-
-            for (int i = 0; i < s.Length; i++)
-            {
-                for (int j = 0; j < han.Length; j++)
-                {
-                    if (s[i].Equals(han[j]))
-                    {
-                        ret += zen[j].ToString();
-                        break;
-                    }
-
-                    // リストに無かった場合はそのまま追加
-                    if (j == han.Length - 1)
-                    {
-                        ret += s[i];
-                    }
-                }
-            }
-
-            return ret;
- */
-        }
-
-        public static string HiraToZenkana(string s)
-        {
-            return Strings.StrConv(s, VbStrConv.Katakana);
-        }
-
-        public static string HiraToHankana(string s)
-        {
-            return Strings.StrConv(Strings.StrConv(s, VbStrConv.Katakana), VbStrConv.Narrow);
-        }
-
-        /// <summary>
-        /// 文字列のバイト長を調べる
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static int LenB(string s)
-        {
-            return Encoding.GetEncoding("Shift_JIS").GetByteCount(s);
-        }
-
-        /// <summary>
-        /// 文字列を指定したバイト長になるまで指定文字で穴埋めする
-        /// </summary>
-        /// <param name="s"></param>
-        /// <param name="n"></param>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        public static string PadRightB(string s, int n, char c)
-        {
-            string ss = s;
-
-            if (LenB(s) < n)
-            {
-                for (int i = 0; i < n - LenB(s); i++)
-                {
-                    ss += c;
-                }
-            }
-
-            return ss;
-        }
-
-        public static string Wrap(string s, float font_size, int width)
-        {
-            string ss = "";
-
-            int n = (int)(width * 1.35) / (int)font_size;
-            int tmp_len = 0;
-
-            for (int i = 0; i < s.Length; i++)
-            {
-                if (s[i].Equals(Environment.NewLine[0]))
-                {
-                    ss += s[i];
-                    tmp_len = 0;
-                    i += Environment.NewLine.Length - 1;
-                    continue;
-                }
-
-                if (tmp_len >= n)
-                {
-                    ss += Environment.NewLine;
-                    tmp_len = 0;
-                }
-
-                ss += s[i];
-                tmp_len += AppString.LenB(s[i].ToString());
-            }
-
-            return ss;
         }
 
         /// <summary>
@@ -241,23 +131,6 @@ namespace MedicalLibrary.Utility
             }
 
             return lists;
-        }
-
-        public static bool IsNumber(string s, bool minus = false)
-        {
-            if (minus)
-            {
-                return Regex.IsMatch(s, @"[\-]*[0-9]+");
-            }
-            else
-            {
-                return Regex.IsMatch(s, @"[0-9]+");
-            }
-        }
-
-        public static bool IsDate(string s)
-        {
-            return DateTimeAgent.IsDate(s);
         }
     }
 }

@@ -142,7 +142,11 @@ namespace MedicalLibrary.Agent
             {
                 rsv = ex.Message;
                 status = SerialStatus.Close;
-                writer.Close();
+
+                if (writer != null)
+                {
+                    writer.Close();
+                }
             }
 
             AddReceivedDataDelegate add = new AddReceivedDataDelegate(AddReceivedData);
@@ -183,6 +187,18 @@ namespace MedicalLibrary.Agent
 
                 this.Dispose();
             }
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            if (port != null && port.IsOpen)
+            {
+                port.Close();
+            }
+
+            timer1.Stop();
+
+            base.OnFormClosed(e);
         }
 
         private void timer1_Tick(object sender, EventArgs e)

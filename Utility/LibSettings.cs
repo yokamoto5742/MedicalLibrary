@@ -21,16 +21,16 @@ namespace MedicalLibrary.Utility
         /// <summary>
         /// DB情報
         /// </summary>
-        public string DBConnectionString1 = "User Id=macs;Password=system;Data Source=wgs_odbc_orcl;";
+        public string DBConnectionString1 = "";
 
         /// <summary>
         /// DB情報
         /// </summary>
-        public string DBConnectionString2 = "User Id=open;Password=system;Data Source=macs_open;";
+        public string DBConnectionString2 = "";
         /// <summary>
         /// DB情報
         /// </summary>
-        public string DBConnectionString3 = "User Id=medb;Password=system;Data Source=inno_orcl;";
+        public string DBConnectionString3 = "";
 
         /// <summary>
         /// ログ出力レベル

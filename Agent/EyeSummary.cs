@@ -207,6 +207,9 @@ namespace MedicalLibrary.Agent
 
             string param = "";
 
+            // 入力された文字列は SQL に直接埋め込まず、バインド変数で渡す
+            List<StdDbColumn> param_list = new List<StdDbColumn>();
+
             // 病名をスペースで区切って複数入力した場合に and 検索が出来るように。
             // 舘先生・岡本康宏さんの要望, by sakane, 14/03/03
             if (diag.Length > 0)
@@ -220,7 +223,9 @@ namespace MedicalLibrary.Agent
                         param += " and ";
                     }
 
-                    param += "DIAG like '%" + s + "%'";
+                    string p = "DIAG" + param_list.Count;
+                    param += "DIAG like :" + p;
+                    param_list.Add(new StdDbColumn(p, StdDbType.VARCHAR2, "%" + s + "%"));
                 }
             }
 
@@ -231,7 +236,8 @@ namespace MedicalLibrary.Agent
                     param += " and ";
                 }
 
-                param += "KIND1 like '%" + kind1 + "%'";
+                param += "KIND1 like :KIND1";
+                param_list.Add(new StdDbColumn("KIND1", StdDbType.VARCHAR2, "%" + kind1 + "%"));
             }
 
             if (kind2.Length > 0)
@@ -241,7 +247,8 @@ namespace MedicalLibrary.Agent
                     param += " and ";
                 }
 
-                param += "KIND2 like '%" + kind2 + "%'";
+                param += "KIND2 like :KIND2";
+                param_list.Add(new StdDbColumn("KIND2", StdDbType.VARCHAR2, "%" + kind2 + "%"));
             }
 
             if (kind3.Length > 0)
@@ -251,7 +258,8 @@ namespace MedicalLibrary.Agent
                     param += " and ";
                 }
 
-                param += "KIND3 like '%" + kind3 + "%'";
+                param += "KIND3 like :KIND3";
+                param_list.Add(new StdDbColumn("KIND3", StdDbType.VARCHAR2, "%" + kind3 + "%"));
             }
 
             if (param.Length == 0)
@@ -267,7 +275,7 @@ namespace MedicalLibrary.Agent
                 cmd = "select * from (" + cmd + ") where ROWNUM <= " + limit;
             }
 
-            List<StdClass> tmp_list = StdClass.GetList(db == null ? DB.Db2 : db, cmd, null, progress);
+            List<StdClass> tmp_list = StdClass.GetList(db == null ? DB.Db2 : db, cmd, param_list, progress);
 
             Dictionary<string, PatBase> pat_dict = PatBase.GetDict(tmp_list, pat_db, progress);
 

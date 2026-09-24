@@ -519,11 +519,17 @@ namespace MedicalLibrary.Agent
         {
             List<EyeOpe> tmpList = new List<EyeOpe>();
 
+            // 入力された文字列は SQL に直接埋め込まず、バインド変数で渡す
+            // （パラメータ名は登録順の番号で一意にする）
+            List<StdDbColumn> param_list = new List<StdDbColumn>();
+
             string date_sql = "";
 
             if (start_date.Length == 8 && end_date.Length == 8)
             {
-                date_sql = " and OPE_DATE >= " + start_date + " and OPE_DATE <= " + end_date;
+                date_sql = " and OPE_DATE >= :START_DATE and OPE_DATE <= :END_DATE";
+                param_list.Add(new StdDbColumn("START_DATE", StdDbType.NUMBER, start_date));
+                param_list.Add(new StdDbColumn("END_DATE", StdDbType.NUMBER, end_date));
             }
 
             string diag_sql = "";
@@ -537,7 +543,9 @@ namespace MedicalLibrary.Agent
                         diag_sql += " and ";
                     }
 
-                    diag_sql += "DIAG like '%" + s + "%'";
+                    string p = "P" + param_list.Count;
+                    diag_sql += "DIAG like :" + p;
+                    param_list.Add(new StdDbColumn(p, StdDbType.VARCHAR2, "%" + s + "%"));
                 }
 
                 if (diag_sql.Length > 0)
@@ -557,7 +565,9 @@ namespace MedicalLibrary.Agent
                         ope_sql += " or ";
                     }
 
-                    ope_sql += "OPE_NAME like '%" + s + "%'";
+                    string p = "P" + param_list.Count;
+                    ope_sql += "OPE_NAME like :" + p;
+                    param_list.Add(new StdDbColumn(p, StdDbType.VARCHAR2, "%" + s + "%"));
                 }
 
                 if (ope_sql.Length > 0)
@@ -577,7 +587,9 @@ namespace MedicalLibrary.Agent
                         doctor_sql += " or ";
                     }
 
-                    doctor_sql += "DOCTOR like '%" + s + "%'";
+                    string p = "P" + param_list.Count;
+                    doctor_sql += "DOCTOR like :" + p;
+                    param_list.Add(new StdDbColumn(p, StdDbType.VARCHAR2, "%" + s + "%"));
                 }
 
                 if (doctor_sql.Length > 0)
@@ -590,14 +602,16 @@ namespace MedicalLibrary.Agent
 
             if (record11.Length > 0)
             {
-                record_sql1 = " and EYE_OPE_RECORD.CONT like '%" + record12 + "," + record13 + "%'";
+                record_sql1 = " and EYE_OPE_RECORD.CONT like :RECORD1";
+                param_list.Add(new StdDbColumn("RECORD1", StdDbType.VARCHAR2, "%" + record12 + "," + record13 + "%"));
             }
 
             string record_sql2 = "";
 
             if (record21.Length > 0)
             {
-                record_sql2 = " and EYE_OPE_RECORD.CONT like '%" + record22 + "," + record23 + "%'";
+                record_sql2 = " and EYE_OPE_RECORD.CONT like :RECORD2";
+                param_list.Add(new StdDbColumn("RECORD2", StdDbType.VARCHAR2, "%" + record22 + "," + record23 + "%"));
             }
             // 患者マスタ（DBリンク先）とは結合せず、眼科DBだけで検索する。
             // 患者情報は検索結果の患者IDからまとめて取得する（DBリンク越しの結合による負荷・ハング対策）。
@@ -611,7 +625,7 @@ namespace MedicalLibrary.Agent
                 cmd = "select * from (" + cmd + ") where ROWNUM <= " + limit;
             }
 
-            List<StdClass> tmp_list = StdClass.GetList(db == null ? DB.Db2 : db, cmd, null, progress);
+            List<StdClass> tmp_list = StdClass.GetList(db == null ? DB.Db2 : db, cmd, param_list, progress);
 
             Dictionary<string, PatBase> pat_dict = PatBase.GetDict(tmp_list, pat_db, progress);
 

@@ -441,19 +441,24 @@ namespace MedicalLibrary.Entity
             }
 
             List<string> conds = new List<string>();
+            List<StdDbColumn> param_list = new List<StdDbColumn>();
             string cond = "";
 
+            // 入力された文字列は SQL に直接埋め込まず、バインド変数で渡す
             if (name.Length > 0)
             {
-                cond = "(P_NAME like '%" + name + "%' ";
+                cond = "(P_NAME like :NAME ";
+                param_list.Add(new StdDbColumn("NAME", StdDbType.VARCHAR2, "%" + name + "%"));
 
                 if (name.Contains(" "))
                 {
-                    cond += " or P_NAME like '%" + name.Replace(' ', '　') + "%' ";
+                    cond += " or P_NAME like :NAME2 ";
+                    param_list.Add(new StdDbColumn("NAME2", StdDbType.VARCHAR2, "%" + name.Replace(' ', '　') + "%"));
                 }
                 else if (name.Contains("　"))
                 {
-                    cond += " or P_NAME like '%" + name.Replace('　', ' ') + "%' ";
+                    cond += " or P_NAME like :NAME2 ";
+                    param_list.Add(new StdDbColumn("NAME2", StdDbType.VARCHAR2, "%" + name.Replace('　', ' ') + "%"));
                 }
 
                 cond += ")";
@@ -463,15 +468,18 @@ namespace MedicalLibrary.Entity
 
             if (kana.Length > 0)
             {
-                cond = "(P_KANA like '%" + kana + "%' ";
+                cond = "(P_KANA like :KANA ";
+                param_list.Add(new StdDbColumn("KANA", StdDbType.VARCHAR2, "%" + kana + "%"));
 
                 if (kana.Contains(" "))
                 {
-                    cond += " or P_KANA like '%" + kana.Replace(' ', '　') + "%' ";
+                    cond += " or P_KANA like :KANA2 ";
+                    param_list.Add(new StdDbColumn("KANA2", StdDbType.VARCHAR2, "%" + kana.Replace(' ', '　') + "%"));
                 }
                 else if (kana.Contains("　"))
                 {
-                    cond += " or P_KANA like '%" + kana.Replace('　', ' ') + "%' ";
+                    cond += " or P_KANA like :KANA2 ";
+                    param_list.Add(new StdDbColumn("KANA2", StdDbType.VARCHAR2, "%" + kana.Replace('　', ' ') + "%"));
                 }
 
                 cond += ")";
@@ -481,14 +489,15 @@ namespace MedicalLibrary.Entity
 
             if (birth.Length == 8)
             {
-                conds.Add("(P_BIRTHDAY_AD = " + birth + ")");
+                conds.Add("(P_BIRTHDAY_AD = :BIRTH)");
+                param_list.Add(new StdDbColumn("BIRTH", StdDbType.NUMBER, birth));
             }
 
             string cmd = "select * from M_PATIENT t " +
                 " where " + AppString.ConcatList(conds, " and ") +
                 " order by P_ID";
 
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
+            List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd, param_list);
 
             foreach (StdClass tmp in tmp_list)
             {

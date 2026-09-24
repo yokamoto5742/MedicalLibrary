@@ -59,15 +59,21 @@ namespace MedicalLibrary.Agent
 
             obj.DataList.Add(new StdDbColumn("RSV_KIND", StdDbType.NUMBER, rsv_kind));
             obj.DataList.Add(new StdDbColumn("COMT", StdDbType.VARCHAR2, comment));
-            obj.WhereList.Add("OPE_DATE = " + ope_date);
-            obj.WhereList.Add("OPE_WAKU = '" + ope_waku + "'");
-            obj.WhereList.Add("OPE_KIND = " + ope_kind);
+            obj.WhereList.Add("OPE_DATE = :W_OPE_DATE");
+            obj.WhereList.Add("OPE_WAKU = :W_OPE_WAKU");
+            obj.WhereList.Add("OPE_KIND = :W_OPE_KIND");
+            obj.ParamList.Add(new StdDbColumn("W_OPE_DATE", StdDbType.NUMBER, ope_date));
+            obj.ParamList.Add(new StdDbColumn("W_OPE_WAKU", StdDbType.VARCHAR2, ope_waku));
+            obj.ParamList.Add(new StdDbColumn("W_OPE_KIND", StdDbType.NUMBER, ope_kind));
 
             sr = obj.UpdateSQL();
 
             // update 対象が無ければ新規登録
             if (sr.IntValue == 0)
             {
+                // Where 句用のパラメータは insert 文に無いので外す
+                obj.ParamList.Clear();
+
                 obj.DataList.Add(new StdDbColumn("OPE_DATE", StdDbType.NUMBER, ope_date));
                 obj.DataList.Add(new StdDbColumn("OPE_WAKU", StdDbType.VARCHAR2, ope_waku));
                 obj.DataList.Add(new StdDbColumn("OPE_KIND", StdDbType.NUMBER, ope_kind));
@@ -143,9 +149,14 @@ namespace MedicalLibrary.Agent
             }
 
             string cmd = "delete from EYE_OPE_RSV " +
-                " where OPE_DATE = " + ope_date + " and OPE_WAKU = '" + ope_waku + "' and OPE_KIND = " + ope_kind;
+                " where OPE_DATE = :OPE_DATE and OPE_WAKU = :OPE_WAKU and OPE_KIND = :OPE_KIND";
 
-            DB.Db2.ExecuteNonQuery(cmd);
+            List<StdDbColumn> param_list = new List<StdDbColumn>();
+            param_list.Add(new StdDbColumn("OPE_DATE", StdDbType.NUMBER, ope_date));
+            param_list.Add(new StdDbColumn("OPE_WAKU", StdDbType.VARCHAR2, ope_waku));
+            param_list.Add(new StdDbColumn("OPE_KIND", StdDbType.NUMBER, ope_kind));
+
+            DB.Db2.ExecuteNonQuery(cmd, param_list);
         }
     }
 }

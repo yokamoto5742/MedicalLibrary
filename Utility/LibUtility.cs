@@ -8,22 +8,6 @@ namespace MedicalLibrary.Utility
 {
     public class LibUtility
     {
-/*
-        /// <summary>
-        /// ログを書き込む TextBox
-        /// </summary>
-        public static TextBox LogBox;
-*/
-/*
-        /// <summary>
-        /// ログボックスのセット
-        /// </summary>
-        public static void SetLogBox(TextBox log_box)
-        {
-            LogBox = log_box;
-        }
-*/
-
         /// <summary>
         /// 例外を受け取って処理する
         /// </summary>

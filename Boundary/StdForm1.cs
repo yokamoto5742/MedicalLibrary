@@ -47,17 +47,6 @@ namespace MedicalLibrary.Boundary
             foreach (Control c in this.Controls)
             {
                 c.Font = f.Ft;
-/*
-                if (c.GetType().Name.StartsWith("Label") ||
-                    c.GetType().Name.StartsWith("TextBox") ||
-                    c.GetType().Name.StartsWith("ComboBox") ||
-                    c.GetType().Name.StartsWith("CheckBox") ||
-                    c.GetType().Name.StartsWith("Button") ||
-                    c.GetType().Name.StartsWith("DataGridView"))
-                {
-                    c.Font = f.Ft;
-                }
- */
             }
         }
 

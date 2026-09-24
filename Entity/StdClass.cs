@@ -345,6 +345,31 @@ namespace MedicalLibrary.Entity
             return sr;
         }
 
+        /// <summary>
+        /// key_list を条件に Update し、対象が無ければ key_list を加えて Insert する。
+        /// key_list は数値の列のみ（Where 句に値をそのまま埋め込むため）。
+        /// </summary>
+        /// <param name="key_list">レコードを特定するキー</param>
+        /// <returns></returns>
+        internal StdReturn UpdateOrInsert(List<StdDbColumn> key_list)
+        {
+            foreach (StdDbColumn key in key_list)
+            {
+                this.WhereList.Add(key.Name + " = " + key.Value);
+            }
+
+            StdReturn sr = this.UpdateSQL();
+
+            if (sr.ErrExist || sr.IntValue > 0)
+            {
+                return sr;
+            }
+
+            // update 対象が無ければ新規登録
+            this.DataList.AddRange(key_list);
+            return this.InsertSQL();
+        }
+
     }
 
 
@@ -452,7 +477,7 @@ namespace MedicalLibrary.Entity
         {
             get
             {
-                return this.Errs.Count() > 0 ? true : false;
+                return this.Errs.Count > 0;
             }
         }
 

@@ -155,95 +155,58 @@ namespace MedicalLibrary.Agent
             // 患者基本情報
             Dictionary<string, List<BaseInfo>> dict = BaseInfo.GetDict(pt_id);
 
-            // 患者情報（短期入院）作成
-            Item item1 = new Item();
-            item1.Kind = "患者情報";
-            item1.Name = "既往歴";
-
-            if (dict.ContainsKey(LibSettings.Current.BaseInfoCodes.Diag))
+            // 患者情報（短期入院）作成（名称, 患者基本情報の項目コード）
+            string[,] pat_infos =
             {
-                item1.Value = dict[LibSettings.Current.BaseInfoCodes.Diag][0].Value;
-            }
+                { "既往歴", LibSettings.Current.BaseInfoCodes.Diag },
+                { "内服・外用", LibSettings.Current.BaseInfoCodes.Drug },
+                { "アレルギー", LibSettings.Current.BaseInfoCodes.Allergy }
+            };
 
-            PatInfoList.Add(item1);
-
-            Item item2 = new Item();
-            item2.Kind = "患者情報";
-            item2.Name = "内服・外用";
-
-            if (dict.ContainsKey(LibSettings.Current.BaseInfoCodes.Drug))
+            for (int k = 0; k < pat_infos.GetLength(0); k++)
             {
-                item2.Value = dict[LibSettings.Current.BaseInfoCodes.Drug][0].Value;
-            }
+                Item item = new Item();
+                item.Kind = "患者情報";
+                item.Name = pat_infos[k, 0];
 
-            PatInfoList.Add(item2);
-
-            Item item3 = new Item();
-            item3.Kind = "患者情報";
-            item3.Name = "アレルギー";
-
-            if (dict.ContainsKey(LibSettings.Current.BaseInfoCodes.Allergy))
-            {
-                item3.Value = dict[LibSettings.Current.BaseInfoCodes.Allergy][0].Value;
-            }
-
-            PatInfoList.Add(item3);
-
-            // 禁忌・アレルギー　リスト作成
-            Item ai1 = new Item();
-            ai1.Kind = "禁忌アレルギー";
-            ai1.Name = "食物";
-
-            Item ai2 = new Item();
-            ai2.Kind = "禁忌アレルギー";
-            ai2.Name = "薬剤";
-
-            Item ai3 = new Item();
-            ai3.Kind = "禁忌アレルギー";
-            ai3.Name = "その他";
-
-            List<AllergyData> allergy_list = AllergyData.GetList(PtId);
-
-            foreach (AllergyData allergy in allergy_list)
-            {
-                if (allergy.GroupCode.Equals("1"))
+                if (dict.ContainsKey(pat_infos[k, 1]))
                 {
-                    if (allergy.Cont.Length > 0)
-                    {
-                        ai1.Value += "\r\n" + allergy.Name + " " + allergy.Cont;
-                    }
-                    else
-                    {
-                        ai1.Value += "\r\n" + allergy.Name;
-                    }
+                    item.Value = dict[pat_infos[k, 1]][0].Value;
                 }
-                else if (allergy.GroupCode.Equals("2"))
+
+                PatInfoList.Add(item);
+            }
+
+            // 禁忌・アレルギー　リスト作成（GroupCode 1: 食物, 2: 薬剤, 3: その他）
+            string[] allergy_names = { "食物", "薬剤", "その他" };
+            Dictionary<string, Item> allergy_dict = new Dictionary<string, Item>();
+
+            for (int k = 0; k < allergy_names.Length; k++)
+            {
+                Item item = new Item();
+                item.Kind = "禁忌アレルギー";
+                item.Name = allergy_names[k];
+
+                allergy_dict.Add((k + 1).ToString(), item);
+                AllergyList.Add(item);
+            }
+
+            foreach (AllergyData allergy in AllergyData.GetList(PtId))
+            {
+                if (!allergy_dict.ContainsKey(allergy.GroupCode))
                 {
-                    if (allergy.Cont.Length > 0)
-                    {
-                        ai2.Value += "\r\n" + allergy.Name + " " + allergy.Cont;
-                    }
-                    else
-                    {
-                        ai2.Value += "\r\n" + allergy.Name;
-                    }
+                    continue;
                 }
-                else if (allergy.GroupCode.Equals("3"))
+
+                if (allergy.Cont.Length > 0)
                 {
-                    if (allergy.Cont.Length > 0)
-                    {
-                        ai3.Value += "\r\n" + allergy.Name + " " + allergy.Cont;
-                    }
-                    else
-                    {
-                        ai3.Value += "\r\n" + allergy.Name;
-                    }
+                    allergy_dict[allergy.GroupCode].Value += "\r\n" + allergy.Name + " " + allergy.Cont;
+                }
+                else
+                {
+                    allergy_dict[allergy.GroupCode].Value += "\r\n" + allergy.Name;
                 }
             }
-
-            AllergyList.Add(ai1);
-            AllergyList.Add(ai2);
-            AllergyList.Add(ai3);
         }
 
         /// <summary>
@@ -354,7 +317,7 @@ namespace MedicalLibrary.Agent
                     i++;
                 }
 
-                string exFileName = System.Environment.GetEnvironmentVariable("TEMP") + "\\" + PtId + "_" + SaveDate + SaveTime + "_" + FileName.Split('\\')[FileName.Split('\\').Length - 1];
+                string exFileName = System.Environment.GetEnvironmentVariable("TEMP") + "\\" + PtId + "_" + SaveDate + SaveTime + "_" + System.IO.Path.GetFileName(FileName);
 
                 exWorkbook.SaveAs(exFileName, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Excel.XlSaveAsAccessMode.xlExclusive, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);
             }

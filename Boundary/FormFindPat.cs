@@ -136,15 +136,7 @@ namespace MedicalLibrary.Boundary
             this.ListView1.Columns["電話"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
 
 
-            foreach (DataGridViewRow r in this.ListView1.Rows)
-            {
-                if (r.Cells["性別"].Value.ToString().Equals("女"))
-                {
-                    r.Cells["氏名"].Style.ForeColor = Color.Red;
-                    r.Cells["カナ"].Style.ForeColor = Color.Red;
-                    r.Cells["性別"].Style.ForeColor = Color.Red;
-                }
-            }
+            AppDataGridView.SexColor(this.ListView1, "性別", new List<string> { "氏名", "カナ", "性別" });
 
             if (this.ListView1.RowCount > 0)
             {

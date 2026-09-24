@@ -59,9 +59,9 @@ namespace MedicalLibrary.Agent
                 }
             }
 
-            if (!Directory.Exists(AppFile.PathName(file)))
+            if (!Directory.Exists(Path.GetDirectoryName(file)))
             {
-                Directory.CreateDirectory(AppFile.PathName(file));
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
             }
 
             ConnectButton.Select();

@@ -15,8 +15,6 @@ namespace MedicalLibrary.Agent
         /// </summary>
         public void Save()
         {
-            StdReturn sr = new StdReturn();
-
             StdDbClass obj = new StdDbClass();
             obj.Db = DB.Db2;
 
@@ -27,20 +25,12 @@ namespace MedicalLibrary.Agent
             obj.DataList.Add(new StdDbColumn("SAVE_DATE", StdDbType.NUMBER, DateTime.Now.ToString("yyyyMMdd")));
             obj.DataList.Add(new StdDbColumn("SAVE_TIME", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
 
-            obj.WhereList.Add("PATIENT_ID = " + this.PtId);
-            obj.WhereList.Add("KENSA_ID = " + this.KensaId);
-            obj.WhereList.Add("KENSA_DATE = " + this.KensaDate);
-
-            sr = obj.UpdateSQL();
-
-            // update 対象が無ければ新規登録
-            if (sr.IntValue == 0)
+            obj.UpdateOrInsert(new List<StdDbColumn>
             {
-                obj.DataList.Add(new StdDbColumn("PATIENT_ID", StdDbType.NUMBER, this.PtId));
-                obj.DataList.Add(new StdDbColumn("KENSA_ID", StdDbType.NUMBER, this.KensaId));
-                obj.DataList.Add(new StdDbColumn("KENSA_DATE", StdDbType.NUMBER, this.KensaDate));
-                sr = obj.InsertSQL();
-            }
+                new StdDbColumn("PATIENT_ID", StdDbType.NUMBER, this.PtId),
+                new StdDbColumn("KENSA_ID", StdDbType.NUMBER, this.KensaId),
+                new StdDbColumn("KENSA_DATE", StdDbType.NUMBER, this.KensaDate)
+            });
         }
 
         static EyeKensa GetFromStdClass(StdClass tmp)
@@ -143,22 +133,11 @@ namespace MedicalLibrary.Agent
                 return tmpList;
             }
 
-            string cmd = "";
-
-            if (pat)
-            {
-                // 患者マスタ（DBリンク先）とは結合せず、眼科DB単独で検索する。
-                // 患者情報は検索結果の患者IDからまとめて取得する（DBリンク越しの結合による負荷・ハング対策）。
-                cmd = "select * from EYE_KENSA " +
-                    " where PATIENT_ID = " + patient_id + " and KENSA_ID = " + kensa_id +
-                    " order by KENSA_DATE desc";
-            }
-            else
-            {
-                cmd = "select * from EYE_KENSA " +
-                    " where PATIENT_ID = " + patient_id + " and KENSA_ID = " + kensa_id +
-                    " order by KENSA_DATE desc";
-            }
+            // 患者マスタ（DBリンク先）とは結合せず、眼科DB単独で検索する。
+            // 患者情報は検索結果の患者IDからまとめて取得する（DBリンク越しの結合による負荷・ハング対策）。
+            string cmd = "select * from EYE_KENSA " +
+                " where PATIENT_ID = " + patient_id + " and KENSA_ID = " + kensa_id +
+                " order by KENSA_DATE desc";
 
             List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
 

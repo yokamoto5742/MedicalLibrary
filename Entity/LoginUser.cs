@@ -131,7 +131,6 @@ namespace MedicalLibrary.Entity
         {
             NONE = 0,
             STAFF = 1,
-//            CLERK = 2,
             BOTH = 4
         }
 
@@ -243,18 +242,18 @@ namespace MedicalLibrary.Entity
 
             LoginUser.Clear();
 
-            StreamReader reader = new StreamReader(patFile, Encoding.Default);
-
             string line;
-            string[] patCont = new string[50];
 
-            if ((line = reader.ReadLine()) != null)
+            using (StreamReader reader = new StreamReader(patFile, Encoding.Default))
             {
-                for (int i = 0; i < 50; i++)
-                {
-                    patCont[i] = line.Split(',')[i];
-                }
+                line = reader.ReadLine();
+            }
 
+            // 空ファイルや列が足りない行は読まない
+            string[] patCont = line == null ? new string[0] : line.Split(',');
+
+            if (patCont.Length >= 50)
+            {
                 id = patCont[9].TrimStart('0');
                 name = patCont[10];
 
@@ -265,57 +264,13 @@ namespace MedicalLibrary.Entity
                 id2 = patCont[32].TrimStart('0');
             }
 
-            reader.Dispose();
-
             // 取得した id に基づいて各種情報をセットする。
             if (id.Length > 0)
             {
                 SetUser(id, id2);
             }
         }
-/*
-        /// <summary>
-        /// ログインIDをセットする。
-        /// さらにユーザー名・セクションID・セクション名・資格ID・資格名・診療科ID・医師ID・医師名を取得してセットする。
-        /// </summary>
-        /// <param name="_id">ユーザーID</param>
-        public static void SetUser(string _id)
-        {
-            int i = 0;
 
-            if (_id.Length == 0 || !int.TryParse(_id, out i))
-            {
-                return;
-            }
-
-            id = _id;
-
-            string cmd = "select IM90RC_F01 コード, Trim(IM90RC_F03) 氏名, IM90RC_F04 所属, IM90RC_F08 資格, IM90RC_F13 科コード, IM90RC_F14 医師コード " +
-                " from IM90RC " +
-                " where IM90RC_F01 = " + _id;
-
-            List<StdClass> tmp_list = StdClass.GetList(Db, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                id = tmp.DataDict["コード"].ToString();
-                name = tmp.DataDict["氏名"].ToString();
-                section_id = tmp.DataDict["所属"].ToString();
-
-                if (tmp.DataDict["科コード"].ToString().Length > 0 && tmp.DataDict["科コード"].ToString() != "0")
-                {
-                    dept_id = tmp.DataDict["科コード"].ToString();
-                }
-
-                if (tmp.DataDict["医師コード"].ToString().Length > 0 && tmp.DataDict["医師コード"].ToString() != "0")
-                {
-                    doctor_id = tmp.DataDict["医師コード"].ToString();
-                }
-
-                break;
-            }
-        }
-*/
         /// <summary>
         /// ログインIDをセットする。
         /// さらにユーザー名・セクションID・セクション名・資格ID・資格名・診療科ID・医師ID・医師名を取得してセットする。

@@ -74,18 +74,30 @@ namespace MedicalLibrary.Agent
             }
         }
 
+        /// <summary>
+        /// OpeTime ‚Ìs‚ªAw’è‚µ‚½í•Ê‚ÅAèp“ú‚ğ‘ÎÛ”ÍˆÍ‚ÉŠÜ‚Ş‚©‚Ç‚¤‚©B
+        /// </summary>
+        static bool IsOpeTime(DataRow r, string ope_kind, string ope_date)
+        {
+            // í•Ê‚ªˆê’v‚·‚é‚à‚Ì‚ğ‘I‘ğ
+            if (!ope_kind.Equals(r["OpeKind"].ToString()))
+            {
+                return false;
+            }
+
+            // èp“ú‚ª‘ÎÛ”ÍˆÍ“à‚É‚ ‚é‚à‚Ì‚ğ‘I‘ğ
+            int date = Int32.Parse(ope_date);
+
+            return Int32.Parse(r["Start"].ToString()) <= date && (r["End"].ToString().Length == 0 || Int32.Parse(r["End"].ToString()) >= date);
+        }
+
         public static string GetEnd(string ope_kind, string ope_date)
         {
             foreach (DataRow r in EyeSet.Tables["OpeTime"].Rows)
             {
-                // í•Ê‚ªˆê’v‚·‚é‚à‚Ì‚ğ‘I‘ğ
-                if (ope_kind.Equals(r["OpeKind"].ToString()))
+                if (IsOpeTime(r, ope_kind, ope_date))
                 {
-                    // èp“ú‚ª‘ÎÛ”ÍˆÍ“à‚É‚ ‚é‚à‚Ì‚ğ‘I‘ğ
-                    if (Int32.Parse(r["Start"].ToString()) <= Int32.Parse(ope_date) && (r["End"].ToString().Length == 0 || Int32.Parse(r["End"].ToString()) >= Int32.Parse(ope_date)))
-                    {
-                        return r["End"].ToString();
-                    }
+                    return r["End"].ToString();
                 }
             }
 
@@ -102,14 +114,9 @@ namespace MedicalLibrary.Agent
         {
             foreach (DataRow r in EyeSet.Tables["OpeTime"].Rows)
             {
-                // í•Ê‚ªˆê’v‚·‚é‚à‚Ì‚ğ‘I‘ğ
-                if (ope_kind.Equals(r["OpeKind"].ToString()))
+                if (IsOpeTime(r, ope_kind, ope_date))
                 {
-                    // èp“ú‚ª‘ÎÛ”ÍˆÍ“à‚É‚ ‚é‚à‚Ì‚ğ‘I‘ğ
-                    if (Int32.Parse(r["Start"].ToString()) <= Int32.Parse(ope_date) && (r["End"].ToString().Length == 0 || Int32.Parse(r["End"].ToString()) >= Int32.Parse(ope_date)))
-                    {
-                        return r["Waku"].ToString().Split(',');
-                    }
+                    return r["Waku"].ToString().Split(',');
                 }
             }
 
@@ -126,21 +133,16 @@ namespace MedicalLibrary.Agent
         {
             foreach (DataRow r in EyeSet.Tables["OpeTime"].Rows)
             {
-                // í•Ê‚ªˆê’v‚·‚é‚à‚Ì‚ğ‘I‘ğ
-                if (ope_kind.Equals(r["OpeKind"].ToString()))
+                if (IsOpeTime(r, ope_kind, ope_date))
                 {
-                    // èp“ú‚ª‘ÎÛ”ÍˆÍ“à‚É‚ ‚é‚à‚Ì‚ğ‘I‘ğ
-                    if (Int32.Parse(r["Start"].ToString()) <= Int32.Parse(ope_date) && (r["End"].ToString().Length == 0 || Int32.Parse(r["End"].ToString()) >= Int32.Parse(ope_date)))
-                    {
-                        // —j“ú‚ªˆê’v‚·‚é‚à‚Ì‚ğ‘I‘ğ
-                        string wday = ((int)DateTime.Parse(ope_date.Insert(4, "/").Insert(7, "/")).DayOfWeek).ToString();
+                    // —j“ú‚ªˆê’v‚·‚é‚à‚Ì‚ğ‘I‘ğ
+                    string wday = ((int)DateTime.Parse(ope_date.Insert(4, "/").Insert(7, "/")).DayOfWeek).ToString();
 
-                        foreach (string s in r["Time"].ToString().Split('\n'))
+                    foreach (string s in r["Time"].ToString().Split('\n'))
+                    {
+                        if (s.Trim('\r').Length > 0 && s.Trim('\r').StartsWith(wday))
                         {
-                            if (s.Trim('\r').Length > 0 && s.Trim('\r').StartsWith(wday))
-                            {
-                                return s.Trim('\r').Split('=')[1].Split(',');
-                            }
+                            return s.Trim('\r').Split('=')[1].Split(',');
                         }
                     }
                 }
@@ -164,7 +166,7 @@ namespace MedicalLibrary.Agent
         /// <returns></returns>
         public static double CalcGrape(double height, double weight)
         {
-            return (30.0 - Math.Round(Math.Pow(height, 0.725) * Math.Pow(weight, 0.425) * 0.007184 * 3, 1));
+            return 30.0 - CalcVisdine(height, weight);
         }
 
         /// <summary>

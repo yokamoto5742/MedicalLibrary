@@ -44,8 +44,6 @@ namespace MedicalLibrary.Agent
         /// </summary>
         public void Save()
         {
-            StdReturn sr = new StdReturn();
-
             StdDbClass obj = new StdDbClass();
             obj.Db = DB.Db2;
 
@@ -65,16 +63,11 @@ namespace MedicalLibrary.Agent
             obj.DataList.Add(new StdDbColumn("STAFF", StdDbType.NUMBER, this.Staff));
             obj.DataList.Add(new StdDbColumn("SAVE_DATE", StdDbType.NUMBER, DateTime.Now.ToString("yyyyMMdd")));
             obj.DataList.Add(new StdDbColumn("SAVE_TIME", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
-            obj.WhereList.Add("PATIENT_ID = " + this.PtId);
 
-            sr = obj.UpdateSQL();
-
-            // update ëŒè€Ç™ñ≥ÇØÇÍÇŒêVãKìoò^
-            if (sr.IntValue == 0)
+            obj.UpdateOrInsert(new List<StdDbColumn>
             {
-                obj.DataList.Add(new StdDbColumn("PATIENT_ID", StdDbType.NUMBER, this.PtId));
-                sr = obj.InsertSQL();
-            }
+                new StdDbColumn("PATIENT_ID", StdDbType.NUMBER, this.PtId)
+            });
         }
 
         static EyeSummary GetFromStdClass(StdClass tmp)

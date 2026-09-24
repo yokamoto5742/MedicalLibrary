@@ -553,18 +553,18 @@ namespace MedicalLibrary.Entity
                 return p;
             }
 
-            StreamReader reader = new StreamReader(patFile, Encoding.Default);
-
             string line;
-            string[] patCont = new string[50];
 
-            if ((line = reader.ReadLine()) != null)
+            using (StreamReader reader = new StreamReader(patFile, Encoding.Default))
             {
-                for (int i = 0; i < 50; i++)
-                {
-                    patCont[i] = line.Split(',')[i];
-                }
+                line = reader.ReadLine();
+            }
 
+            // 空ファイルや列が足りない行は読まない
+            string[] patCont = line == null ? new string[0] : line.Split(',');
+
+            if (patCont.Length >= 50)
+            {
                 p.Id = patCont[2].TrimStart('0');
                 p.Name = patCont[3];
                 p.Kana = patCont[4];
@@ -578,8 +578,6 @@ namespace MedicalLibrary.Entity
 
                 p.Ins = patCont[31];
             }
-
-            reader.Dispose();
 
             return p;
         }

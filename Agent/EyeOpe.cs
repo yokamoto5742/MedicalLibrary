@@ -272,35 +272,7 @@ namespace MedicalLibrary.Agent
 
             return tmpOpe;
         }
-/*
-        /// <summary>
-        /// 該当患者の手術記録をデータベースから検索する。
-        /// </summary>
-        /// <param name="pt_id"></param>
-        /// <returns></returns>
-        public static List<EyeOpe> Find(string pt_id)
-        {
-            List<EyeOpe> tmpList = new List<EyeOpe>();
 
-            if (pt_id.Length == 0)
-            {
-                return tmpList;
-            }
-
-            string cmd = "select * from EYE_OPE " +
-                " where PATIENT_ID = " + pt_id + " and STATUS != 0 " +
-                " order by OPE_DATE desc, OPE_TIME desc";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                tmpList.Add(GetFromStdClass(tmp));
-            }
-
-            return tmpList;
-        }
-*/
         /// <summary>
         /// データベースから削除する。
         /// </summary>
@@ -355,31 +327,7 @@ namespace MedicalLibrary.Agent
                 cond_list.Add("OPE_TIME <= " + time2);
             }
 
-            // 患者マスタ（DBリンク先）とは結合せず、眼科DB単独で検索する。
-            // 患者情報は検索結果の患者IDからまとめて取得する（DBリンク越しの結合による負荷・ハング対策）。
-            string cmd = "select * from EYE_OPE " +
-                " where " + AppString.ConcatList(cond_list, " and ") + " and STATUS != 0 " +
-                " order by OPE_KIND, OPE_DATE, OPE_TIME";
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db2, cmd);
-
-            Dictionary<string, PatBase> pat_dict = PatBase.GetDict(tmp_list);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                EyeOpe obj = GetFromStdClass(tmp);
-
-                obj._Pat.Id = tmp.GetDataString("PATIENT_ID");
-
-                // 患者マスタに存在するIDのみ患者情報を設定する（従来の left join と同一挙動）
-                if (pat_dict.ContainsKey(obj.PtId))
-                {
-                    obj._Pat = pat_dict[obj.PtId];
-                }
-
-                list.Add(obj);
-            }
-
-            return list;
+            return GetListByConds(cond_list);
         }
 
         /// <summary>
@@ -405,23 +353,20 @@ namespace MedicalLibrary.Agent
                 cond_list.Add("OPE_KIND = " + kind);
             }
 
-            if (DateTimeAgent.IsDate(start_date))
-            {
-                cond_list.Add("OPE_DATE >= " + start_date);
-            }
-            else
-            {
-                cond_list.Add("OPE_DATE >= " + DateTime.Now.ToString("yyyyMMdd"));
-            }
+            cond_list.Add("OPE_DATE >= " + start_date);
+            cond_list.Add("OPE_DATE <= " + end_date);
 
-            if (DateTimeAgent.IsDate(end_date))
-            {
-                cond_list.Add("OPE_DATE <= " + end_date);
-            }
-            else
-            {
-                cond_list.Add("OPE_DATE <= " + DateTime.Now.AddDays(7).ToString("yyyyMMdd"));
-            }
+            return GetListByConds(cond_list);
+        }
+
+        /// <summary>
+        /// GetListByKindDateTimes / GetListByKindDates の共通部分
+        /// </summary>
+        /// <param name="cond_list">Where 句の条件</param>
+        /// <returns></returns>
+        static List<EyeOpe> GetListByConds(List<string> cond_list)
+        {
+            List<EyeOpe> list = new List<EyeOpe>();
 
             // 患者マスタ（DBリンク先）とは結合せず、眼科DB単独で検索する。
             // 患者情報は検索結果の患者IDからまとめて取得する（DBリンク越しの結合による負荷・ハング対策）。

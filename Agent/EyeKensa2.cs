@@ -15,8 +15,6 @@ namespace MedicalLibrary.Agent
         /// </summary>
         public void Save()
         {
-            StdReturn sr = new StdReturn();
-
             StdDbClass obj = new StdDbClass();
             obj.Db = DB.Db2;
 
@@ -27,22 +25,13 @@ namespace MedicalLibrary.Agent
             obj.DataList.Add(new StdDbColumn("SAVE_DATE", StdDbType.NUMBER, DateTime.Now.ToString("yyyyMMdd")));
             obj.DataList.Add(new StdDbColumn("SAVE_TIME", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
 
-            obj.WhereList.Add("PATIENT_ID = " + this.PtId);
-            obj.WhereList.Add("KENSA_ID = " + this.KensaId);
-            obj.WhereList.Add("KENSA_DATE = " + this.KensaDate);
-            obj.WhereList.Add("KENSA_SEQ = " + this.KensaSEQ);
-
-            sr = obj.UpdateSQL();
-
-            // update ëŒè€Ç™ñ≥ÇØÇÍÇŒêVãKìoò^
-            if (sr.IntValue == 0)
+            obj.UpdateOrInsert(new List<StdDbColumn>
             {
-                obj.DataList.Add(new StdDbColumn("PATIENT_ID", StdDbType.NUMBER, this.PtId));
-                obj.DataList.Add(new StdDbColumn("KENSA_ID", StdDbType.NUMBER, this.KensaId));
-                obj.DataList.Add(new StdDbColumn("KENSA_DATE", StdDbType.NUMBER, this.KensaDate));
-                obj.DataList.Add(new StdDbColumn("KENSA_SEQ", StdDbType.NUMBER, this.KensaSEQ));
-                sr = obj.InsertSQL();
-            }
+                new StdDbColumn("PATIENT_ID", StdDbType.NUMBER, this.PtId),
+                new StdDbColumn("KENSA_ID", StdDbType.NUMBER, this.KensaId),
+                new StdDbColumn("KENSA_DATE", StdDbType.NUMBER, this.KensaDate),
+                new StdDbColumn("KENSA_SEQ", StdDbType.NUMBER, this.KensaSEQ)
+            });
         }
 
         static EyeKensa2 GetFromStdClass(StdClass tmp)

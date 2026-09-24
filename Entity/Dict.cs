@@ -13,23 +13,6 @@ namespace MedicalLibrary.Entity
 
         static Dictionary<string, Ward> wardDict;
 
-/*
-        static Dictionary<string, string> wardShortDict;
-
-        public static Dictionary<string, string> WardShortDict
-        {
-            get
-            {
-                if (wardShortDict == null || wardShortDict.Count == 0)
-                {
-                    InitDict();
-                }
-
-                return wardShortDict;
-            }
-        }
- */
-
         static Dictionary<string, string> kouiDict;
 
         static Dictionary<string, Sekou> sekouDict;
@@ -356,69 +339,6 @@ namespace MedicalLibrary.Entity
         public string Short = "";
         public string DeptCode = "";
         public Color BackColor = Color.White;
-
-        /*
-        static Dictionary<string, Ward> dict = new Dictionary<string, Ward>();
-
-        static Dictionary<string, Ward> Dict
-        {
-            get
-            {
-                if (dict.Count == 0)
-                {
-                    Ward obj = new Ward();
-                    obj.SEQ = 0;
-                    obj.Code = "0";
-                    obj.Name = "";
-                    obj.Short = "";
-                    obj.BackColor = Color.White;
-
-                    dict.Add(obj.Code, obj);
-
-                    obj = new Ward();
-                    obj.SEQ = 3;
-                    obj.Code = "3";
-                    obj.Name = "ÇÌÇ©ÇŒ";
-                    obj.Short = "é·";
-                    obj.DeptCode = "31";
-                    obj.BackColor = Color.LightGreen;
-
-                    dict.Add(obj.Code, obj);
-
-                    obj = new Ward();
-                    obj.SEQ = 4;
-                    obj.Code = "4";
-                    obj.Name = "Ç≥Ç≠ÇÁ";
-                    obj.Short = "ç˜";
-                    obj.DeptCode = "41";
-                    obj.BackColor = Color.Pink;
-
-                    dict.Add(obj.Code, obj);
-
-                    obj = new Ward();
-                    obj.SEQ = 5;
-                    obj.Code = "5";
-                    obj.Name = "Ç†Ç‚Çﬂ";
-                    obj.Short = "è“";
-                    obj.DeptCode = "33";
-                    obj.BackColor = Color.Lavender;
-
-                    dict.Add(obj.Code, obj);
-
-                    obj = new Ward();
-                    obj.SEQ = 99;
-                    obj.Code = "99";
-                    obj.Name = "ñ¢íË";
-                    obj.Short = "ñ¢";
-                    obj.BackColor = Color.White;
-
-                    dict.Add(obj.Code, obj);
-                }
-
-                return dict;
-            }
-        }
-         */
     }
 
     public class Dept

@@ -16,29 +16,6 @@ namespace MedicalLibrary.Utility
         public static string ZenToHan(string s)
         {
             return Strings.StrConv(s, VbStrConv.Narrow);
-/*
-            string ret = "";
-
-            for (int i = 0; i < s.Length; i++)
-            {
-                for (int j = 0; j < zen.Length; j++)
-                {
-                    if (s[i].Equals(zen[j]))
-                    {
-                        ret += han[j].ToString();
-                        break;
-                    }
-
-                    // リストに無かった場合はそのまま追加
-                    if (j == zen.Length - 1)
-                    {
-                        ret += s[i];
-                    }
-                }
-            }
-
-            return ret;
- */
         }
 
         /// <summary>

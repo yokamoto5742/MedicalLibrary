@@ -85,26 +85,6 @@ namespace MedicalLibrary.Entity
                 {
                     i.DictData.Add(tmp.GetDataString("CODE"), new InfectionDetail(tmp.GetDataString("CODE"), tmp.GetDataString("NAME"), tmp.GetDataString("RESULT")));
                 }
-
-                /*
-                if (i.Id.Length == 0)
-                {
-                    i.Id = tmp.GetDataString("P_ID");
-                    i.Date = tmp.GetDataString("EXAMIN_DATE");
-                    i.DictData.Add(tmp.GetDataString("CODE"), new InfectionDetail(tmp.GetDataString("CODE"), tmp.GetDataString("NAME"), tmp.GetDataString("RESULT")));
-                }
-                else if (i.Date.Equals(tmp.GetDataString("EXAMIN_DATE")))
-                {
-                    if (!i.DictData.ContainsKey(tmp.GetDataString("CODE")))
-                    {
-                        i.DictData.Add(tmp.GetDataString("CODE"), new InfectionDetail(tmp.GetDataString("CODE"), tmp.GetDataString("NAME"), tmp.GetDataString("RESULT")));
-                    }
-                }
-                else
-                {
-                    break;
-                }
-                 */
             }
             return i;
         }

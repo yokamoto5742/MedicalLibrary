@@ -32,26 +32,8 @@ namespace MedicalLibrary.Utility
                 return result;
             }
 
-            const int GW_HWNDNEXT = 2;
-            StringBuilder sb = new StringBuilder(100);
-            IntPtr hwnd = WinAPI.GetForegroundWindow();
-
             // カルテ記載ウィンドウを探す
-            while (hwnd != IntPtr.Zero)
-            {
-                if (WinAPI.IsWindowVisible(hwnd))
-                {
-                    // タイトルバー文字列を取得
-                    WinAPI.GetWindowText(hwnd, sb, sb.Capacity);
-
-                    if ((sb.ToString().IndexOf("SOAP入力") != -1))
-                    {
-                        break;
-                    }
-                }
-
-                hwnd = WinAPI.GetWindow(hwnd, GW_HWNDNEXT);
-            }
+            IntPtr hwnd = FindWindowByTitle("SOAP入力");
 
             // カルテ記載ウィンドウが見つかった場合
             if (hwnd != IntPtr.Zero)
@@ -62,32 +44,19 @@ namespace MedicalLibrary.Utility
                     TreeScope.Element | TreeScope.Descendants,
                     new PropertyCondition(AutomationElement.AutomationIdProperty, "BtnReturn"));
 
-                InvokePattern p2 = (InvokePattern)e2.GetCurrentPattern(InvokePattern.Pattern);
+                if (e2 != null)
+                {
+                    InvokePattern p2 = (InvokePattern)e2.GetCurrentPattern(InvokePattern.Pattern);
 
-                p2.Invoke();
+                    p2.Invoke();
 
-                // ウェイト
-                Thread.Sleep(150);
+                    // ウェイト
+                    Thread.Sleep(150);
+                }
             }
-
-            hwnd = WinAPI.GetForegroundWindow();
 
             // 外来患者一覧または入院一覧ウィンドウを探す
-            while (hwnd != IntPtr.Zero)
-            {
-                if (WinAPI.IsWindowVisible(hwnd))
-                {
-                    // タイトルバー文字列を取得
-                    WinAPI.GetWindowText(hwnd, sb, sb.Capacity);
-
-                    if ((sb.ToString().IndexOf("外来患者一覧") != -1) || (sb.ToString().IndexOf("入院一覧") != -1))
-                    {
-                        break;
-                    }
-                }
-
-                hwnd = WinAPI.GetWindow(hwnd, GW_HWNDNEXT);
-            }
+            hwnd = FindWindowByTitle("外来患者一覧", "入院一覧");
 
             // 外来患者一覧または入院一覧ウィンドウが見つかった場合
             if (hwnd != IntPtr.Zero)
@@ -101,6 +70,12 @@ namespace MedicalLibrary.Utility
                 AutomationElement e2 = aeForm.FindFirst(
                     TreeScope.Element | TreeScope.Descendants,
                     new PropertyCondition(AutomationElement.AutomationIdProperty, "BtnKarte"));
+
+                // 患者IDの入力欄かカルテボタンが見つからなければ何もしない
+                if (e1 == null || e2 == null)
+                {
+                    return result;
+                }
 
                 ValuePattern p1 = (ValuePattern)e1.GetCurrentPattern(ValuePattern.Pattern);
                 InvokePattern p2 = (InvokePattern)e2.GetCurrentPattern(InvokePattern.Pattern);
@@ -124,6 +99,36 @@ namespace MedicalLibrary.Utility
             return result;
         }
 
-        
+        /// <summary>
+        /// 最前面から順に、タイトルに titles のいずれかを含む表示中のウィンドウを探す。
+        /// </summary>
+        /// <returns>見つからなければ IntPtr.Zero</returns>
+        static IntPtr FindWindowByTitle(params string[] titles)
+        {
+            const int GW_HWNDNEXT = 2;
+            StringBuilder sb = new StringBuilder(100);
+            IntPtr hwnd = WinAPI.GetForegroundWindow();
+
+            while (hwnd != IntPtr.Zero)
+            {
+                if (WinAPI.IsWindowVisible(hwnd))
+                {
+                    // タイトルバー文字列を取得
+                    WinAPI.GetWindowText(hwnd, sb, sb.Capacity);
+
+                    foreach (string title in titles)
+                    {
+                        if (sb.ToString().IndexOf(title) != -1)
+                        {
+                            return hwnd;
+                        }
+                    }
+                }
+
+                hwnd = WinAPI.GetWindow(hwnd, GW_HWNDNEXT);
+            }
+
+            return IntPtr.Zero;
+        }
     }
 }

@@ -42,8 +42,6 @@ namespace MedicalLibrary.Agent
         {
             if (!DataCheck()) return;
 
-            StdReturn sr = new StdReturn();
-
             StdDbClass obj = new StdDbClass();
             obj.Db = DB.Db2;
 
@@ -55,16 +53,10 @@ namespace MedicalLibrary.Agent
             obj.DataList.Add(new StdDbColumn("SAVE_TIME", StdDbType.NUMBER, DateTime.Now.ToString("HHmmss")));
             obj.DataList.Add(new StdDbColumn("STATUS", StdDbType.NUMBER, this.Status));
 
-            obj.WhereList.Add("ID = " + this.Id);
-
-            sr = obj.UpdateSQL();
-
-            // update ëŒè€Ç™ñ≥ÇØÇÍÇŒêVãKìoò^
-            if (sr.IntValue == 0)
+            obj.UpdateOrInsert(new List<StdDbColumn>
             {
-                obj.DataList.Add(new StdDbColumn("ID", StdDbType.NUMBER, this.Id));
-                sr = obj.InsertSQL();
-            }
+                new StdDbColumn("ID", StdDbType.NUMBER, this.Id)
+            });
         }
 
         static EyeOpeRecord GetFromStdClass(StdClass tmp)

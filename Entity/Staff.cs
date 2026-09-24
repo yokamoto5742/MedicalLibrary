@@ -45,24 +45,6 @@ namespace MedicalLibrary.Entity
         }
 
         /// <summary>
-        /// M_USR.PASSWORD（AES 暗号化）を復号し、入力パスワードと照合する。
-        /// 旧 InnoUketsukeLib.Entity.M_USR.GetData の移植。
-        /// </summary>
-        static bool VerifyPassword(int code, string pw)
-        {
-            string cmd = "select PASSWORD from M_USR where CODE = :CODE";
-
-            List<StdDbColumn> param_list = new List<StdDbColumn>();
-            param_list.Add(new StdDbColumn("CODE", StdDbType.NUMBER, code));
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd, param_list);
-
-            if (tmp_list.Count == 0) return false;
-
-            return pw == DecryptPassword(tmp_list[0].DataDict["PASSWORD"].ToString());
-        }
-
-        /// <summary>
         /// M_USR.PASSWORD の復号（AES-128 CBC、平文は UTF-16LE）。
         /// </summary>
         static string DecryptPassword(string text)
@@ -90,14 +72,27 @@ namespace MedicalLibrary.Entity
         {
             Staff obj = new Staff();
 
+            int i = 0;
+            int.TryParse(id, out i);
+            if (i == 0) return obj;
+
+            List<StdClass> tmp_list;
+
             try
             {
-                int i = 0;
-                int.TryParse(id, out i);
-                if (i == 0) return obj;
+                // パスワードと属性を1回で取得する
+                string cmd = "select CODE コード, Trim(NAME) 氏名, SYOZOKU 所属, SHIKAKU 資格, DEPT 科コード, DR 医師コード, PASSWORD " +
+                    " from M_USR " +
+                    " where CODE = :CODE";
 
-                // 認証に失敗したら終了
-                if (!VerifyPassword(i, pw)) return obj;
+                List<StdDbColumn> param_list = new List<StdDbColumn>();
+                param_list.Add(new StdDbColumn("CODE", StdDbType.NUMBER, i));
+
+                tmp_list = StdClass.GetList(DB.Db3, cmd, param_list);
+
+                // M_USR.PASSWORD（AES 暗号化）を復号して照合し、認証に失敗したら終了
+                // （旧 InnoUketsukeLib.Entity.M_USR.GetData の移植）
+                if (tmp_list.Count == 0 || pw != DecryptPassword(tmp_list[0].DataDict["PASSWORD"].ToString())) return obj;
             }
             catch (Exception ex)
             {
@@ -105,12 +100,6 @@ namespace MedicalLibrary.Entity
                 LibUtility.Except(ex, false);
                 return obj;
             }
-
-            string cmd = "select CODE コード, Trim(NAME) 氏名, SYOZOKU 所属, SHIKAKU 資格, DEPT 科コード, DR 医師コード " +
-                " from M_USR " +
-                " where CODE = " + id;
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
 
             foreach (StdClass tmp in tmp_list)
             {

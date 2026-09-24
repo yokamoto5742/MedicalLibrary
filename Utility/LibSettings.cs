@@ -73,22 +73,6 @@ namespace MedicalLibrary.Utility
 
                         Current.BaseInfoCodes.BaseInfoCodeList.Add(obj);
                     }
-
-                    // エラーチェック
-                    //  →　今後は必要ないと思われるので外す 2019/05/09
-                    /*
-                    if (!Directory.Exists(Current.LogFolderPath))
-                    {
-                        Directory.CreateDirectory(Current.LogFolderPath);
-                    }
-
-                    Current.LogServerFolderPath = Current.LogServerFolderPath + "\\" + AppStat.IP4;
-
-                    if (!Directory.Exists(Current.LogServerFolderPath))
-                    {
-                        Directory.CreateDirectory(Current.LogServerFolderPath);
-                    }
-                     */
                 }
                 catch (Exception ex)
                 {

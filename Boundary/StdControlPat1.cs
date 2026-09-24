@@ -36,10 +36,6 @@ namespace MedicalLibrary.Boundary
                     this.Height = 30;
                     this.Width = 450;
 
-                    this.PatNameLabel1.Size = new Size(104, 23);
-                    this.PatKanaLabel1.Size = new Size(80, 23);
-                    this.PatKanaLabel1.Location = new Point(180, 5);
-
                     this.PatSexLabel1.Visible = true;
                     this.PatBirthLabel1.Visible = true;
                     this.PatAgeLabel1.Visible = true;
@@ -52,10 +48,6 @@ namespace MedicalLibrary.Boundary
                 {
                     this.Height = 30;
                     this.Width = 450;
-
-                    this.PatNameLabel1.Size = new Size(104, 23);
-                    this.PatKanaLabel1.Size = new Size(80, 23);
-                    this.PatKanaLabel1.Location = new Point(180, 5);
 
                     this.PatSexLabel1.Visible = false;
                     this.PatBirthLabel1.Visible = false;
@@ -70,10 +62,6 @@ namespace MedicalLibrary.Boundary
                     this.Height = 60;
                     this.Width = 265;
 
-                    this.PatNameLabel1.Size = new Size(104, 23);
-                    this.PatKanaLabel1.Size = new Size(80, 23);
-                    this.PatKanaLabel1.Location = new Point(180, 5);
-
                     this.PatSexLabel1.Visible = true;
                     this.PatBirthLabel1.Visible = true;
                     this.PatAgeLabel1.Visible = true;
@@ -82,6 +70,11 @@ namespace MedicalLibrary.Boundary
                     this.PatBirthLabel1.Location = new Point(99, 30);
                     this.PatAgeLabel1.Location = new Point(220, 30);
                 }
+
+                // 氏名・カナはどのモードでも同じ
+                this.PatNameLabel1.Size = new Size(104, 23);
+                this.PatKanaLabel1.Size = new Size(80, 23);
+                this.PatKanaLabel1.Location = new Point(180, 5);
             }
             get
             {
@@ -142,10 +135,7 @@ namespace MedicalLibrary.Boundary
         {
             this.Pat = p;
 
-            this.PatIdBox1.Clear();
-            this.PatNameLabel1.Text = "";
-            this.PatKanaLabel1.Text = "";
-            this.PatSexLabel1.Text = "";
+            // 生年月日・年齢は値があるときだけ設定するので先にクリアする
             this.PatBirthLabel1.Text = "";
             this.PatAgeLabel1.Text = "";
 

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-//using Oracle.ManagedDataAccess.Client;
 using MedicalLibrary.Utility;
 
 namespace MedicalLibrary.Entity
@@ -186,7 +185,6 @@ namespace MedicalLibrary.Entity
                     " from D_NYUIN_NOW t, M_PATIENT tm " +
                     " where t.NYUIN_DATE > 0 and t.NYUIN_DATE <= " + today +
                     " and (t.TAIIN_DATE is null or t.TAIIN_DATE = 0)" +
-//                    " and (t.TAIIN_PLAN_DATE is null or t.TAIIN_PLAN_DATE = 0 or t.TAIIN_PLAN_DATE >= " + adm_date + ")" +
                     " and t.P_ID = tm.P_ID ";
 
                 tmp_list = StdClass.GetList(DB.Db3, cmd);
@@ -218,7 +216,6 @@ namespace MedicalLibrary.Entity
                     "  where t.PROCESS in (10,18) and (t.DEL_FLG is null or t.DEL_FLG = 0) and (t.NYUIN_PLAN_DATE >= " + today + " or t.NYUIN_DATE >= " + today + ")) tt " +
                     "  where tt.RN = 1) ttt, M_PATIENT tm " +
                     " where ttt.NYUIN_DATE <= " + adm_date +
-//                    " and (ttt.TAIIN_PLAN_DATE is null or ttt.TAIIN_PLAN_DATE = 0 or ttt.TAIIN_PLAN_DATE >= " + adm_date + ")" +
                     " and ttt.P_ID = tm.P_ID";
 
                 tmp_list = StdClass.GetList(DB.Db3, cmd);

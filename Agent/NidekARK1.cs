@@ -381,7 +381,7 @@ namespace MedicalLibrary.Agent
             try
             {
                 // 既にあれば何もしない
-                Directory.CreateDirectory(AppFile.PathName(Settings.TargetFile));
+                Directory.CreateDirectory(Path.GetDirectoryName(Settings.TargetFile));
 
                 StreamWriter writer = new StreamWriter(new FileStream(Settings.TargetFile, FileMode.Create), Encoding.Default);
                 writer.Write(s);

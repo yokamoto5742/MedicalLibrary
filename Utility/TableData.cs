@@ -323,26 +323,6 @@ namespace MedicalLibrary.Utility
                 Marshal.ReleaseComObject(app);
             }
         }
-
-/*
-        /// <summary>
-        /// CSV•Û‘¶‚ÉƒJƒ‰ƒ€–¼‚ğo—Í‚·‚é‚©‚Ç‚¤‚©
-        /// </summary>
-        public enum TitlePrint : int
-        {
-            No = 0,
-            Yes = 1
-        }
-
-        /// <summary>
-        /// SaveFileDialog‚ğ•\¦‚·‚é‚©‚Ç‚¤‚©
-        /// </summary>
-        public enum FileDialogShow : int
-        {
-            No = 0,
-            Yes = 1
-        }
- */
     }
 
     /// <summary>

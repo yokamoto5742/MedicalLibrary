@@ -29,15 +29,13 @@ namespace MedicalLibrary.Agent
             this.Init();
         }
 
-        public bool Init()
+        public void Init()
         {
-            bool b = false;
-
             string file = AppFile.FilePath("NidekARK1.xml");
 
             if (!File.Exists(file))
             {
-                return b;
+                return;
             }
 
             XmlDocument doc = new XmlDocument();
@@ -66,8 +64,6 @@ namespace MedicalLibrary.Agent
                 this.SourcePath = xe.SelectSingleNode("SourcePath").InnerText;
                 this.TargetFile = xe.SelectSingleNode("TargetFile").InnerText;
             }
-
-            return b;
         }
     }
 }

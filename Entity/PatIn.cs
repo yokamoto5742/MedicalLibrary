@@ -355,32 +355,7 @@ namespace MedicalLibrary.Entity
         /// <returns></returns>
         public static List<PatIn> GetDeptList(List<PatIn> seq_list, string date)
         {
-            List<PatIn> list = new List<PatIn>();
-
-            string ss = AppString.ConcatList(seq_list.ConvertAll((x) => { return "(" + x.Id + "," + x.SEQ + ")"; }), ",");
-
-            if (ss.Length == 0 || !DateTimeAgent.IsDate(date))
-            {
-                return list;
-            }
-
-            string cmd = "select * from " +
-                " (select row_number() over (partition by P_ID, NYUIN_NO order by APPLY_DATE desc, APPLY_ZONE desc, NYUIN_INDEX desc) rn, t.* " +
-                "  from D_NYUIN t " +
-                "  where t.PROCESS in (11, 14, 19) and (t.DEL_FLG is null or t.DEL_FLG = 0) " +
-                "  and (t.DEPT is not null and t.DEPT > 0) " +
-                "  and (t.P_ID, t.NYUIN_NO) in (" + ss + ") " +
-                "  and t.APPLY_DATE <= " + date + ") tt " +
-                " where tt.RN = 1";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                list.Add(PatIn.GetFromStdClass(tmp));
-            }
-
-            return list;
+            return GetListAt(seq_list, date, "11, 14, 19", "t.DEPT is not null and t.DEPT > 0");
         }
 
         /// <summary>
@@ -391,86 +366,7 @@ namespace MedicalLibrary.Entity
         /// <returns></returns>
         public static List<PatIn> GetDeptList(List<PatIn> seq_list, bool pat_info = true)
         {
-            List<PatIn> list = new List<PatIn>();
-
-            // 現在または過去の入院から取得
-            string ss = AppString.ConcatList(seq_list.FindAll((x) =>
-            {
-                return (x.Status == PatInStatus.Done || x.Status == PatInStatus.Now);
-            })
-            .ConvertAll((x) =>
-            {
-                return "(" + x.Id + "," + x.SEQ + ")";
-            }), ",");
-
-            if (ss.Length > 0)
-            {
-                string cmd = "";
-
-                if (pat_info)
-                {
-                    cmd = "select tt.P_ID, tt.NYUIN_NO, tt.NYUIN_DATE, tt.NYUIN_ZONE, tt.TAIIN_DATE, tt.TAIIN_ZONE " +
-                        ", td.APPLY_DATE, td.APPLY_ZONE, td.NYUIN_INDEX, td.DEPT " +
-                        ", tm.P_KANA, tm.P_NAME, tm.P_SEX, tm.P_BIRTHDAY_AD " +
-                        " from D_NYUIN td, M_PATIENT tm, " +
-                        " (select t.P_ID, t.NYUIN_NO, t.NYUIN_DATE, t.NYUIN_ZONE, t.TAIIN_DATE, t.TAIIN_ZONE from D_NYUIN t " +
-                        "  where (t.P_ID, t.NYUIN_NO) in (" + ss + ") and t.PROCESS in (19) and (t.DEL_FLG is null or t.DEL_FLG = 0) " +
-                        "  union " +
-                        "  select t.P_ID, t.NYUIN_NO, t.NYUIN_DATE, t.NYUIN_ZONE, t.TAIIN_PLAN_DATE, t.TAIIN_PLAN_ZONE from D_NYUIN_NOW t " +
-                        "  where (t.P_ID, t.NYUIN_NO) in (" + ss + ") and (t.TAIIN_DATE is null or t.TAIIN_DATE = 0)) tt " +
-                        " where td.PROCESS in (11, 14, 19) and (td.DEL_FLG is null or td.DEL_FLG = 0) " +
-                        " and td.P_ID = tt.P_ID and td.NYUIN_NO = tt.NYUIN_NO " +
-                        " and td.P_ID = tm.P_ID " +
-                        " order by tt.P_ID, tt.NYUIN_NO, td.APPLY_DATE, td.APPLY_ZONE, td.NYUIN_INDEX";
-                }
-                else
-                {
-                    cmd = "select tt.P_ID, tt.NYUIN_NO, tt.NYUIN_DATE, tt.NYUIN_ZONE, tt.TAIIN_DATE, tt.TAIIN_ZONE " +
-                        ", td.APPLY_DATE, td.APPLY_ZONE, td.NYUIN_INDEX, td.DEPT " +
-                        " from D_NYUIN td, " +
-                        " (select t.P_ID, t.NYUIN_NO, t.NYUIN_DATE, t.NYUIN_ZONE, t.TAIIN_DATE, t.TAIIN_ZONE from D_NYUIN t " +
-                        "  where (t.P_ID, t.NYUIN_NO) in (" + ss + ") and t.PROCESS in (19) and (t.DEL_FLG is null or t.DEL_FLG = 0) " +
-                        "  union " +
-                        "  select t.P_ID, t.NYUIN_NO, t.NYUIN_DATE, t.NYUIN_ZONE, t.TAIIN_PLAN_DATE, t.TAIIN_PLAN_ZONE from D_NYUIN_NOW t " +
-                        "  where (t.P_ID, t.NYUIN_NO) in (" + ss + ") and (t.TAIIN_DATE is null or t.TAIIN_DATE = 0)) tt " +
-                        " where td.PROCESS in (11, 14, 19) and (td.DEL_FLG is null or td.DEL_FLG = 0) " +
-                        " and td.P_ID = tt.P_ID and td.NYUIN_NO = tt.NYUIN_NO " +
-                        " order by tt.P_ID, tt.NYUIN_NO, td.APPLY_DATE, td.APPLY_ZONE, td.NYUIN_INDEX";
-                }
-
-                List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-
-                foreach (StdClass tmp in tmp_list)
-                {
-                    PatIn obj = PatIn.GetFromStdClass(tmp);
-
-                    // 同一患者・同一入院で、直前の科と同じなら飛ばす
-                    if (list.Count > 0)
-                    {
-                        PatIn obj2 = list[list.Count - 1];
-
-                        if (obj2.Id.Equals(obj.Id) &&
-                            obj2.SEQ.Equals(obj.SEQ) &&
-                            obj2.Dept.Equals(obj.Dept))
-                        {
-                            continue;
-                        }
-                    }
-
-                    list.Add(obj);
-                }
-            }
-
-            // 未来入院があれば足す
-            foreach (PatIn pin in seq_list)
-            {
-                if (pin.Status == PatInStatus.Yet)
-                {
-                    list.Add(pin);
-                }
-            }
-
-            return list;
+            return GetMoveList(seq_list, pat_info, "11, 14, 19", "td.DEPT", (x, y) => x.Dept.Equals(y.Dept));
         }
 
         /// <summary>
@@ -481,34 +377,7 @@ namespace MedicalLibrary.Entity
         /// <returns></returns>
         public static List<PatIn> GetDoctorList(List<PatIn> seq_list, string date)
         {
-            List<PatIn> list = new List<PatIn>();
-
-            string ss = AppString.ConcatList(seq_list.ConvertAll((x) => { return "(" + x.Id + "," + x.SEQ + ")"; }), ",");
-
-            if (ss.Length == 0 || !DateTimeAgent.IsDate(date))
-            {
-                return list;
-            }
-
-            string cmd = "select * from " +
-                " (select row_number() over (partition by P_ID, NYUIN_NO order by APPLY_DATE desc, APPLY_ZONE desc, NYUIN_INDEX desc) rn, t.* " +
-                "  from D_NYUIN t " +
-                "  where t.PROCESS in (11, 15, 19) and (t.DEL_FLG is null or t.DEL_FLG = 0) " +
-                "  and (t.DR is not null and t.DR > 0) " +
-                "  and (t.P_ID, t.NYUIN_NO) in (" + ss + ") " +
-                "  and t.APPLY_DATE <= " + date + ") tt " +
-                " where tt.RN = 1";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                PatIn obj = PatIn.GetFromStdClass(tmp);
-
-                list.Add(obj);
-            }
-
-            return list;
+            return GetListAt(seq_list, date, "11, 15, 19", "t.DR is not null and t.DR > 0");
         }
 
         /// <summary>
@@ -519,86 +388,7 @@ namespace MedicalLibrary.Entity
         /// <returns></returns>
         public static List<PatIn> GetDoctorList(List<PatIn> seq_list, bool pat_info = true)
         {
-            List<PatIn> list = new List<PatIn>();
-
-            // 現在または過去の入院から取得
-            string ss = AppString.ConcatList(seq_list.FindAll((x) =>
-            {
-                return (x.Status == PatInStatus.Done || x.Status == PatInStatus.Now);
-            })
-            .ConvertAll((x) =>
-            {
-                return "(" + x.Id + "," + x.SEQ + ")";
-            }), ",");
-
-            if (ss.Length > 0)
-            {
-                string cmd = "";
-
-                if (pat_info)
-                {
-                    cmd = "select tt.P_ID, tt.NYUIN_NO, tt.NYUIN_DATE, tt.NYUIN_ZONE, tt.TAIIN_DATE, tt.TAIIN_ZONE " +
-                        ", td.APPLY_DATE, td.APPLY_ZONE, td.NYUIN_INDEX, td.DR " +
-                        ", tm.P_KANA, tm.P_NAME, tm.P_SEX, tm.P_BIRTHDAY_AD " +
-                        " from D_NYUIN td, M_PATIENT tm, " +
-                        " (select t.P_ID, t.NYUIN_NO, t.NYUIN_DATE, t.NYUIN_ZONE, t.TAIIN_DATE, t.TAIIN_ZONE from D_NYUIN t " +
-                        "  where (t.P_ID, t.NYUIN_NO) in (" + ss + ") and t.PROCESS in (19) and (t.DEL_FLG is null or t.DEL_FLG = 0) " +
-                        "  union " +
-                        "  select t.P_ID, t.NYUIN_NO, t.NYUIN_DATE, t.NYUIN_ZONE, t.TAIIN_PLAN_DATE, t.TAIIN_PLAN_ZONE from D_NYUIN_NOW t " +
-                        "  where (t.P_ID, t.NYUIN_NO) in (" + ss + ") and (t.TAIIN_DATE is null or t.TAIIN_DATE = 0)) tt " +
-                        " where td.PROCESS in (11, 15, 19) and (td.DEL_FLG is null or td.DEL_FLG = 0) " +
-                        " and td.P_ID = tt.P_ID and td.NYUIN_NO = tt.NYUIN_NO " +
-                        " and td.P_ID = tm.P_ID " +
-                        " order by tt.P_ID, tt.NYUIN_NO, td.APPLY_DATE, td.APPLY_ZONE, td.NYUIN_INDEX";
-                }
-                else
-                {
-                    cmd = "select tt.P_ID, tt.NYUIN_NO, tt.NYUIN_DATE, tt.NYUIN_ZONE, tt.TAIIN_DATE, tt.TAIIN_ZONE " +
-                        ", td.APPLY_DATE, td.APPLY_ZONE, td.NYUIN_INDEX, td.DR " +
-                        " from D_NYUIN td, " +
-                        " (select t.P_ID, t.NYUIN_NO, t.NYUIN_DATE, t.NYUIN_ZONE, t.TAIIN_DATE, t.TAIIN_ZONE from D_NYUIN t " +
-                        "  where (t.P_ID, t.NYUIN_NO) in (" + ss + ") and t.PROCESS in (19) and (t.DEL_FLG is null or t.DEL_FLG = 0) " +
-                        "  union " +
-                        "  select t.P_ID, t.NYUIN_NO, t.NYUIN_DATE, t.NYUIN_ZONE, t.TAIIN_PLAN_DATE, t.TAIIN_PLAN_ZONE from D_NYUIN_NOW t " +
-                        "  where (t.P_ID, t.NYUIN_NO) in (" + ss + ") and (t.TAIIN_DATE is null or t.TAIIN_DATE = 0)) tt " +
-                        " where td.PROCESS in (11, 15, 19) and (td.DEL_FLG is null or td.DEL_FLG = 0) " +
-                        " and td.P_ID = tt.P_ID and td.NYUIN_NO = tt.NYUIN_NO " +
-                        " order by tt.P_ID, tt.NYUIN_NO, td.APPLY_DATE, td.APPLY_ZONE, td.NYUIN_INDEX";
-                }
-
-                List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-
-                foreach (StdClass tmp in tmp_list)
-                {
-                    PatIn obj = PatIn.GetFromStdClass(tmp);
-
-                    // 同一患者・同一入院で、直前の医師と同じなら飛ばす
-                    if (list.Count > 0)
-                    {
-                        PatIn obj2 = list[list.Count - 1];
-
-                        if (obj2.Id.Equals(obj.Id) &&
-                            obj2.SEQ.Equals(obj.SEQ) &&
-                            obj2.Doctor.Equals(obj.Doctor))
-                        {
-                            continue;
-                        }
-                    }
-
-                    list.Add(obj);
-                }
-            }
-
-            // 未来入院があれば足す
-            foreach (PatIn pin in seq_list)
-            {
-                if (pin.Status == PatInStatus.Yet)
-                {
-                    list.Add(pin);
-                }
-            }
-
-            return list;
+            return GetMoveList(seq_list, pat_info, "11, 15, 19", "td.DR", (x, y) => x.Doctor.Equals(y.Doctor));
         }
 
         /// <summary>
@@ -609,32 +399,7 @@ namespace MedicalLibrary.Entity
         /// <returns></returns>
         public static List<PatIn> GetRoomList(List<PatIn> seq_list, string date)
         {
-            List<PatIn> list = new List<PatIn>();
-
-            string ss = AppString.ConcatList(seq_list.ConvertAll((x) => { return "(" + x.Id + "," + x.SEQ + ")"; }), ",");
-
-            if (ss.Length == 0 || !DateTimeAgent.IsDate(date))
-            {
-                return list;
-            }
-
-            string cmd = "select * from " +
-                " (select row_number() over (partition by P_ID, NYUIN_NO order by APPLY_DATE desc, APPLY_ZONE desc, NYUIN_INDEX desc) rn, t.* " +
-                "  from D_NYUIN t " +
-                "  where t.PROCESS in (11, 13, 19) and (t.DEL_FLG is null or t.DEL_FLG = 0) " +
-                "  and (t.ROOM is not null and trim(t.ROOM) != '0') " +
-                "  and (t.P_ID, t.NYUIN_NO) in (" + ss + ") " +
-                "  and t.APPLY_DATE <= " + date + ") tt " +
-                " where tt.RN = 1";
-
-            List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                list.Add(PatIn.GetFromStdClass(tmp));
-            }
-
-            return list;
+            return GetListAt(seq_list, date, "11, 13, 19", "t.ROOM is not null and trim(t.ROOM) != '0'");
         }
 
 
@@ -646,52 +411,93 @@ namespace MedicalLibrary.Entity
         /// <returns></returns>
         public static List<PatIn> GetRoomList(List<PatIn> seq_list, bool pat_info = true)
         {
+            return GetMoveList(seq_list, pat_info, "11, 13, 19", "td.BYOTO, td.ROOM, td.BED", (x, y) => x.Room.Equals(y.Room));
+        }
+
+        /// <summary>
+        /// （患者, 入院番号）の組み合わせを IN 句用の "(id,seq),(id,seq)" にする
+        /// </summary>
+        static string SeqInList(List<PatIn> seq_list)
+        {
+            return AppString.ConcatList(seq_list.ConvertAll((x) => { return "(" + x.Id + "," + x.SEQ + ")"; }), ",");
+        }
+
+        /// <summary>
+        /// GetDeptList / GetDoctorList / GetRoomList の指定日時点版の共通部分
+        /// </summary>
+        /// <param name="seq_list"></param>
+        /// <param name="date"></param>
+        /// <param name="process">対象の PROCESS（"11, 14, 19" など）</param>
+        /// <param name="not_empty">対象の列に値があることの条件</param>
+        /// <returns></returns>
+        static List<PatIn> GetListAt(List<PatIn> seq_list, string date, string process, string not_empty)
+        {
+            List<PatIn> list = new List<PatIn>();
+
+            string ss = SeqInList(seq_list);
+
+            if (ss.Length == 0 || !DateTimeAgent.IsDate(date))
+            {
+                return list;
+            }
+
+            string cmd = "select * from " +
+                " (select row_number() over (partition by P_ID, NYUIN_NO order by APPLY_DATE desc, APPLY_ZONE desc, NYUIN_INDEX desc) rn, t.* " +
+                "  from D_NYUIN t " +
+                "  where t.PROCESS in (" + process + ") and (t.DEL_FLG is null or t.DEL_FLG = 0) " +
+                "  and (" + not_empty + ") " +
+                "  and (t.P_ID, t.NYUIN_NO) in (" + ss + ") " +
+                "  and t.APPLY_DATE <= " + date + ") tt " +
+                " where tt.RN = 1";
+
+            List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
+
+            foreach (StdClass tmp in tmp_list)
+            {
+                list.Add(PatIn.GetFromStdClass(tmp));
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// GetDeptList / GetDoctorList / GetRoomList の移動歴版の共通部分
+        /// </summary>
+        /// <param name="seq_list"></param>
+        /// <param name="pat_info">true: 患者情報を取得する</param>
+        /// <param name="process">対象の PROCESS（"11, 14, 19" など）</param>
+        /// <param name="cols">取得する D_NYUIN の列</param>
+        /// <param name="same">直前の行と同じ値かどうか</param>
+        /// <returns></returns>
+        static List<PatIn> GetMoveList(List<PatIn> seq_list, bool pat_info, string process, string cols, Func<PatIn, PatIn, bool> same)
+        {
             List<PatIn> list = new List<PatIn>();
 
             // 現在または過去の入院から取得
-            string ss = AppString.ConcatList(seq_list.FindAll((x) =>
+            string ss = SeqInList(seq_list.FindAll((x) =>
             {
                 return (x.Status == PatInStatus.Done || x.Status == PatInStatus.Now);
-            })
-            .ConvertAll((x) =>
-            {
-                return "(" + x.Id + "," + x.SEQ + ")";
-            }), ",");
+            }));
 
             if (ss.Length > 0)
             {
-                string cmd = "";
+                string pat_cols = pat_info ? ", tm.P_KANA, tm.P_NAME, tm.P_SEX, tm.P_BIRTHDAY_AD " : "";
+                string pat_from = pat_info ? "M_PATIENT tm, " : "";
+                string pat_where = pat_info ? " and td.P_ID = tm.P_ID " : "";
 
-                if (pat_info)
-                {
-                    cmd = "select tt.P_ID, tt.NYUIN_NO, tt.NYUIN_DATE, tt.NYUIN_ZONE, tt.TAIIN_DATE, tt.TAIIN_ZONE " +
-                        ", td.APPLY_DATE, td.APPLY_ZONE, td.NYUIN_INDEX, td.BYOTO, td.ROOM, td.BED " +
-                        ", tm.P_KANA, tm.P_NAME, tm.P_SEX, tm.P_BIRTHDAY_AD " +
-                        " from D_NYUIN td, M_PATIENT tm, " +
-                        " (select t.P_ID, t.NYUIN_NO, t.NYUIN_DATE, t.NYUIN_ZONE, t.TAIIN_DATE, t.TAIIN_ZONE from D_NYUIN t " +
-                        "  where (t.P_ID, t.NYUIN_NO) in (" + ss + ") and t.PROCESS in (19) and (t.DEL_FLG is null or t.DEL_FLG = 0) " +
-                        "  union " +
-                        "  select t.P_ID, t.NYUIN_NO, t.NYUIN_DATE, t.NYUIN_ZONE, t.TAIIN_PLAN_DATE, t.TAIIN_PLAN_ZONE from D_NYUIN_NOW t " +
-                        "  where (t.P_ID, t.NYUIN_NO) in (" + ss + ") and (t.TAIIN_DATE is null or t.TAIIN_DATE = 0)) tt " +
-                        " where td.PROCESS in (11, 13, 19) and (td.DEL_FLG is null or td.DEL_FLG = 0) " +
-                        " and td.P_ID = tt.P_ID and td.NYUIN_NO = tt.NYUIN_NO " +
-                        " and td.P_ID = tm.P_ID " +
-                        " order by tt.P_ID, tt.NYUIN_NO, td.APPLY_DATE, td.APPLY_ZONE, td.NYUIN_INDEX";
-                }
-                else
-                {
-                    cmd = "select tt.P_ID, tt.NYUIN_NO, tt.NYUIN_DATE, tt.NYUIN_ZONE, tt.TAIIN_DATE, tt.TAIIN_ZONE " +
-                        ", td.APPLY_DATE, td.APPLY_ZONE, td.NYUIN_INDEX, td.BYOTO, td.ROOM, td.BED " +
-                        " from D_NYUIN td, " +
-                        " (select t.P_ID, t.NYUIN_NO, t.NYUIN_DATE, t.NYUIN_ZONE, t.TAIIN_DATE, t.TAIIN_ZONE from D_NYUIN t " +
-                        "  where (t.P_ID, t.NYUIN_NO) in (" + ss + ") and t.PROCESS in (19) and (t.DEL_FLG is null or t.DEL_FLG = 0) " +
-                        "  union " +
-                        "  select t.P_ID, t.NYUIN_NO, t.NYUIN_DATE, t.NYUIN_ZONE, t.TAIIN_PLAN_DATE, t.TAIIN_PLAN_ZONE from D_NYUIN_NOW t " +
-                        "  where (t.P_ID, t.NYUIN_NO) in (" + ss + ") and (t.TAIIN_DATE is null or t.TAIIN_DATE = 0)) tt " +
-                        " where td.PROCESS in (11, 13, 19) and (td.DEL_FLG is null or td.DEL_FLG = 0) " +
-                        " and td.P_ID = tt.P_ID and td.NYUIN_NO = tt.NYUIN_NO " +
-                        " order by tt.P_ID, tt.NYUIN_NO, td.APPLY_DATE, td.APPLY_ZONE, td.NYUIN_INDEX";
-                }
+                string cmd = "select tt.P_ID, tt.NYUIN_NO, tt.NYUIN_DATE, tt.NYUIN_ZONE, tt.TAIIN_DATE, tt.TAIIN_ZONE " +
+                    ", td.APPLY_DATE, td.APPLY_ZONE, td.NYUIN_INDEX, " + cols + " " +
+                    pat_cols +
+                    " from D_NYUIN td, " + pat_from +
+                    " (select t.P_ID, t.NYUIN_NO, t.NYUIN_DATE, t.NYUIN_ZONE, t.TAIIN_DATE, t.TAIIN_ZONE from D_NYUIN t " +
+                    "  where (t.P_ID, t.NYUIN_NO) in (" + ss + ") and t.PROCESS in (19) and (t.DEL_FLG is null or t.DEL_FLG = 0) " +
+                    "  union " +
+                    "  select t.P_ID, t.NYUIN_NO, t.NYUIN_DATE, t.NYUIN_ZONE, t.TAIIN_PLAN_DATE, t.TAIIN_PLAN_ZONE from D_NYUIN_NOW t " +
+                    "  where (t.P_ID, t.NYUIN_NO) in (" + ss + ") and (t.TAIIN_DATE is null or t.TAIIN_DATE = 0)) tt " +
+                    " where td.PROCESS in (" + process + ") and (td.DEL_FLG is null or td.DEL_FLG = 0) " +
+                    " and td.P_ID = tt.P_ID and td.NYUIN_NO = tt.NYUIN_NO " +
+                    pat_where +
+                    " order by tt.P_ID, tt.NYUIN_NO, td.APPLY_DATE, td.APPLY_ZONE, td.NYUIN_INDEX";
 
                 List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd);
 
@@ -699,14 +505,14 @@ namespace MedicalLibrary.Entity
                 {
                     PatIn obj = PatIn.GetFromStdClass(tmp);
 
-                    // 同一患者・同一入院で、直前の部屋と同じなら飛ばす
+                    // 同一患者・同一入院で、直前と同じ値なら飛ばす
                     if (list.Count > 0)
                     {
                         PatIn obj2 = list[list.Count - 1];
 
                         if (obj2.Id.Equals(obj.Id) &&
                             obj2.SEQ.Equals(obj.SEQ) &&
-                            obj2.Room.Equals(obj.Room))
+                            same(obj2, obj))
                         {
                             continue;
                         }

@@ -151,7 +151,6 @@ namespace MedicalLibrary.Agent
         public static string Convert(string file)
         {
             string s = "";
-            string ss = "";
 
             if (!File.Exists(file))
             {
@@ -166,8 +165,6 @@ namespace MedicalLibrary.Agent
             XmlDocument doc = new XmlDocument();
             doc.Load(file);
 
-            XmlElement xe;
-
             try
             {
                 s += doc.SelectSingleNode("Data/Company").InnerText + " " + doc.SelectSingleNode("Data/ModelName").InnerText + Environment.NewLine;
@@ -176,289 +173,13 @@ namespace MedicalLibrary.Agent
 
                 // 右眼
                 s += "<R>\r\n";
-
-                ss = "";
-
-                if (doc.SelectNodes("Data/R/AR/ARList") != null)
-                {
-                    foreach (XmlNode xnn in doc.SelectNodes("Data/R/AR/ARList"))
-                    {
-                        xe = (XmlElement)xnn;
-                        ss += "\r\n";
-                        ss += xe.SelectSingleNode("Sphere").InnerText.PadRight(7, ' ');
-                        ss += xe.SelectSingleNode("Cylinder").InnerText.PadRight(7, ' ');
-                        ss += xe.SelectSingleNode("Axis").InnerText.PadRight(4, ' ');
-                        ss += xe.SelectSingleNode("ConfidenceIndex").InnerText;
-                    }
-                }
-
-                if (doc.SelectSingleNode("Data/R/AR/ARMedian") != null)
-                {
-                    xe = (XmlElement)doc.SelectSingleNode("Data/R/AR/ARMedian");
-                    ss += "\r\n";
-                    ss += "Avg\r\n";
-                    ss += xe.SelectSingleNode("Sphere").InnerText.PadRight(7, ' ');
-                    ss += xe.SelectSingleNode("Cylinder").InnerText.PadRight(7, ' ');
-                    ss += xe.SelectSingleNode("Axis").InnerText.PadRight(4, ' ');
-                }
-
-                if (doc.SelectSingleNode("Data/R/AR/ARPeriData") != null)
-                {
-                    xe = (XmlElement)doc.SelectSingleNode("Data/R/AR/ARPeriData");
-                    ss += "\r\n";
-                    ss += "L.DATA\r\n";
-                    ss += xe.SelectSingleNode("Sphere").InnerText.PadRight(7, ' ');
-                    ss += xe.SelectSingleNode("Cylinder").InnerText.PadRight(7, ' ');
-                    ss += xe.SelectSingleNode("Axis").InnerText.PadRight(4, ' ');
-                }
-
-                if (ss.Length > 0)
-                {
-                    s += "S      C      A";
-                    s += ss;
-                    s += "\r\n";
-                }
-
-                if (doc.SelectSingleNode("Data/R/PS/PSList/Size") != null)
-                {
-                    s += "\r\n";
-                    s += "PS  ";
-                    s += doc.SelectSingleNode("Data/R/PS/PSList/Size").InnerText.PadLeft(5, ' ');
-                }
-
-                if (doc.SelectSingleNode("Data/R/AC2") != null)
-                {
-                    xe = (XmlElement)doc.SelectSingleNode("Data/R/AC2");
-
-                    s += "\r\n\r\n";
-                    s += "負荷調節       AGE\r\n";
-                    s += "         AVG   2SD   BLK%\r\n";
-
-                    s += "T1Ref ";
-                    s += xe.SelectSingleNode("T1Average").InnerText.PadLeft(7, ' ');
-                    s += xe.SelectSingleNode("T12SD").InnerText.PadLeft(6, ' ');
-                    s += xe.SelectSingleNode("T1BlinkRate").InnerText.PadLeft(5, ' ');
-                    s += "\r\n";
-
-                    s += "L1Lag ";
-                    s += xe.SelectSingleNode("L1Average").InnerText.PadLeft(7, ' ');
-                    s += xe.SelectSingleNode("L12SD").InnerText.PadLeft(6, ' ');
-                    s += xe.SelectSingleNode("L1BlinkRate").InnerText.PadLeft(5, ' ');
-                    s += "\r\n";
-
-                    s += "Amp. ";
-                    s += xe.SelectSingleNode("AMP").InnerText.PadLeft(8, ' ');
-                    s += "  FarP ";
-                    s += xe.SelectSingleNode("FarPoint").InnerText.PadLeft(6, ' ');
-                    s += "\r\n";
-
-                    s += "(PS MIN ";
-                    s += xe.SelectSingleNode("MinPS2").InnerText.PadLeft(5, ' ');
-                    s += "  MAX ";
-                    s += xe.SelectSingleNode("MaxPS2").InnerText.PadLeft(5, ' ');
-                    s += ")";
-                }
-
-                s += "\r\n";
-
-                ss = "";
-
-                if (doc.SelectSingleNode("Data/R/KM/KMMedian/R1") != null)
-                {
-                    xe = (XmlElement)doc.SelectSingleNode("Data/R/KM/KMMedian/R1");
-                    ss += "\r\n";
-                    ss += "R1 ";
-                    ss += xe.SelectSingleNode("Radius").InnerText.PadLeft(7, ' ');
-                    ss += xe.SelectSingleNode("Power").InnerText.PadLeft(7, ' ');
-                    ss += xe.SelectSingleNode("Axis").InnerText.PadLeft(5, ' ');
-                }
-
-                if (doc.SelectSingleNode("Data/R/KM/KMMedian/R2") != null)
-                {
-                    xe = (XmlElement)doc.SelectSingleNode("Data/R/KM/KMMedian/R2");
-                    ss += "\r\n";
-                    ss += "R2 ";
-                    ss += xe.SelectSingleNode("Radius").InnerText.PadLeft(7, ' ');
-                    ss += xe.SelectSingleNode("Power").InnerText.PadLeft(7, ' ');
-                    ss += xe.SelectSingleNode("Axis").InnerText.PadLeft(5, ' ');
-                }
-
-                if (doc.SelectSingleNode("Data/R/KM/KMMedian/Average") != null)
-                {
-                    xe = (XmlElement)doc.SelectSingleNode("Data/R/KM/KMMedian/Average");
-                    ss += "\r\n";
-                    ss += "Avg";
-                    ss += xe.SelectSingleNode("Radius").InnerText.PadLeft(7, ' ');
-                    ss += xe.SelectSingleNode("Power").InnerText.PadLeft(7, ' ');
-                }
-
-                if (doc.SelectSingleNode("Data/R/KM/KMMedian/KMCylinder") != null)
-                {
-                    xe = (XmlElement)doc.SelectSingleNode("Data/R/KM/KMMedian/KMCylinder");
-                    ss += "\r\n";
-                    ss += "CYL       ";
-                    ss += xe.SelectSingleNode("Power").InnerText.PadLeft(7, ' ');
-                    ss += xe.SelectSingleNode("Axis").InnerText.PadLeft(5, ' ');
-                }
-
-                if (ss.Length > 0)
-                {
-                    s += "\r\n";
-                    s += "      mm    D      deg";
-                    s += ss;
-                    s += "\r\n";
-                }
-
-                if (doc.SelectSingleNode("Data/R/CS/CSList/Size") != null)
-                {
-                    s += "\r\n";
-                    s += "CS  ";
-                    s += doc.SelectSingleNode("Data/R/CS/CSList/Size").InnerText.PadLeft(5, ' ');
-                }
+                ConvertEye(doc, "Data/R/", ref s);
 
                 s += "\r\n\r\n";
 
                 // 左眼
                 s += "<L>\r\n";
-
-                ss = "";
-
-                if (doc.SelectNodes("Data/L/AR/ARList") != null)
-                {
-                    foreach (XmlNode xnn in doc.SelectNodes("Data/L/AR/ARList"))
-                    {
-                        xe = (XmlElement)xnn;
-                        ss += "\r\n";
-                        ss += xe.SelectSingleNode("Sphere").InnerText.PadRight(7, ' ');
-                        ss += xe.SelectSingleNode("Cylinder").InnerText.PadRight(7, ' ');
-                        ss += xe.SelectSingleNode("Axis").InnerText.PadRight(4, ' ');
-                        ss += xe.SelectSingleNode("ConfidenceIndex").InnerText;
-                    }
-                }
-
-                if (doc.SelectSingleNode("Data/L/AR/ARMedian") != null)
-                {
-                    xe = (XmlElement)doc.SelectSingleNode("Data/L/AR/ARMedian");
-                    ss += "\r\n";
-                    ss += "Avg\r\n";
-                    ss += xe.SelectSingleNode("Sphere").InnerText.PadRight(7, ' ');
-                    ss += xe.SelectSingleNode("Cylinder").InnerText.PadRight(7, ' ');
-                    ss += xe.SelectSingleNode("Axis").InnerText.PadRight(4, ' ');
-                }
-
-                if (doc.SelectSingleNode("Data/L/AR/ARPeriData") != null)
-                {
-                    xe = (XmlElement)doc.SelectSingleNode("Data/L/AR/ARPeriData");
-                    ss += "\r\n";
-                    ss += "L.DATA\r\n";
-                    ss += xe.SelectSingleNode("Sphere").InnerText.PadRight(7, ' ');
-                    ss += xe.SelectSingleNode("Cylinder").InnerText.PadRight(7, ' ');
-                    ss += xe.SelectSingleNode("Axis").InnerText.PadRight(4, ' ');
-                }
-
-                if (ss.Length > 0)
-                {
-                    s += "S      C      A";
-                    s += ss;
-                    s += "\r\n";
-                }
-
-                if (doc.SelectSingleNode("Data/L/PS/PSList/Size") != null)
-                {
-                    s += "\r\n";
-                    s += "PS  ";
-                    s += doc.SelectSingleNode("Data/L/PS/PSList/Size").InnerText.PadLeft(5, ' ');
-                }
-
-                if (doc.SelectSingleNode("Data/L/AC2") != null)
-                {
-                    xe = (XmlElement)doc.SelectSingleNode("Data/L/AC2");
-
-                    s += "\r\n\r\n";
-                    s += "負荷調節       AGE\r\n";
-                    s += "         AVG   2SD   BLK%\r\n";
-
-                    s += "T1Ref ";
-                    s += xe.SelectSingleNode("T1Average").InnerText.PadLeft(7, ' ');
-                    s += xe.SelectSingleNode("T12SD").InnerText.PadLeft(6, ' ');
-                    s += xe.SelectSingleNode("T1BlinkRate").InnerText.PadLeft(5, ' ');
-                    s += "\r\n";
-
-                    s += "L1Lag ";
-                    s += xe.SelectSingleNode("L1Average").InnerText.PadLeft(7, ' ');
-                    s += xe.SelectSingleNode("L12SD").InnerText.PadLeft(6, ' ');
-                    s += xe.SelectSingleNode("L1BlinkRate").InnerText.PadLeft(5, ' ');
-                    s += "\r\n";
-
-                    s += "Amp. ";
-                    s += xe.SelectSingleNode("AMP").InnerText.PadLeft(8, ' ');
-                    s += "  FarP ";
-                    s += xe.SelectSingleNode("FarPoint").InnerText.PadLeft(6, ' ');
-                    s += "\r\n";
-
-                    s += "(PS MIN ";
-                    s += xe.SelectSingleNode("MinPS2").InnerText.PadLeft(5, ' ');
-                    s += "  MAX ";
-                    s += xe.SelectSingleNode("MaxPS2").InnerText.PadLeft(5, ' ');
-                    s += ")";
-                }
-
-                s += "\r\n";
-
-                ss = "";
-
-                if (doc.SelectSingleNode("Data/L/KM/KMMedian/R1") != null)
-                {
-                    xe = (XmlElement)doc.SelectSingleNode("Data/L/KM/KMMedian/R1");
-                    ss += "\r\n";
-                    ss += "R1 ";
-                    ss += xe.SelectSingleNode("Radius").InnerText.PadLeft(7, ' ');
-                    ss += xe.SelectSingleNode("Power").InnerText.PadLeft(7, ' ');
-                    ss += xe.SelectSingleNode("Axis").InnerText.PadLeft(5, ' ');
-                }
-
-                if (doc.SelectSingleNode("Data/L/KM/KMMedian/R2") != null)
-                {
-                    xe = (XmlElement)doc.SelectSingleNode("Data/L/KM/KMMedian/R2");
-                    ss += "\r\n";
-                    ss += "R2 ";
-                    ss += xe.SelectSingleNode("Radius").InnerText.PadLeft(7, ' ');
-                    ss += xe.SelectSingleNode("Power").InnerText.PadLeft(7, ' ');
-                    ss += xe.SelectSingleNode("Axis").InnerText.PadLeft(5, ' ');
-                }
-
-                if (doc.SelectSingleNode("Data/L/KM/KMMedian/Average") != null)
-                {
-                    xe = (XmlElement)doc.SelectSingleNode("Data/L/KM/KMMedian/Average");
-                    ss += "\r\n";
-                    ss += "Avg";
-                    ss += xe.SelectSingleNode("Radius").InnerText.PadLeft(7, ' ');
-                    ss += xe.SelectSingleNode("Power").InnerText.PadLeft(7, ' ');
-                }
-
-                if (doc.SelectSingleNode("Data/L/KM/KMMedian/KMCylinder") != null)
-                {
-                    xe = (XmlElement)doc.SelectSingleNode("Data/L/KM/KMMedian/KMCylinder");
-                    ss += "\r\n";
-                    ss += "CYL       ";
-                    ss += xe.SelectSingleNode("Power").InnerText.PadLeft(7, ' ');
-                    ss += xe.SelectSingleNode("Axis").InnerText.PadLeft(5, ' ');
-                }
-
-                if (ss.Length > 0)
-                {
-                    s += "\r\n";
-                    s += "      mm    D      deg";
-                    s += ss;
-                    s += "\r\n";
-                }
-
-                if (doc.SelectSingleNode("Data/L/CS/CSList/Size") != null)
-                {
-                    s += "\r\n";
-                    s += "CS  ";
-                    s += doc.SelectSingleNode("Data/L/CS/CSList/Size").InnerText.PadLeft(5, ' ');
-                }
+                ConvertEye(doc, "Data/L/", ref s);
 
                 // 最終データ
                 if (doc.SelectSingleNode("Data/PD/PDList/FarPD") != null)
@@ -477,9 +198,170 @@ namespace MedicalLibrary.Agent
 
                 return s;
             }
-            finally
+        }
+
+        /// <summary>
+        /// 片眼分のデータをテキスト変換して s に追加する。
+        /// （途中で例外になった場合も、それまでの出力を残すため ref で受け取る）
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="root">"Data/R/" または "Data/L/"</param>
+        /// <param name="s"></param>
+        static void ConvertEye(XmlDocument doc, string root, ref string s)
+        {
+            XmlNode xe;
+            string ss = "";
+
+            foreach (XmlNode xnn in doc.SelectNodes(root + "AR/ARList"))
             {
+                ss += "\r\n";
+                ss += Text(xnn, "Sphere").PadRight(7, ' ');
+                ss += Text(xnn, "Cylinder").PadRight(7, ' ');
+                ss += Text(xnn, "Axis").PadRight(4, ' ');
+                ss += Text(xnn, "ConfidenceIndex");
             }
+
+            xe = doc.SelectSingleNode(root + "AR/ARMedian");
+
+            if (xe != null)
+            {
+                ss += "\r\n";
+                ss += "Avg\r\n";
+                ss += Text(xe, "Sphere").PadRight(7, ' ');
+                ss += Text(xe, "Cylinder").PadRight(7, ' ');
+                ss += Text(xe, "Axis").PadRight(4, ' ');
+            }
+
+            xe = doc.SelectSingleNode(root + "AR/ARPeriData");
+
+            if (xe != null)
+            {
+                ss += "\r\n";
+                ss += "L.DATA\r\n";
+                ss += Text(xe, "Sphere").PadRight(7, ' ');
+                ss += Text(xe, "Cylinder").PadRight(7, ' ');
+                ss += Text(xe, "Axis").PadRight(4, ' ');
+            }
+
+            if (ss.Length > 0)
+            {
+                s += "S      C      A";
+                s += ss;
+                s += "\r\n";
+            }
+
+            xe = doc.SelectSingleNode(root + "PS/PSList/Size");
+
+            if (xe != null)
+            {
+                s += "\r\n";
+                s += "PS  ";
+                s += xe.InnerText.PadLeft(5, ' ');
+            }
+
+            xe = doc.SelectSingleNode(root + "AC2");
+
+            if (xe != null)
+            {
+                s += "\r\n\r\n";
+                s += "負荷調節       AGE\r\n";
+                s += "         AVG   2SD   BLK%\r\n";
+
+                s += "T1Ref ";
+                s += Text(xe, "T1Average").PadLeft(7, ' ');
+                s += Text(xe, "T12SD").PadLeft(6, ' ');
+                s += Text(xe, "T1BlinkRate").PadLeft(5, ' ');
+                s += "\r\n";
+
+                s += "L1Lag ";
+                s += Text(xe, "L1Average").PadLeft(7, ' ');
+                s += Text(xe, "L12SD").PadLeft(6, ' ');
+                s += Text(xe, "L1BlinkRate").PadLeft(5, ' ');
+                s += "\r\n";
+
+                s += "Amp. ";
+                s += Text(xe, "AMP").PadLeft(8, ' ');
+                s += "  FarP ";
+                s += Text(xe, "FarPoint").PadLeft(6, ' ');
+                s += "\r\n";
+
+                s += "(PS MIN ";
+                s += Text(xe, "MinPS2").PadLeft(5, ' ');
+                s += "  MAX ";
+                s += Text(xe, "MaxPS2").PadLeft(5, ' ');
+                s += ")";
+            }
+
+            s += "\r\n";
+
+            ss = "";
+
+            xe = doc.SelectSingleNode(root + "KM/KMMedian/R1");
+
+            if (xe != null)
+            {
+                ss += "\r\n";
+                ss += "R1 ";
+                ss += Text(xe, "Radius").PadLeft(7, ' ');
+                ss += Text(xe, "Power").PadLeft(7, ' ');
+                ss += Text(xe, "Axis").PadLeft(5, ' ');
+            }
+
+            xe = doc.SelectSingleNode(root + "KM/KMMedian/R2");
+
+            if (xe != null)
+            {
+                ss += "\r\n";
+                ss += "R2 ";
+                ss += Text(xe, "Radius").PadLeft(7, ' ');
+                ss += Text(xe, "Power").PadLeft(7, ' ');
+                ss += Text(xe, "Axis").PadLeft(5, ' ');
+            }
+
+            xe = doc.SelectSingleNode(root + "KM/KMMedian/Average");
+
+            if (xe != null)
+            {
+                ss += "\r\n";
+                ss += "Avg";
+                ss += Text(xe, "Radius").PadLeft(7, ' ');
+                ss += Text(xe, "Power").PadLeft(7, ' ');
+            }
+
+            xe = doc.SelectSingleNode(root + "KM/KMMedian/KMCylinder");
+
+            if (xe != null)
+            {
+                ss += "\r\n";
+                ss += "CYL       ";
+                ss += Text(xe, "Power").PadLeft(7, ' ');
+                ss += Text(xe, "Axis").PadLeft(5, ' ');
+            }
+
+            if (ss.Length > 0)
+            {
+                s += "\r\n";
+                s += "      mm    D      deg";
+                s += ss;
+                s += "\r\n";
+            }
+
+            xe = doc.SelectSingleNode(root + "CS/CSList/Size");
+
+            if (xe != null)
+            {
+                s += "\r\n";
+                s += "CS  ";
+                s += xe.InnerText.PadLeft(5, ' ');
+            }
+        }
+
+        /// <summary>
+        /// 子要素のテキストを取得する
+        /// </summary>
+        static string Text(XmlNode node, string name)
+        {
+            return node.SelectSingleNode(name).InnerText;
         }
 
         /// <summary>

@@ -25,250 +25,164 @@ namespace MedicalLibrary.Agent
                 return false;
             }
 
-            StreamReader reader = new StreamReader(file_name, Encoding.Default);
+            string data_str;
 
-            string data_str = reader.ReadLine();
-
-            if (data_str.StartsWith("CANON", StringComparison.CurrentCultureIgnoreCase) ||
-                data_str.StartsWith("NIDEK", StringComparison.CurrentCultureIgnoreCase))
+            using (StreamReader reader = new StreamReader(file_name, Encoding.Default))
             {
-                text_box.Text = data_str + Environment.NewLine;
-                text_box.Text += reader.ReadToEnd();
+                data_str = reader.ReadLine();
 
-                reader.Close();
-            }
-            else
-            {
-                reader.Close();
-
-                string[] data = data_str.Split(',');
-
-                if (data.Length < 100)
+                // 空ファイル
+                if (data_str == null)
                 {
                     return false;
                 }
 
-                EyeRefKrt tmpRefKrt = new EyeRefKrt();
-
-                tmpRefKrt.Serial = data[4];
-                tmpRefKrt.Date = data[6];
-
-                float f = 0;
-                float f1 = 0;
-                float f2 = 0;
-                string ave = "";
-
-                for (int i = 0; i < 10; i++)
+                if (data_str.StartsWith("CANON", StringComparison.CurrentCultureIgnoreCase) ||
+                    data_str.StartsWith("NIDEK", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    EyeRefElement tmpRef = new EyeRefElement();
-                    tmpRef.Mode = data[7 + i * 3].Substring(0, 1);
-                    tmpRef.Liability = data[7 + i * 3].Substring(1, 2);
-                    tmpRef.SPH = data[8 + i * 3].Substring(0, 6);
-                    tmpRef.CYL = data[8 + i * 3].Substring(6, 6);
-                    tmpRef.AXIS = data[8 + i * 3].Substring(12, 3);
-                    tmpRef.SE = data[9 + i * 3];
+                    text_box.Text = data_str + Environment.NewLine;
+                    text_box.Text += reader.ReadToEnd();
 
-                    tmpRefKrt.R.RefList.Add(tmpRef);
+                    return true;
                 }
-
-                tmpRefKrt.R.Ref_SPH = data[37].Substring(0, 6);
-                tmpRefKrt.R.Ref_CYL = data[37].Substring(6, 6);
-                tmpRefKrt.R.Ref_AXIS = data[37].Substring(12, 3);
-                tmpRefKrt.R.Ref_SE = data[38];
-
-                for (int i = 0; i < 10; i++)
-                {
-                    EyeKrtElement tmpKrt = new EyeKrtElement();
-                    tmpKrt.Mode = data[39 + i].Substring(0, 1);
-                    tmpKrt.R1 = data[39 + i].Substring(1, 5);
-                    tmpKrt.D1 = data[39 + i].Substring(6, 5);
-                    tmpKrt.A1 = data[39 + i].Substring(11, 3);
-                    tmpKrt.R2 = data[39 + i].Substring(14, 5);
-                    tmpKrt.D2 = data[39 + i].Substring(19, 5);
-                    tmpKrt.A2 = data[39 + i].Substring(24, 3);
-                    tmpKrt.RAVE = data[39 + i].Substring(27, 5);
-
-                    if (float.TryParse(tmpKrt.D1, out f1) && float.TryParse(tmpKrt.D2, out f2))
-                    {
-                        f = f1 + f2;
-
-                        if (f * 2 - Math.Floor(f * 2) == 0)
-                        {
-                            ave = Math.Round(f / 2, 2).ToString();
-                        }
-                        else
-                        {
-                            ave = Math.Round((f + 0.25) / 2, 2).ToString();
-                        }
-
-                        if (ave.Contains("."))
-                        {
-                            tmpKrt.DAVE = ave.PadRight(5, '0').Substring(0, 5);
-                        }
-                        else
-                        {
-                            tmpKrt.DAVE = (ave + ".").PadRight(5, '0').Substring(0, 5);
-                        }
-                    }
-
-                    tmpKrt.CYL = data[39 + i].Substring(32, 6);
-                    tmpKrt.AXIS = data[39 + i].Substring(38, 3);
-
-                    tmpRefKrt.R.KrtList.Add(tmpKrt);
-                }
-
-                tmpRefKrt.R.Krt_R1 = data[49].Substring(0, 5);
-                tmpRefKrt.R.Krt_D1 = data[49].Substring(5, 5);
-                tmpRefKrt.R.Krt_A1 = data[49].Substring(10, 3);
-                tmpRefKrt.R.Krt_R2 = data[49].Substring(13, 5);
-                tmpRefKrt.R.Krt_D2 = data[49].Substring(18, 5);
-                tmpRefKrt.R.Krt_A2 = data[49].Substring(23, 3);
-                tmpRefKrt.R.Krt_RAVE = data[49].Substring(26, 5);
-
-                if (float.TryParse(tmpRefKrt.R.Krt_D1, out f1) && float.TryParse(tmpRefKrt.R.Krt_D2, out f2))
-                {
-                    f = f1 + f2;
-
-                    if (f * 2 - Math.Floor(f * 2) == 0)
-                    {
-                        ave = Math.Round(f / 2, 2).ToString();
-                    }
-                    else
-                    {
-                        ave = Math.Round((f + 0.25) / 2, 2).ToString();
-                    }
-
-                    if (ave.Contains("."))
-                    {
-                        tmpRefKrt.R.Krt_DAVE = ave.PadRight(5, '0').Substring(0, 5);
-                    }
-                    else
-                    {
-                        tmpRefKrt.R.Krt_DAVE = (ave + ".").PadRight(5, '0').Substring(0, 5);
-                    }
-                }
-
-                tmpRefKrt.R.Krt_CYL = data[49].Substring(31, 6);
-                tmpRefKrt.R.Krt_AXIS = data[49].Substring(37, 3);
-                tmpRefKrt.R.CD = data[50];
-                tmpRefKrt.R.SP = data[51];
-
-                for (int i = 0; i < 10; i++)
-                {
-                    EyeRefElement tmpRef = new EyeRefElement();
-                    tmpRef.Mode = data[52 + i * 3].Substring(0, 1);
-                    tmpRef.Liability = data[52 + i * 3].Substring(1, 2);
-                    tmpRef.SPH = data[53 + i * 3].Substring(0, 6);
-                    tmpRef.CYL = data[53 + i * 3].Substring(6, 6);
-                    tmpRef.AXIS = data[53 + i * 3].Substring(12, 3);
-                    tmpRef.SE = data[54 + i * 3];
-
-                    tmpRefKrt.L.RefList.Add(tmpRef);
-                }
-
-                tmpRefKrt.L.Ref_SPH = data[82].Substring(0, 6);
-                tmpRefKrt.L.Ref_CYL = data[82].Substring(6, 6);
-                tmpRefKrt.L.Ref_AXIS = data[82].Substring(12, 3);
-                tmpRefKrt.L.Ref_SE = data[83];
-
-                for (int i = 0; i < 10; i++)
-                {
-                    EyeKrtElement tmpKrt = new EyeKrtElement();
-                    tmpKrt.Mode = data[84 + i].Substring(0, 1);
-                    tmpKrt.R1 = data[84 + i].Substring(1, 5);
-                    tmpKrt.D1 = data[84 + i].Substring(6, 5);
-                    tmpKrt.A1 = data[84 + i].Substring(11, 3);
-                    tmpKrt.R2 = data[84 + i].Substring(14, 5);
-                    tmpKrt.D2 = data[84 + i].Substring(19, 5);
-                    tmpKrt.A2 = data[84 + i].Substring(24, 3);
-                    tmpKrt.RAVE = data[84 + i].Substring(27, 5);
-
-                    if (float.TryParse(tmpKrt.D1, out f1) && float.TryParse(tmpKrt.D2, out f2))
-                    {
-                        f = f1 + f2;
-
-                        if (f * 2 - Math.Floor(f * 2) == 0)
-                        {
-                            ave = Math.Round(f / 2, 2).ToString();
-                        }
-                        else
-                        {
-                            ave = Math.Round((f + 0.25) / 2, 2).ToString();
-                        }
-
-                        if (ave.Contains("."))
-                        {
-                            tmpKrt.DAVE = ave.PadRight(5, '0').Substring(0, 5);
-                        }
-                        else
-                        {
-                            tmpKrt.DAVE = (ave + ".").PadRight(5, '0').Substring(0, 5);
-                        }
-                    }
-
-                    tmpKrt.CYL = data[84 + i].Substring(32, 6);
-                    tmpKrt.AXIS = data[84 + i].Substring(38, 3);
-
-                    tmpRefKrt.L.KrtList.Add(tmpKrt);
-                }
-
-                tmpRefKrt.L.Krt_R1 = data[94].Substring(0, 5);
-                tmpRefKrt.L.Krt_D1 = data[94].Substring(5, 5);
-                tmpRefKrt.L.Krt_A1 = data[94].Substring(10, 3);
-                tmpRefKrt.L.Krt_R2 = data[94].Substring(13, 5);
-                tmpRefKrt.L.Krt_D2 = data[94].Substring(18, 5);
-                tmpRefKrt.L.Krt_A2 = data[94].Substring(23, 3);
-                tmpRefKrt.L.Krt_RAVE = data[94].Substring(26, 5);
-
-                if (float.TryParse(tmpRefKrt.L.Krt_D1, out f1) && float.TryParse(tmpRefKrt.L.Krt_D2, out f2))
-                {
-                    f = f1 + f2;
-
-                    if (f * 2 - Math.Floor(f * 2) == 0)
-                    {
-                        ave = Math.Round(f / 2, 2).ToString();
-                    }
-                    else
-                    {
-                        ave = Math.Round((f + 0.25) / 2, 2).ToString();
-                    }
-
-                    if (ave.Contains("."))
-                    {
-                        tmpRefKrt.L.Krt_DAVE = ave.PadRight(5, '0').Substring(0, 5);
-                    }
-                    else
-                    {
-                        tmpRefKrt.L.Krt_DAVE = (ave + ".").PadRight(5, '0').Substring(0, 5);
-                    }
-                }
-
-                tmpRefKrt.L.Krt_CYL = data[94].Substring(31, 6);
-                tmpRefKrt.L.Krt_AXIS = data[94].Substring(37, 3);
-                tmpRefKrt.L.CD = data[95];
-                tmpRefKrt.L.SP = data[96];
-
-                tmpRefKrt.PD = data[97];
-                tmpRefKrt.VD = data[98];
-
-                string str = "     VD  : " + tmpRefKrt.VD + "\r\n\r\n";
-
-                if (tmpRefKrt.R.RefString().Length > 0 || tmpRefKrt.L.RefString().Length > 0)
-                {
-                    str += tmpRefKrt.R.RefString() + "\r\n" + tmpRefKrt.L.RefString() + "\r\n";
-                }
-
-                if (tmpRefKrt.R.KrtString().Length > 0 || tmpRefKrt.L.KrtString().Length > 0)
-                {
-                    str += " KRT. DATA\r\n" + tmpRefKrt.R.KrtString() + "\r\n KRT. DATA\r\n" + tmpRefKrt.L.KrtString() + "\r\n";
-                }
-
-                str += "     PD = " + tmpRefKrt.PD + "mm";
-
-                text_box.Text = str;
             }
 
+            string[] data = data_str.Split(',');
+
+            if (data.Length < 100)
+            {
+                return false;
+            }
+
+            EyeRefKrt tmpRefKrt = new EyeRefKrt();
+
+            tmpRefKrt.Serial = data[4];
+            tmpRefKrt.Date = data[6];
+
+            // 左眼の項目は右眼の 45 列後ろにある
+            ReadEye(data, 0, tmpRefKrt.R);
+            ReadEye(data, 45, tmpRefKrt.L);
+
+            tmpRefKrt.PD = data[97];
+            tmpRefKrt.VD = data[98];
+
+            string str = "     VD  : " + tmpRefKrt.VD + "\r\n\r\n";
+
+            if (tmpRefKrt.R.RefString().Length > 0 || tmpRefKrt.L.RefString().Length > 0)
+            {
+                str += tmpRefKrt.R.RefString() + "\r\n" + tmpRefKrt.L.RefString() + "\r\n";
+            }
+
+            if (tmpRefKrt.R.KrtString().Length > 0 || tmpRefKrt.L.KrtString().Length > 0)
+            {
+                str += " KRT. DATA\r\n" + tmpRefKrt.R.KrtString() + "\r\n KRT. DATA\r\n" + tmpRefKrt.L.KrtString() + "\r\n";
+            }
+
+            str += "     PD = " + tmpRefKrt.PD + "mm";
+
+            text_box.Text = str;
+
             return true;
+        }
+
+        /// <summary>
+        /// 片眼分のレフ・ケラトのデータを読み取る。
+        /// </summary>
+        /// <param name="data">CSV の列</param>
+        /// <param name="offset">右眼は 0、左眼は 45</param>
+        /// <param name="e"></param>
+        static void ReadEye(string[] data, int offset, EyeRefKrtElement e)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                EyeRefElement tmpRef = new EyeRefElement();
+                tmpRef.Mode = data[offset + 7 + i * 3].Substring(0, 1);
+                tmpRef.Liability = data[offset + 7 + i * 3].Substring(1, 2);
+                tmpRef.SPH = data[offset + 8 + i * 3].Substring(0, 6);
+                tmpRef.CYL = data[offset + 8 + i * 3].Substring(6, 6);
+                tmpRef.AXIS = data[offset + 8 + i * 3].Substring(12, 3);
+                tmpRef.SE = data[offset + 9 + i * 3];
+
+                e.RefList.Add(tmpRef);
+            }
+
+            string ref_avg = data[offset + 37];
+
+            e.Ref_SPH = ref_avg.Substring(0, 6);
+            e.Ref_CYL = ref_avg.Substring(6, 6);
+            e.Ref_AXIS = ref_avg.Substring(12, 3);
+            e.Ref_SE = data[offset + 38];
+
+            for (int i = 0; i < 10; i++)
+            {
+                string krt = data[offset + 39 + i];
+
+                EyeKrtElement tmpKrt = new EyeKrtElement();
+                tmpKrt.Mode = krt.Substring(0, 1);
+                tmpKrt.R1 = krt.Substring(1, 5);
+                tmpKrt.D1 = krt.Substring(6, 5);
+                tmpKrt.A1 = krt.Substring(11, 3);
+                tmpKrt.R2 = krt.Substring(14, 5);
+                tmpKrt.D2 = krt.Substring(19, 5);
+                tmpKrt.A2 = krt.Substring(24, 3);
+                tmpKrt.RAVE = krt.Substring(27, 5);
+                tmpKrt.DAVE = CalcDAve(tmpKrt.D1, tmpKrt.D2);
+                tmpKrt.CYL = krt.Substring(32, 6);
+                tmpKrt.AXIS = krt.Substring(38, 3);
+
+                e.KrtList.Add(tmpKrt);
+            }
+
+            string krt_avg = data[offset + 49];
+
+            e.Krt_R1 = krt_avg.Substring(0, 5);
+            e.Krt_D1 = krt_avg.Substring(5, 5);
+            e.Krt_A1 = krt_avg.Substring(10, 3);
+            e.Krt_R2 = krt_avg.Substring(13, 5);
+            e.Krt_D2 = krt_avg.Substring(18, 5);
+            e.Krt_A2 = krt_avg.Substring(23, 3);
+            e.Krt_RAVE = krt_avg.Substring(26, 5);
+            e.Krt_DAVE = CalcDAve(e.Krt_D1, e.Krt_D2);
+            e.Krt_CYL = krt_avg.Substring(31, 6);
+            e.Krt_AXIS = krt_avg.Substring(37, 3);
+            e.CD = data[offset + 50];
+            e.SP = data[offset + 51];
+        }
+
+        /// <summary>
+        /// 角膜屈折力 D1・D2 の平均を5文字で返す（0.25 刻みに切り上げる）。
+        /// 数値でなければ空文字。
+        /// </summary>
+        static string CalcDAve(string d1, string d2)
+        {
+            float f1 = 0;
+            float f2 = 0;
+
+            if (!float.TryParse(d1, out f1) || !float.TryParse(d2, out f2))
+            {
+                return "";
+            }
+
+            float f = f1 + f2;
+            string ave = "";
+
+            if (f * 2 - Math.Floor(f * 2) == 0)
+            {
+                ave = Math.Round(f / 2, 2).ToString();
+            }
+            else
+            {
+                ave = Math.Round((f + 0.25) / 2, 2).ToString();
+            }
+
+            if (ave.Contains("."))
+            {
+                return ave.PadRight(5, '0').Substring(0, 5);
+            }
+            else
+            {
+                return (ave + ".").PadRight(5, '0').Substring(0, 5);
+            }
         }
     }
 

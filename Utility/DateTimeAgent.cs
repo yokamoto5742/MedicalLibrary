@@ -112,138 +112,93 @@ namespace MedicalLibrary.Utility
         /// <returns></returns>
         public static string DateFormat(string org_date, DateFormatKind kind)
         {
-            string result = "";
-
-            if (org_date.Length == 8)
+            if (org_date.Length != 8)
             {
-                DateTime dt;
-                bool valid = DateTime.TryParseExact(org_date, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt);
+                return "";
+            }
 
-                if (kind == DateFormatKind.LONG)
-                {
-                    result = org_date.Insert(4, "/").Insert(7, "/");
-                }
-                else if (kind == DateFormatKind.SHORT)
-                {
-                    result = org_date.Substring(2).Insert(2, "/").Insert(5, "/");
-                }
-                else if (!valid)
-                {
-                    // "00000000" のような日付として不正な値は空文字とする
-                }
-                else if (kind == DateFormatKind.WLONG)
-                {
-                    result = DateTime.Parse(org_date.Insert(4, "/").Insert(7, "/")).ToString("yyyy/MM/dd(ddd)");
-                }
-                else if (kind == DateFormatKind.WSHORT)
-                {
-                    result = DateTime.Parse(org_date.Insert(4, "/").Insert(7, "/")).ToString("yy/MM/dd(ddd)");
-                }
-                else if (kind == DateFormatKind.J1)
-                {
-                    // .NET Framework が令和対応していないPCのため
-                    if (org_date.CompareTo("20190501") >= 0)
-                    {
-                        result = "令和" + (int.Parse(org_date.Substring(0, 4)) - 2018).ToString().PadLeft(2, '0') + "年" +
-                            DateTime.Parse(org_date.Insert(4, "/").Insert(7, "/")).ToString("M月d日", DefaultCulture);
-                    }
-                    else
-                    {
-                        result = DateTime.Parse(org_date.Insert(4, "/").Insert(7, "/")).ToString("ggyy年M月d日", DefaultCulture);
-                    }
-                }
-                else if (kind == DateFormatKind.J2)
-                {
-                    // .NET Framework が令和対応していないPCのため
-                    if (org_date.CompareTo("20190501") >= 0)
-                    {
-                        result = "令和" + (int.Parse(org_date.Substring(0, 4)) - 2018).ToString().PadLeft(2, '0') + "/" +
-                            DateTime.Parse(org_date.Insert(4, "/").Insert(7, "/")).ToString("M/d", DefaultCulture);
-                    }
-                    else
-                    {
-                        result = DateTime.Parse(org_date.Insert(4, "/").Insert(7, "/")).ToString("gyy/M/d", DefaultCulture);
-                    }
+            // LONG / SHORT は文字列の区切りを入れるだけ（日付として正しいかは見ない）
+            if (kind == DateFormatKind.LONG)
+            {
+                return org_date.Insert(4, "/").Insert(7, "/");
+            }
+            else if (kind == DateFormatKind.SHORT)
+            {
+                return org_date.Substring(2).Insert(2, "/").Insert(5, "/");
+            }
 
-                    if (result.StartsWith("明治"))
-                    {
-                        result = result.Replace("明治", "M");
-                    }
-                    else if (result.StartsWith("大正"))
-                    {
-                        result = result.Replace("大正", "T");
-                    }
-                    else if (result.StartsWith("昭和"))
-                    {
-                        result = result.Replace("昭和", "S");
-                    }
-                    else if (result.StartsWith("平成"))
-                    {
-                        result = result.Replace("平成", "H");
-                    }
-					else if (result.StartsWith("令和"))
-					{
-						result = result.Replace("令和", "R");
-					}
-				}
-                else if (kind == DateFormatKind.JW1)
-                {
-                    // .NET Framework が令和対応していないPCのため
-                    if (org_date.CompareTo("20190501") >= 0)
-                    {
-                        result = "令和" + (int.Parse(org_date.Substring(0, 4)) - 2018).ToString().PadLeft(2, '0') + "年" +
-                            DateTime.Parse(org_date.Insert(4, "/").Insert(7, "/")).ToString("M月d日(ddd)", DefaultCulture);
-                    }
-                    else
-                    {
-                        result = DateTime.Parse(org_date.Insert(4, "/").Insert(7, "/")).ToString("ggyy年M月d日(ddd)", DefaultCulture);
-                    }
-                }
-                else if (kind == DateFormatKind.JW2)
-                {
-                    // .NET Framework が令和対応していないPCのため
-                    if (org_date.CompareTo("20190501") >= 0)
-                    {
-                        result = "令和" + (int.Parse(org_date.Substring(0, 4)) - 2018).ToString().PadLeft(2, '0') + "/" +
-                            DateTime.Parse(org_date.Insert(4, "/").Insert(7, "/")).ToString("M/d(ddd)", DefaultCulture);
-                    }
-                    else
-                    {
-                        result = DateTime.Parse(org_date.Insert(4, "/").Insert(7, "/")).ToString("gyy/M/d(ddd)", DefaultCulture);
-                    }
+            DateTime dt;
 
-                    if (result.StartsWith("明治"))
-                    {
-                        result = result.Replace("明治", "M");
-                    }
-                    else if (result.StartsWith("大正"))
-                    {
-                        result = result.Replace("大正", "T");
-                    }
-                    else if (result.StartsWith("昭和"))
-                    {
-                        result = result.Replace("昭和", "S");
-                    }
-                    else if (result.StartsWith("平成"))
-                    {
-                        result = result.Replace("平成", "H");
-                    }
-					else if (result.StartsWith("令和"))
-					{
-						result = result.Replace("令和", "R");
-					}
-				}
-                else if (kind == DateFormatKind.MD)
+            // "00000000" のような日付として不正な値は空文字とする
+            if (!DateTime.TryParseExact(org_date, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt))
+            {
+                return "";
+            }
+
+            switch (kind)
+            {
+                case DateFormatKind.WLONG:
+                    return dt.ToString("yyyy/MM/dd(ddd)");
+                case DateFormatKind.WSHORT:
+                    return dt.ToString("yy/MM/dd(ddd)");
+                case DateFormatKind.J1:
+                    return JFormat(dt, "年", "M月d日", false);
+                case DateFormatKind.J2:
+                    return JFormat(dt, "/", "M/d", true);
+                case DateFormatKind.JW1:
+                    return JFormat(dt, "年", "M月d日(ddd)", false);
+                case DateFormatKind.JW2:
+                    return JFormat(dt, "/", "M/d(ddd)", true);
+                case DateFormatKind.MD:
+                    return dt.ToString("M/d", DefaultCulture);
+                case DateFormatKind.MDD:
+                    return dt.ToString("M/dd", DefaultCulture);
+                case DateFormatKind.MDW:
+                    return dt.ToString("M/d(ddd)", DefaultCulture);
+            }
+
+            return "";
+        }
+
+        /// <summary>
+        /// 元号の置き換え（J2 / JW2 用）
+        /// </summary>
+        static readonly string[,] era_alphabet =
+        {
+            { "明治", "M" }, { "大正", "T" }, { "昭和", "S" }, { "平成", "H" }, { "令和", "R" }
+        };
+
+        /// <summary>
+        /// 和暦の書式にする。
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="year_sep">年と月日の区切り（"年" または "/"）</param>
+        /// <param name="md_format">月日の書式</param>
+        /// <param name="alphabet">true: 元号をアルファベット1文字にする</param>
+        /// <returns></returns>
+        static string JFormat(DateTime dt, string year_sep, string md_format, bool alphabet)
+        {
+            string result;
+
+            // .NET Framework が令和対応していないPCのため
+            if (dt >= new DateTime(2019, 5, 1))
+            {
+                result = "令和" + (dt.Year - 2018).ToString().PadLeft(2, '0') + year_sep + dt.ToString(md_format, DefaultCulture);
+            }
+            else
+            {
+                result = dt.ToString("ggyy" + year_sep + md_format, DefaultCulture);
+            }
+
+            if (alphabet)
+            {
+                for (int i = 0; i < era_alphabet.GetLength(0); i++)
                 {
-                    result = DateTime.Parse(org_date.Insert(4, "/").Insert(7, "/")).ToString("M/d", DefaultCulture);
-                }
-                else if (kind == DateFormatKind.MDD)
-                {
-                    result = DateTime.Parse(org_date.Insert(4, "/").Insert(7, "/")).ToString("M/dd", DefaultCulture);
-                }
-                else if (kind == DateFormatKind.MDW)
-                {
-                    result = DateTime.Parse(org_date.Insert(4, "/").Insert(7, "/")).ToString("M/d(ddd)", DefaultCulture);
+                    if (result.StartsWith(era_alphabet[i, 0]))
+                    {
+                        result = result.Replace(era_alphabet[i, 0], era_alphabet[i, 1]);
+                        break;
+                    }
                 }
             }
 
@@ -469,6 +424,11 @@ namespace MedicalLibrary.Utility
         }
 
         /// <summary>
+        /// 元号ごとの基準年（元号の年 + 基準年 = 西暦）。添字は gen（1: 明治, 2: 大正, 3: 昭和, 4: 平成, 5: 令和）
+        /// </summary>
+        static readonly int[] era_base = { 0, 1867, 1911, 1925, 1988, 2018 };
+
+        /// <summary>
         /// 和暦を西暦に変換する
         /// </summary>
         /// <param name="gen">1: 明治, 2: 大正, 3: 昭和, 4: 平成, 5: 令和</param>
@@ -478,37 +438,12 @@ namespace MedicalLibrary.Utility
         /// <returns></returns>
         public static int JtoW(int gen, int gy, int m, int d)
         {
-            int i = 0;
-
             if (gen < 1 || gen > 5)
             {
-                return i;
+                return 0;
             }
 
-            if (gen == 1)
-            {
-                i += (gy + 1867) * 10000;
-            }
-            else if (gen == 2)
-            {
-                i += (gy + 1911) * 10000;
-            }
-            else if (gen == 3)
-            {
-                i += (gy + 1925) * 10000;
-            }
-            else if (gen == 4)
-            {
-                i += (gy + 1988) * 10000;
-            }
-			else if (gen == 5)
-			{
-				i += (gy + 2018) * 10000;
-			}
-
-            i += m * 100 + d;
-
-            return i;
+            return (gy + era_base[gen]) * 10000 + m * 100 + d;
         }
 
         /// <summary>
@@ -519,35 +454,12 @@ namespace MedicalLibrary.Utility
         /// <returns></returns>
         public static int JtoW(int gen, int gyymmdd)
         {
-            int i = 0;
-
             if (gen < 1 || gen > 5)
             {
-                return i;
+                return 0;
             }
 
-            if (gen == 1)
-            {
-                i += gyymmdd + 1867 * 10000;
-            }
-            else if (gen == 2)
-            {
-                i += gyymmdd + 1911 * 10000;
-            }
-            else if (gen == 3)
-            {
-                i += gyymmdd + 1925 * 10000;
-            }
-            else if (gen == 4)
-            {
-                i += gyymmdd + 1988 * 10000;
-            }
-			else if (gen == 5)
-			{
-				i += gyymmdd + 2018 * 10000;
-			}
-
-            return i;
+            return gyymmdd + era_base[gen] * 10000;
         }
 
         /// <summary>

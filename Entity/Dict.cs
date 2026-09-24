@@ -13,10 +13,6 @@ namespace MedicalLibrary.Entity
 
         static Dictionary<string, Ward> wardDict;
 
-        static Dictionary<string, string> kouiDict;
-
-        static Dictionary<string, Sekou> sekouDict;
-
         static Dictionary<string, Dept> deptDict;
 
         public static Dictionary<string, Dept> DeptDict
@@ -76,16 +72,6 @@ namespace MedicalLibrary.Entity
                 return holidayDict;
             }
         }
-
-        /// <summary>
-        /// èäëÆ
-        /// </summary>
-        static Dictionary<string, Section> sectionDict;
-
-        /// <summary>
-        /// éëäi
-        /// </summary>
-        static Dictionary<string, Qual> qualDict;
 
         static Dictionary<string, string> soapDict;
 
@@ -165,50 +151,17 @@ namespace MedicalLibrary.Entity
             soapShortDict.Add("7", "E");
             soapShortDict.Add("9", "ª");
 
-            kouiDict = new Dictionary<string, string>();
-            sekouDict = new Dictionary<string, Sekou>();
             deptDict = new Dictionary<string, Dept>();
             doctorDict = new Dictionary<string, Doctor>();
             staffDict = new Dictionary<string, Staff>();
-            sectionDict = new Dictionary<string, Section>();
-            qualDict = new Dictionary<string, Qual>();
 
+            // ê⁄ë±ÇÃ Open/Close ÇÕ GetList Ç≤Ç∆Ç…çsÇ§ÅiäOë§Ç≈ Open Ç∑ÇÈÇ∆ì¸ÇÍéqÇ…Ç»ÇËê⁄ë±Ç™ï¬Ç∂Ç»Ç¢Åj
             DB db = DB.Db3;
 
-            db.Open();
-
-            // êfó√ãÊï™
-            string cmd = "select CODE, Trim(NAME) NAME from M_SHINKU order by CODE";
+            // êfó√â»
+            string cmd = "select CODE, NAME, S_NAME, CATEGORY from M_DEPT order by CODE";
 
             List<StdClass> tmp_list = StdClass.GetList(db, cmd);
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                kouiDict.Add(tmp.DataDict["CODE"].ToString(), tmp.DataDict["NAME"].ToString());
-            }
-
-            // é{çsïîèê
-            cmd = "select CODE, Trim(NAME) NAME, Trim(S_NAME) S_NAME from M_SEKOU order by CODE";
-
-            tmp_list = StdClass.GetList(db, cmd);
-
-            sekouDict.Add("0", new Sekou());
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                Sekou obj = new Sekou();
-
-                int.TryParse(tmp.DataDict["CODE"].ToString(), out obj.Code);
-                obj.FullName = tmp.DataDict["NAME"].ToString();
-                obj.ShortName = tmp.DataDict["S_NAME"].ToString();
-
-                sekouDict.Add(obj.Code.ToString(), obj);
-            }
-
-            // êfó√â»
-            cmd = "select CODE, NAME, S_NAME, CATEGORY from M_DEPT order by CODE";
-
-            tmp_list = StdClass.GetList(db, cmd);
 
             deptDict.Add("0", new Dept());
 
@@ -273,52 +226,6 @@ namespace MedicalLibrary.Entity
 
                 staffDict.Add(obj.Code.ToString(), obj);
             }
-
-            // èäëÆ
-            cmd = "select t.CODE, t.NAME, t.S_NAME " +
-                ", case when t.DEL_FLG = 1 then 9 else 0 end STATUS " +
-                " from M_SYOZOKU t " +
-                " order by t.CODE";
-
-            tmp_list = StdClass.GetList(db, cmd);
-
-            sectionDict.Add("0", new Section());
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                Section obj = new Section();
-
-                int.TryParse(tmp.DataDict["CODE"].ToString(), out obj.Code);
-                obj.FullName = tmp.DataDict["NAME"].ToString().Trim();
-                obj.ShortName = tmp.DataDict["S_NAME"].ToString().Trim();
-                int.TryParse(tmp.DataDict["STATUS"].ToString(), out obj.Kind1);
-
-                sectionDict.Add(obj.Code.ToString(), obj);
-            }
-
-            // éëäi
-            cmd = "select t.CODE, t.NAME, t.S_NAME " +
-                ", case when t.DEL_FLG = 1 then 9 else 0 end STATUS " +
-                " from M_SHIKAKU t " +
-                " order by t.CODE";
-
-            tmp_list = StdClass.GetList(db, cmd);
-
-            qualDict.Add("0", new Qual());
-
-            foreach (StdClass tmp in tmp_list)
-            {
-                Qual obj = new Qual();
-
-                int.TryParse(tmp.DataDict["CODE"].ToString(), out obj.Code);
-                obj.FullName = tmp.DataDict["NAME"].ToString().Trim();
-                obj.ShortName = tmp.DataDict["S_NAME"].ToString().Trim();
-                int.TryParse(tmp.DataDict["STATUS"].ToString(), out obj.Kind1);
-
-                qualDict.Add(obj.Code.ToString(), obj);
-            }
-
-            db.Close();
         }
 
         /// <summary>
@@ -394,73 +301,6 @@ namespace MedicalLibrary.Entity
         public override string ToString()
         {
             return this.Name;
-        }
-    }
-
-    public class Sekou
-    {
-        public int Code;
-        public string FullName;
-        public string ShortName;
-
-        public Sekou()
-        {
-            Code = 0;
-            FullName = "";
-            ShortName = "";
-        }
-
-        public override string ToString()
-        {
-            return this.FullName;
-        }
-    }
-
-    /// <summary>
-    /// èäëÆ
-    /// </summary>
-    public class Section
-    {
-        public int Code;
-        public string FullName;
-        public string ShortName;
-        public int Kind1;
-
-        public Section()
-        {
-            Code = 0;
-            FullName = "";
-            ShortName = "";
-            Kind1 = 0;
-        }
-
-        public override string ToString()
-        {
-            return this.FullName;
-        }
-    }
-
-    /// <summary>
-    /// éëäi
-    /// </summary>
-    public class Qual
-    {
-        public int Code = 0;
-        public string FullName;
-        public string ShortName;
-        public int Kind1;
-
-        public Qual()
-        {
-            Code = 0;
-            FullName = "";
-            ShortName = "";
-            Kind1 = 0;
-        }
-
-        public override string ToString()
-        {
-            return this.FullName;
         }
     }
 }

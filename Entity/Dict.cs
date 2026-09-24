@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Drawing;
 using Oracle.ManagedDataAccess.Client;
 using MedicalLibrary.Utility;
 
@@ -9,10 +8,6 @@ namespace MedicalLibrary.Entity
 {
     public class Dict
     {
-        static Dictionary<string, string> inOutDict;
-
-        static Dictionary<string, Ward> wardDict;
-
         static Dictionary<string, Dept> deptDict;
 
         public static Dictionary<string, Dept> DeptDict
@@ -73,84 +68,8 @@ namespace MedicalLibrary.Entity
             }
         }
 
-        static Dictionary<string, string> soapDict;
-
-        static Dictionary<string, string> soapShortDict;
-
         private static void InitDict()
         {
-            inOutDict = new Dictionary<string, string>();
-
-            inOutDict.Add("0", "");
-            inOutDict.Add("1", "äOóà");
-            inOutDict.Add("2", "ì¸â@");
-
-            wardDict = new Dictionary<string, Ward>();
-            Ward ward = new Ward();
-            ward.SEQ = 0;
-            ward.Code = "0";
-            ward.Name = "";
-            ward.Short = "";
-            ward.BackColor = Color.White;
-            wardDict.Add(ward.Code, ward);
-
-            ward = new Ward();
-            ward.SEQ = 3;
-            ward.Code = "3";
-            ward.Name = "ÇÌÇ©ÇŒ";
-            ward.Short = "é·";
-            ward.DeptCode = "31";
-            ward.BackColor = Color.LightGreen;
-            wardDict.Add(ward.Code, ward);
-
-            ward = new Ward();
-            ward.SEQ = 4;
-            ward.Code = "4";
-            ward.Name = "Ç≥Ç≠ÇÁ";
-            ward.Short = "ç˜";
-            ward.DeptCode = "41";
-            ward.BackColor = Color.Pink;
-            wardDict.Add(ward.Code, ward);
-
-            ward = new Ward();
-            ward.SEQ = 5;
-            ward.Code = "5";
-            ward.Name = "Ç†Ç‚Çﬂ";
-            ward.Short = "è“";
-            ward.DeptCode = "33";
-            ward.BackColor = Color.Lavender;
-            wardDict.Add(ward.Code, ward);
-
-            ward = new Ward();
-            ward.SEQ = 99;
-            ward.Code = "99";
-            ward.Name = "ñ¢íË";
-            ward.Short = "ñ¢";
-            ward.BackColor = Color.White;
-            wardDict.Add(ward.Code, ward);
-
-            soapDict = new Dictionary<string, string>();
-
-            soapDict.Add("1", "S");
-            soapDict.Add("2", "O");
-            soapDict.Add("3", "A");
-            soapDict.Add("4", "P");
-            soapDict.Add("5", "F");
-            soapDict.Add("6", "I");
-            soapDict.Add("7", "E");
-            soapDict.Add("9", "ªœÿ");
-
-            soapShortDict = new Dictionary<string, string>();
-
-            soapShortDict.Add("1", "S");
-            soapShortDict.Add("2", "O");
-            soapShortDict.Add("3", "A");
-            soapShortDict.Add("4", "P");
-            soapShortDict.Add("5", "F");
-            soapShortDict.Add("6", "I");
-            soapShortDict.Add("7", "E");
-            soapShortDict.Add("9", "ª");
-
             deptDict = new Dictionary<string, Dept>();
             doctorDict = new Dictionary<string, Doctor>();
             staffDict = new Dictionary<string, Staff>();
@@ -235,17 +154,6 @@ namespace MedicalLibrary.Entity
         {
             holidayDict = new Dictionary<string, string>();
         }
-    }
-
-    public class Ward
-    {
-        public int SEQ = 0;
-        public string Code = "";
-
-        public string Name = "";
-        public string Short = "";
-        public string DeptCode = "";
-        public Color BackColor = Color.White;
     }
 
     public class Dept

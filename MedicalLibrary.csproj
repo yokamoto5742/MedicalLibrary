@@ -216,7 +216,6 @@
     <None Include=".claude\settings.local.json" />
     <None Include="CLAUDE.md" />
     <None Include="docs\CHANGELOG.md" />
-    <None Include="docs\cleanup-plan-phase4.md" />
     <None Include="docs\LICENSE" />
     <None Include="README.md" />
   </ItemGroup>

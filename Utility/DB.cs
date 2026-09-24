@@ -144,7 +144,7 @@ namespace MedicalLibrary.Utility
         /// <param name="command_text">SQL</param>
         /// <param name="param_list">パラメータリスト</param>
         /// <param name="execute">true: 実行する, false: 実行しない</param>
-        /// <param name="mode">0: null も登録, 1: null なら無視</param>
+        /// <param name="mode">空の値のパラメータをスキップするか。0: 空の値も null として登録する, 0 以外: 空の値のパラメータは登録しない</param>
         /// <param name="close">true: close 実行, false: close しない</param>
         /// <returns></returns>
         public int ExecuteNonQuery(string command_text, List<StdDbColumn> param_list = null, bool execute = true, int mode = 0, bool close = true)

@@ -209,7 +209,7 @@ namespace MedicalLibrary.Entity
         /// Update SQL
         /// </summary>
         /// <param name="execute">true: 実行する, false: 実行しない</param>
-        /// <param name="mode">0: null も登録, 1: null なら無視</param>
+        /// <param name="mode">空の値の列をスキップするか。0: 空の値も null として登録する, 0 以外: 空の値の列は対象から外す</param>
         /// <param name="close">true: close 実行, false: close しない</param>
         /// <returns></returns>
         public StdReturn UpdateSQL(bool execute = true, int mode = 0, bool close = true)
@@ -281,7 +281,7 @@ namespace MedicalLibrary.Entity
         /// Insert SQL
         /// </summary>
         /// <param name="execute">true: 実行する, false: 実行しない</param>
-        /// <param name="mode">0: null も登録, 1: null なら無視</param>
+        /// <param name="mode">空の値の列をスキップするか。0: 空の値も null として登録する, 0 以外: 空の値の列は対象から外す</param>
         /// <param name="close">true: close 実行, false: close しない</param>
         /// <returns></returns>
         public StdReturn InsertSQL(bool execute = true, int mode = 0, bool close = true)

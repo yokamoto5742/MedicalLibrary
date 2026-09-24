@@ -92,7 +92,7 @@ namespace MedicalLibrary.Utility
         /// <returns></returns>
         public static List<string> ConcatLists(List<string> list, string delimiter, string quote = "", int max = 1000)
         {
-            return ConcatLists(list.ToArray(), delimiter, quote);
+            return ConcatLists(list.ToArray(), delimiter, quote, max);
         }
 
         /// <summary>
@@ -105,29 +105,13 @@ namespace MedicalLibrary.Utility
         /// <returns></returns>
         public static List<string> ConcatLists(string[] list, string delimiter, string quote = "", int max = 1000)
         {
+            // 空の要素は除く（"1,,2" のような不正な IN 句を作らないため）
+            List<string> items = list.Where(x => x.Length > 0).Select(x => quote + x + quote).ToList();
             List<string> lists = new List<string>();
-            string s = "";
-            int i = 0;
 
-            while (i < list.Length)
+            for (int i = 0; i < items.Count; i += max)
             {
-                if (s.Length > 0)
-                {
-                    s += delimiter;
-                }
-
-                if (list[i].Length > 0)
-                {
-                    s += quote + list[i] + quote;
-                }
-
-                if (i % 1000 == 999 || i == list.Length - 1)
-                {
-                    if (s.Length > 0) lists.Add(s);
-                    s = "";
-                }
-
-                i++;
+                lists.Add(string.Join(delimiter, items.Skip(i).Take(max)));
             }
 
             return lists;

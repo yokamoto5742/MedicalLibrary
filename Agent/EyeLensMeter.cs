@@ -46,10 +46,11 @@ namespace MedicalLibrary.Agent
 
             reader.Close();
 
-            if (line != null)
-            {
-                string[] s = line.Split(',');
+            string[] s = line.Split(',');
 
+            // ファイルが空、または列が足りない場合は何もしない
+            if (s.Length >= 20)
+            {
                 if (!s[1].Contains("---"))
                 {
                     SPH_R = s[1];

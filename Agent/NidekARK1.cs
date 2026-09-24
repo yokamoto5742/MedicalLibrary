@@ -37,7 +37,7 @@ namespace MedicalLibrary.Agent
                 string s = "";
                 string f = Path.GetFileName(this.SourceFile);
 
-                if (Path.GetExtension(f).Equals(".xml"))
+                if (Path.GetExtension(f).Equals(".xml") && f.Length >= 18)
                 {
                     s = f.Substring(f.Length - 18, 8);
                 }
@@ -56,7 +56,7 @@ namespace MedicalLibrary.Agent
                 string s = "";
                 string f = Path.GetFileName(this.SourceFile);
 
-                if (Path.GetExtension(f).Equals(".xml"))
+                if (Path.GetExtension(f).Equals(".xml") && f.Length >= 10)
                 {
                     s = f.Substring(f.Length - 10, 6);
                 }
@@ -498,11 +498,8 @@ namespace MedicalLibrary.Agent
 
             try
             {
-                if (!Directory.Exists(AppFile.PathName(@"c:\transfile\data")))
-//                if (!Directory.Exists(AppFile.PathName(Settings.TargetFile)))
-                {
-                    Directory.CreateDirectory(AppFile.PathName(Settings.TargetFile));
-                }
+                // 既にあれば何もしない
+                Directory.CreateDirectory(AppFile.PathName(Settings.TargetFile));
 
                 StreamWriter writer = new StreamWriter(new FileStream(Settings.TargetFile, FileMode.Create), Encoding.Default);
                 writer.Write(s);

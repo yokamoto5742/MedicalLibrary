@@ -331,6 +331,12 @@ namespace MedicalLibrary.Entity
                 return;
             }
 
+            // 別のユーザーに切り替える場合は、前のユーザーの情報を残さない
+            if (!_id.Equals(id))
+            {
+                Clear();
+            }
+
             id = _id;
 
             string cmd = "select CODE コード, Trim(NAME) 氏名, SYOZOKU 所属, SHIKAKU 資格, DEPT 科コード, DR 医師コード " +

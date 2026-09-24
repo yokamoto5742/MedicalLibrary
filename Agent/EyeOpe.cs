@@ -550,7 +550,7 @@ namespace MedicalLibrary.Agent
 
             if (ope.Length > 0)
             {
-                foreach (string s in ope.Split(' ', '　'))
+                foreach (string s in ope.Split(new[] { ' ', '　' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     if (ope_sql.Length > 0)
                     {
@@ -570,7 +570,7 @@ namespace MedicalLibrary.Agent
 
             if (doctor.Length > 0)
             {
-                foreach (string s in doctor.Split(' ', '　'))
+                foreach (string s in doctor.Split(new[] { ' ', '　' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     if (doctor_sql.Length > 0)
                     {

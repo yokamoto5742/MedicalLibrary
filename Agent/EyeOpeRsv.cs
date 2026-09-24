@@ -22,14 +22,7 @@ namespace MedicalLibrary.Agent
         /// </summary>
         public void Save()
         {
-            try
-            {
-                Save(OpeDate, OpeWaku, OpeKind, RsvKind, Comment);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            Save(OpeDate, OpeWaku, OpeKind, RsvKind, Comment);
         }
 
         /// <summary>

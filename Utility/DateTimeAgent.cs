@@ -116,6 +116,9 @@ namespace MedicalLibrary.Utility
 
             if (org_date.Length == 8)
             {
+                DateTime dt;
+                bool valid = DateTime.TryParseExact(org_date, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt);
+
                 if (kind == DateFormatKind.LONG)
                 {
                     result = org_date.Insert(4, "/").Insert(7, "/");
@@ -123,6 +126,10 @@ namespace MedicalLibrary.Utility
                 else if (kind == DateFormatKind.SHORT)
                 {
                     result = org_date.Substring(2).Insert(2, "/").Insert(5, "/");
+                }
+                else if (!valid)
+                {
+                    // "00000000" のような日付として不正な値は空文字とする
                 }
                 else if (kind == DateFormatKind.WLONG)
                 {

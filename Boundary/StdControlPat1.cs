@@ -173,9 +173,9 @@ namespace MedicalLibrary.Boundary
             {
                 if (this.PatIdBox1.Text.Length > 0)
                 {
-                    double pid = 0;
+                    long pid = 0;
 
-                    if (!double.TryParse(this.PatIdBox1.Text, out pid))
+                    if (!long.TryParse(this.PatIdBox1.Text, out pid))
                     {
                         MessageBox.Show("患者コードは数字のみで入力してください");
                         this.PatIdBox1.Clear();

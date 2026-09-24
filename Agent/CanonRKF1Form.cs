@@ -130,6 +130,11 @@ namespace MedicalLibrary.Agent
 
                 string rsv = port.ReadExisting();
 
+                if (rsv.Length == 0)
+                {
+                    return "";
+                }
+
                 if (rsv[rsv.Length - 1] == (char)0x17 || rsv[rsv.Length - 1] == (char)0x03)
                 {
                     byte[] s_data = new byte[1];

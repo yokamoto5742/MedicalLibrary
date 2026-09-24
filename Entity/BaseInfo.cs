@@ -78,7 +78,7 @@ namespace MedicalLibrary.Entity
                 obj.ItemKey = tmp.DataDict["ITEM_KEY"].ToString();
                 int.TryParse(tmp.DataDict["SEQ"].ToString(), out obj.SEQ);
                 obj.Name1 = tmp.DataDict["ITEM_TITLE1"].ToString();
-                obj.Name1 = tmp.DataDict["ITEM_TITLE2"].ToString();
+                obj.Name2 = tmp.DataDict["ITEM_TITLE2"].ToString();
                 obj.Value = tmp.DataDict["DATA"].ToString();
 
                 obj.BaseFromStdClass(tmp);
@@ -149,7 +149,7 @@ namespace MedicalLibrary.Entity
                 obj.ItemKey = tmp.DataDict["ITEM_KEY"].ToString();
                 int.TryParse(tmp.DataDict["SEQ"].ToString(), out obj.SEQ);
                 obj.Name1 = tmp.DataDict["ITEM_TITLE1"].ToString();
-                obj.Name1 = tmp.DataDict["ITEM_TITLE2"].ToString();
+                obj.Name2 = tmp.DataDict["ITEM_TITLE2"].ToString();
                 obj.Value = tmp.DataDict["DATA"].ToString();
 
                 obj.BaseFromStdClass(tmp);

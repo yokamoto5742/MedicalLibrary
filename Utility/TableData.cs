@@ -51,6 +51,9 @@ namespace MedicalLibrary.Utility
 
             foreach (DataGridViewRow row in view.Rows)
             {
+                // AllowUserToAddRows の新規行は飛ばす
+                if (row.IsNewRow) continue;
+
                 TableDataRecord record = new TableDataRecord();
 
                 foreach (DataGridViewCell cell in row.Cells)
@@ -58,7 +61,7 @@ namespace MedicalLibrary.Utility
                     // 非表示カラムを印字しない場合、そのカラムが非表示ならば飛ばす
                     if (!hide_column_print && !cell.Visible) continue;
 
-                    record.DataList.Add(cell.Value.ToString());
+                    record.DataList.Add(Convert.ToString(cell.Value));
                 }
 
                 this.RecordList.Add(record);

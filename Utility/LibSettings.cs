@@ -382,20 +382,6 @@ namespace MedicalLibrary.Utility
                         Current.Proas.ShinkuList.Add(obj);
                     }
 
-
-                    if (Directory.Exists(Current.SoapImageTemporaryFolder))
-                    {
-                        // 既存のファイルを消す
-                        foreach (string file in Directory.GetFiles(Current.SoapImageTemporaryFolder))
-                        {
-                            File.Delete(file);
-                        }
-                    }
-                    else
-                    {
-                        Directory.CreateDirectory(Current.SoapImageTemporaryFolder);
-                    }
-
                     // エラーチェック
                     //  →　今後は必要ないと思われるので外す 2019/05/09
                     /*

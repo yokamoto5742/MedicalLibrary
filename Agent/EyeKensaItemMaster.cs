@@ -31,7 +31,14 @@ namespace MedicalLibrary.Agent
         {
             List<EyeKensaItemMaster> list = new List<EyeKensaItemMaster>();
 
-            DataRow[] rows = EyeDict.EyeSet.Tables["KensaItem"].Select("KensaPage_ID = '" + EyeDict.EyeSet.Tables["KensaPage"].Select("ID = '" + kensa_id + "'")[0]["KensaPage_ID"].ToString() + "'");
+            DataRow[] pages = EyeDict.EyeSet.Tables["KensaPage"].Select("ID = '" + kensa_id + "'");
+
+            if (pages.Length == 0)
+            {
+                return list;
+            }
+
+            DataRow[] rows = EyeDict.EyeSet.Tables["KensaItem"].Select("KensaPage_ID = '" + pages[0]["KensaPage_ID"].ToString() + "'");
 
             foreach (DataRow r in rows)
             {

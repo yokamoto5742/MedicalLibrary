@@ -469,7 +469,7 @@ namespace MedicalLibrary.Entity
                 {
                     cond += " or P_KANA like '%" + kana.Replace(' ', '　') + "%' ";
                 }
-                else if (name.Contains("　"))
+                else if (kana.Contains("　"))
                 {
                     cond += " or P_KANA like '%" + kana.Replace('　', ' ') + "%' ";
                 }

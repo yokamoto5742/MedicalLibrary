@@ -9,97 +9,10 @@ namespace MedicalLibrary.Utility
     /// </summary>
     public static class Env
     {
-        static string legacy_home = "";
-        static string agent_home = "";
-        static string karte_home = "";
-
-        static string inno_home = "";
-        static string shin_home = "";
-
-        public static string LEGACY_HOME
-        {
-            get
-            {
-                if (legacy_home == null || legacy_home.Length == 0)
-                {
-                    init();
-                }
-
-                return legacy_home;
-            }
-        }
-
-        public static string AGENT_HOME
-        {
-            get
-            {
-                if (agent_home == null || agent_home.Length == 0)
-                {
-                    init();
-                }
-
-                return agent_home;
-            }
-        }
-
-        public static string KARTE_HOME
-        {
-            get
-            {
-                if (karte_home == null || karte_home.Length == 0)
-                {
-                    init();
-                }
-
-                return karte_home;
-            }
-            set
-            {
-                karte_home = value;
-            }
-        }
-
-        public static string INNO_HOME
-        {
-            get
-            {
-                if (inno_home == null || inno_home.Length == 0)
-                {
-                    init();
-                }
-
-                return inno_home;
-            }
-            set
-            {
-                inno_home = value;
-            }
-        }
-
-        public static string SHIN_HOME
-        {
-            get
-            {
-                if (shin_home == null || shin_home.Length == 0)
-                {
-                    init();
-                }
-
-                return shin_home;
-            }
-            set
-            {
-                shin_home = value;
-            }
-        }
-
-        private static void init()
-        {
-            legacy_home = @"C:\macs";
-            agent_home = @"C:\macs\utility";
-            karte_home = @"c:\karte";
-            inno_home = @"c:\innokarte";
-            shin_home = @"c:\shinseikai";
-        }
+        public static string LEGACY_HOME { get; } = @"C:\macs";
+        public static string AGENT_HOME { get; } = @"C:\macs\utility";
+        public static string KARTE_HOME { get; set; } = @"c:\karte";
+        public static string INNO_HOME { get; set; } = @"c:\innokarte";
+        public static string SHIN_HOME { get; set; } = @"c:\shinseikai";
     }
 }

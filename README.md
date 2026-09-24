@@ -26,7 +26,6 @@
 以下の外部DLLが必要です（HintPath参照）：
 
 - Oracle ODP.NET 11.2 32bit クライアント（`C:\app\Administrator\product\11.2.0\client\odp.net\bin\2.x\Oracle.DataAccess.dll`）
-- InnoUketsukeLib.dll（`..\..\..\..\Shinseikai\InnoUketsukeLib.dll`）
 - Interop.Excel.dll（`..\..\..\..\Karte\Interop.Excel.dll`）
 - itextsharp 5.5.5（`..\..\..\..\Karte\itextsharp.dll`）
 - System.Windows.Forms, System.Drawing, System.Data 他標準ライブラリ

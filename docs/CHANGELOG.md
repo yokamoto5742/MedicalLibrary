@@ -7,6 +7,15 @@
 
 ## [Unreleased]
 
+### 変更
+- InnoUketsukeLib.dll を MedicalLibrary.dll に統合（詳細は `docs/merge-plan-innouketsukelib.md`）
+  - ログイン時のパスワード照合（`M_USR.PASSWORD` の AES 復号・照合）を `Entity/Staff.cs` に移植し、`DB.Db3` で照会するよう変更
+  - 照合中に例外（DB 障害・復号失敗など）が発生した場合は、照合を飛ばさずログイン失敗とするよう変更
+  - パスワード `AGENT_PASSWORD` で照合なしに認証される抜け道を廃止
+
+### 削除
+- InnoUketsukeLib.dll への参照と、`LibSettings.Init` での InnoUketsukeLib 初期化（`SettingsCommon.xml` は読み込まれなくなった）
+
 ## [1.2.1] - 2026-09-23
 
 ### 追加

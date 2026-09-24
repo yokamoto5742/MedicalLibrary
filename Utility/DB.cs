@@ -155,49 +155,76 @@ namespace MedicalLibrary.Utility
 
             if (param_list != null)
             {
-                foreach (StdDbColumn obj in param_list)
-                {
-                    if (mode == 0 || obj.Value.ToString().Length > 0)
-                    {
-                        if (obj.DataType == StdDbType.NUMBER)
-                        {
-                            if (obj.Value != null && obj.Value.ToString().Length > 0)
-                            {
-                                this.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = obj.Value;
-                            }
-                            else
-                            {
-                                this.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = DBNull.Value;
-                            }
-                        }
-                        else if (obj.DataType == StdDbType.VARCHAR2)
-                        {
-                            this.Command.Parameters.Add(":" + obj.Name, OracleDbType.Varchar2).Value = obj.Value;
-                        }
-                        else if (obj.DataType == StdDbType.CHAR)
-                        {
-                            this.Command.Parameters.Add(":" + obj.Name, OracleDbType.Char).Value = obj.Value;
-                        }
-                        else if (obj.DataType == StdDbType.DATE)
-                        {
-                            this.Command.Parameters.Add(":" + obj.Name, OracleDbType.Date).Value = obj.Value;
-                        }
-                    }
-                }
+                AddParameters(param_list, mode != 0);
             }
 
             if (execute)
             {
-                this.Open();
-                result = this.Command.ExecuteNonQuery();
-
-                if (close)
-                {
-                    this.Close();
-                }
+                result = ExecuteCommand(close);
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// 設定済みの Command を ExecuteNonQuery で実行する。
+        /// 失敗したときは close の指定にかかわらず Close し、共有の Command にパラメータを残さない。
+        /// </summary>
+        /// <param name="close">true: 成功時に close 実行, false: close しない</param>
+        /// <returns>影響を受けた行数</returns>
+        internal int ExecuteCommand(bool close)
+        {
+            int result;
+
+            try
+            {
+                this.Open();
+                result = this.Command.ExecuteNonQuery();
+            }
+            catch
+            {
+                this.Close();
+                throw;
+            }
+
+            if (close)
+            {
+                this.Close();
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// パラメータリストを Command に登録する。
+        /// TEXT 型の列は SQL 文字列に直接埋め込むため登録しない。
+        /// </summary>
+        /// <param name="param_list">パラメータリスト</param>
+        /// <param name="skip_empty">true: 値が空のパラメータは登録しない</param>
+        internal void AddParameters(List<StdDbColumn> param_list, bool skip_empty)
+        {
+            foreach (StdDbColumn obj in param_list)
+            {
+                bool empty = obj.IsEmpty;
+
+                if (skip_empty && empty) continue;
+
+                switch (obj.DataType)
+                {
+                    case StdDbType.NUMBER:
+                        this.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = empty ? DBNull.Value : obj.Value;
+                        break;
+                    case StdDbType.VARCHAR2:
+                        this.Command.Parameters.Add(":" + obj.Name, OracleDbType.Varchar2).Value = obj.Value;
+                        break;
+                    case StdDbType.CHAR:
+                        this.Command.Parameters.Add(":" + obj.Name, OracleDbType.Char).Value = obj.Value;
+                        break;
+                    case StdDbType.DATE:
+                        this.Command.Parameters.Add(":" + obj.Name, OracleDbType.Date).Value = obj.Value;
+                        break;
+                }
+            }
         }
 
     }

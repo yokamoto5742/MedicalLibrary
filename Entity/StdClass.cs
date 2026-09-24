@@ -16,89 +16,68 @@ namespace MedicalLibrary.Entity
         {
             List<StdClass> list = new List<StdClass>();
 
-            db.Open();
-
-            db.Command.CommandText = sql_command;
-
-            if (param_list != null)
+            // 途中で失敗しても Close（パラメータのクリアを含む）を必ず実行し、
+            // 共有の Command にパラメータが残って次の SQL まで失敗するのを防ぐ
+            try
             {
-                foreach (StdDbColumn obj in param_list)
+                db.Open();
+
+                db.Command.CommandText = sql_command;
+
+                if (param_list != null)
                 {
-                    if (obj.Value.ToString().Length > 0)
+                    db.AddParameters(param_list, true);
+                }
+
+                if (progress != null)
+                {
+                    progress("DBを検索しています...");
+                }
+
+                using (OracleDataReader reader = db.Command.ExecuteReader())
+                {
+                    while (reader.Read())
                     {
-                        if (obj.DataType == StdDbType.NUMBER)
+                        StdClass obj = new StdClass();
+
+                        for (int i = 0; i < reader.FieldCount; i++)
                         {
-                            if (obj.Value != null && obj.Value.ToString().Length > 0)
+                            // NULL 判定は IsDBNull で行う。ToString() が "null" になるかはドライバの実装依存で、
+                            // 値そのものが "null" という文字列の列を空文字に潰してしまう危険もある。
+                            if (reader.IsDBNull(i))
                             {
-                                db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = obj.Value;
+                                obj.DataDict[reader.GetName(i)] = "";
+                                continue;
                             }
-                            else
+
+                            // GetOracleValue は呼ぶたびに新しいオブジェクトを返す（CLOB/BLOB はネイティブの
+                            // LOBロケータを持つ）ため、1列につき1回だけ呼び、使い終わったら解放する。
+                            // 2回呼んでいると大量件数の取得でネイティブ資源が倍のペースで枯渇する。
+                            object value = reader.GetOracleValue(i);
+
+                            obj.DataDict[reader.GetName(i)] = value.ToString();
+
+                            IDisposable disposable = value as IDisposable;
+
+                            if (disposable != null)
                             {
-                                db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = DBNull.Value;
+                                disposable.Dispose();
                             }
                         }
-                        else if (obj.DataType == StdDbType.VARCHAR2)
+
+                        list.Add(obj);
+
+                        if (progress != null && list.Count % 1000 == 0)
                         {
-                            db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Varchar2).Value = obj.Value;
-                        }
-                        else if (obj.DataType == StdDbType.CHAR)
-                        {
-                            db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Char).Value = obj.Value;
-                        }
-                        else if (obj.DataType == StdDbType.DATE)
-                        {
-                            db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Date).Value = obj.Value;
+                            progress("検索結果を取得中 " + list.Count.ToString("#,0") + "件");
                         }
                     }
                 }
             }
-
-            if (progress != null)
+            finally
             {
-                progress("DBを検索しています...");
+                db.Close();
             }
-
-            OracleDataReader reader = db.Command.ExecuteReader();
-
-            while (reader.Read())
-            {
-                StdClass obj = new StdClass();
-
-                for (int i = 0; i < reader.FieldCount; i++)
-                {
-                    // NULL 判定は IsDBNull で行う。ToString() が "null" になるかはドライバの実装依存で、
-                    // 値そのものが "null" という文字列の列を空文字に潰してしまう危険もある。
-                    if (reader.IsDBNull(i))
-                    {
-                        obj.DataDict[reader.GetName(i)] = "";
-                        continue;
-                    }
-
-                    // GetOracleValue は呼ぶたびに新しいオブジェクトを返す（CLOB/BLOB はネイティブの
-                    // LOBロケータを持つ）ため、1列につき1回だけ呼び、使い終わったら解放する。
-                    // 2回呼んでいると大量件数の取得でネイティブ資源が倍のペースで枯渇する。
-                    object value = reader.GetOracleValue(i);
-
-                    obj.DataDict[reader.GetName(i)] = value.ToString();
-
-                    IDisposable disposable = value as IDisposable;
-
-                    if (disposable != null)
-                    {
-                        disposable.Dispose();
-                    }
-                }
-
-                list.Add(obj);
-
-                if (progress != null && list.Count % 1000 == 0)
-                {
-                    progress("検索結果を取得中 " + list.Count.ToString("#,0") + "件");
-                }
-            }
-
-            reader.Close();
-            db.Close();
 
             return list;
         }
@@ -254,7 +233,7 @@ namespace MedicalLibrary.Entity
 
             foreach (StdDbColumn obj in this.DataList)
             {
-                if (mode == 0 || obj.Value.ToString().Length > 0)
+                if (mode == 0 || !obj.IsEmpty)
                 {
                     if (ups.Length > 0)
                     {
@@ -270,60 +249,6 @@ namespace MedicalLibrary.Entity
                     {
                         // TEXT 以外のときはパラメータ化する
                         ups += obj.Name + " = :" + obj.Name;
-
-                        if (obj.DataType == StdDbType.NUMBER)
-                        {
-                            if (obj.Value != null && obj.Value.ToString().Length > 0)
-                            {
-                                Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = obj.Value;
-                            }
-                            else
-                            {
-                                Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = DBNull.Value;
-                            }
-                        }
-                        else if (obj.DataType == StdDbType.VARCHAR2)
-                        {
-                            Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Varchar2).Value = obj.Value;
-                        }
-                        else if (obj.DataType == StdDbType.CHAR)
-                        {
-                            Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Char).Value = obj.Value;
-                        }
-                        else if (obj.DataType == StdDbType.DATE)
-                        {
-                            Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Date).Value = obj.Value;
-                        }
-                    }
-                }
-            }
-
-            foreach (StdDbColumn obj in this.ParamList)
-            {
-                if (obj.Value.ToString().Length > 0)
-                {
-                    if (obj.DataType == StdDbType.NUMBER)
-                    {
-                        if (obj.Value != null && obj.Value.ToString().Length > 0)
-                        {
-                            Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = obj.Value;
-                        }
-                        else
-                        {
-                            Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = DBNull.Value;
-                        }
-                    }
-                    else if (obj.DataType == StdDbType.VARCHAR2)
-                    {
-                        Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Varchar2).Value = obj.Value;
-                    }
-                    else if (obj.DataType == StdDbType.CHAR)
-                    {
-                        Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Char).Value = obj.Value;
-                    }
-                    else if (obj.DataType == StdDbType.DATE)
-                    {
-                        Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Date).Value = obj.Value;
                     }
                 }
             }
@@ -337,16 +262,12 @@ namespace MedicalLibrary.Entity
             cmd = "update " + this.Table + " set " + ups + this.WhereState;
 
             Db.Command.CommandText = cmd;
+            Db.AddParameters(this.DataList, mode != 0);
+            Db.AddParameters(this.ParamList, true);
 
             if (execute)
             {
-                Db.Open();
-                sr.IntValue = Db.Command.ExecuteNonQuery();
-
-                if (close)
-                {
-                    Db.Close();
-                }
+                sr.IntValue = Db.ExecuteCommand(close);
             }
 
             sr.Msgs.Add(cmd);
@@ -380,7 +301,7 @@ namespace MedicalLibrary.Entity
 
             foreach (StdDbColumn obj in this.DataList)
             {
-                if (mode == 0 || obj.Value.ToString().Length > 0)
+                if (mode == 0 || !obj.IsEmpty)
                 {
                     if (cols.Length > 0)
                     {
@@ -399,60 +320,6 @@ namespace MedicalLibrary.Entity
                     {
                         // TEXT 以外のときはパラメータ化する
                         vals += ":" + obj.Name;
-
-                        if (obj.DataType == StdDbType.NUMBER)
-                        {
-                            if (obj.Value != null && obj.Value.ToString().Length > 0)
-                            {
-                                Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = obj.Value;
-                            }
-                            else
-                            {
-                                Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = DBNull.Value;
-                            }
-                        }
-                        else if (obj.DataType == StdDbType.VARCHAR2)
-                        {
-                            Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Varchar2).Value = obj.Value;
-                        }
-                        else if (obj.DataType == StdDbType.CHAR)
-                        {
-                            Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Char).Value = obj.Value;
-                        }
-                        else if (obj.DataType == StdDbType.DATE)
-                        {
-                            Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Date).Value = obj.Value;
-                        }
-                    }
-                }
-            }
-
-            foreach (StdDbColumn obj in this.ParamList)
-            {
-                if (obj.Value.ToString().Length > 0)
-                {
-                    if (obj.DataType == StdDbType.NUMBER)
-                    {
-                        if (obj.Value != null && obj.Value.ToString().Length > 0)
-                        {
-                            Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = obj.Value;
-                        }
-                        else
-                        {
-                            Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Decimal).Value = DBNull.Value;
-                        }
-                    }
-                    else if (obj.DataType == StdDbType.VARCHAR2)
-                    {
-                        Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Varchar2).Value = obj.Value;
-                    }
-                    else if (obj.DataType == StdDbType.CHAR)
-                    {
-                        Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Char).Value = obj.Value;
-                    }
-                    else if (obj.DataType == StdDbType.DATE)
-                    {
-                        Db.Command.Parameters.Add(":" + obj.Name, OracleDbType.Date).Value = obj.Value;
                     }
                 }
             }
@@ -466,16 +333,12 @@ namespace MedicalLibrary.Entity
             cmd = "insert into " + this.Table + " (" + cols + ") values (" + vals + ")";
 
             Db.Command.CommandText = cmd;
+            Db.AddParameters(this.DataList, mode != 0);
+            Db.AddParameters(this.ParamList, true);
 
             if (execute)
             {
-                Db.Open();
-                sr.IntValue = Db.Command.ExecuteNonQuery();
-
-                if (close)
-                {
-                    Db.Close();
-                }
+                sr.IntValue = Db.ExecuteCommand(close);
             }
 
             sr.Msgs.Add(cmd);
@@ -519,6 +382,17 @@ namespace MedicalLibrary.Entity
         /// 値
         /// </summary>
         public Object Value = new object();
+
+        /// <summary>
+        /// 値が null・DBNull・空文字のいずれかであれば true
+        /// </summary>
+        internal bool IsEmpty
+        {
+            get
+            {
+                return Value == null || Value == DBNull.Value || Value.ToString().Length == 0;
+            }
+        }
 
 
         public StdDbColumn()

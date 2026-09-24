@@ -5,7 +5,6 @@ using System.Text;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Runtime.CompilerServices;
 
 namespace MedicalLibrary.Utility
 {
@@ -482,37 +481,12 @@ namespace MedicalLibrary.Utility
 
         static bool init = false;
 
-		/// <summary>
-		/// InnoUketsukeLib の初期化。
-		/// DLL が無い環境では呼び出し時点で FileNotFoundException が発生するため、
-		/// 呼び出し元の try/catch で捕捉できるよう別メソッドに分離（インライン化禁止）。
-		/// </summary>
-		[MethodImpl(MethodImplOptions.NoInlining)]
-		static void InitInnoUketsukeLib()
-		{
-			InnoUketsukeLib.Utility.AppInit.g_AppInit.Init();
-		}
-
         /// <summary>
         /// 初期化
         /// </summary>
         /// <param name="forced">強制的に初期化する</param>
         public static void Init(bool forced = false)
         {
-			if (!init)
-			{
-				// InnoUketsukeLib を初期化しておく。
-				// ２回以上初期化するとエラーが出るので１回だけ行う。
-				try
-				{
-					InitInnoUketsukeLib();
-				}
-				catch (Exception ex)
-				{
-					LibUtility.Except(ex, false);
-				}
-			}
-
             if (forced || !init)
             {
                 string msg = "";

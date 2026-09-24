@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MedicalLibrary.Utility;
-using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 
 namespace MedicalLibrary.Entity
 {
@@ -369,35 +369,67 @@ namespace MedicalLibrary.Entity
             return list;
         }
 
-		/// <summary>
-		/// InnoUketsukeLib による認証。
-		/// DLL が無い環境では呼び出し時点で FileNotFoundException が発生するため、
-		/// 呼び出し元の try/catch で捕捉できるよう別メソッドに分離（インライン化禁止）。
-		/// </summary>
-		[MethodImpl(MethodImplOptions.NoInlining)]
-		static bool VerifyInnoUketsukeLib(int i, string pw)
-		{
-			return InnoUketsukeLib.Entity.M_USR.g_Usr1.GetData(i, pw);
-		}
+        /// <summary>
+        /// M_USR.PASSWORD（AES 暗号化）を復号し、入力パスワードと照合する。
+        /// 旧 InnoUketsukeLib.Entity.M_USR.GetData の移植。
+        /// </summary>
+        static bool VerifyPassword(int code, string pw)
+        {
+            string cmd = "select PASSWORD from M_USR where CODE = :CODE";
+
+            List<StdDbColumn> param_list = new List<StdDbColumn>();
+            param_list.Add(new StdDbColumn("CODE", StdDbType.NUMBER, code));
+
+            List<StdClass> tmp_list = StdClass.GetList(DB.Db3, cmd, param_list);
+
+            if (tmp_list.Count == 0) return false;
+
+            return pw == DecryptPassword(tmp_list[0].DataDict["PASSWORD"].ToString());
+        }
+
+        /// <summary>
+        /// M_USR.PASSWORD の復号（AES-128 CBC、平文は UTF-16LE）。
+        /// </summary>
+        static string DecryptPassword(string text)
+        {
+            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
+            {
+                aes.BlockSize = 128;
+                aes.KeySize = 128;
+                aes.IV = Encoding.UTF8.GetBytes("&94YAKHGQS$FFKQ8");
+                aes.Key = Encoding.UTF8.GetBytes("JVT5%W#SA$$%%G0W");
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
+
+                byte[] cipher_bytes = Convert.FromBase64String(text);
+
+                using (ICryptoTransform decryptor = aes.CreateDecryptor())
+                {
+                    byte[] plain_bytes = decryptor.TransformFinalBlock(cipher_bytes, 0, cipher_bytes.Length);
+                    return Encoding.Unicode.GetString(plain_bytes);
+                }
+            }
+        }
 
         public static Staff Verify(string id, string pw)
         {
             Staff obj = new Staff();
 
-			try
-			{
-				// InnoUketsukeLib で認証
-				int i = 0;
-				int.TryParse(id, out i);
+            try
+            {
+                int i = 0;
+                int.TryParse(id, out i);
+                if (i == 0) return obj;
 
-				// 認証に失敗したら終了
-				if (!VerifyInnoUketsukeLib(i, pw)) return obj;
-			}
-			catch (Exception ex)
-			{
-				// InnoUketsukeLib の例外が生じたらスルー
-				LibUtility.Except(ex, false);
-			}
+                // 認証に失敗したら終了
+                if (!VerifyPassword(i, pw)) return obj;
+            }
+            catch (Exception ex)
+            {
+                // 照合中の例外（DB 障害・復号失敗など）は認証失敗とする
+                LibUtility.Except(ex, false);
+                return obj;
+            }
 
             string cmd = "select CODE コード, Trim(NAME) 氏名, SYOZOKU 所属, SHIKAKU 資格, DEPT 科コード, DR 医師コード " +
                 " from M_USR " +

@@ -14,10 +14,7 @@ namespace MedicalLibrary.Agent
     public partial class CanonRKF1Form : Form
     {
         SerialPort port;
-        StreamWriter writer;
         string file = "c:\\transfile\\data\\ref.dat";
-
-        string rsv = "";
 
         SerialStatus status = SerialStatus.Close;
 
@@ -74,9 +71,9 @@ namespace MedicalLibrary.Agent
 
         void PortConnect()
         {
-            if (port != null && port.IsOpen)
+            if (port != null)
             {
-                port.Close();
+                port.Dispose();
             }
 
             port = new SerialPort(PortBox.Text);
@@ -92,33 +89,46 @@ namespace MedicalLibrary.Agent
             StatusLabel.BackColor = Color.LightPink;
         }
 
-        delegate void AddReceivedDataDelegate(string data);
-
-        void AddReceivedData(string data)
-        {
-            this.RsvBox.Text += data;
-        }
-
-        delegate void ClearDataDelegate();
-
-        void ClearData()
-        {
-            this.RsvBox.Clear();
-        }
-
         void port_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            // スレッドプールで実行されるため、ここで例外を漏らすと EyeData ごと終了する
+            try
+            {
+                if (IsDisposed)
+                {
+                    return;
+                }
+
+                string rsv = ReadData();
+
+                RsvBox.Invoke(new Action(() => RsvBox.Text += rsv));
+
+                if (status == SerialStatus.Close)
+                {
+                    SaveFile();
+                }
+            }
+            catch (Exception)
+            {
+                // 画面を閉じた直後の受信・ファイル書き込み失敗は無視する
+            }
+        }
+
+        /// <summary>
+        /// 受信データを読み取る。受信エラー時はエラーメッセージを返す。
+        /// </summary>
+        string ReadData()
         {
             try
             {
                 if (status == SerialStatus.Close)
                 {
-                    ClearDataDelegate clear = new ClearDataDelegate(ClearData);
-                    RsvBox.Invoke(clear);
+                    RsvBox.Invoke(new Action(() => RsvBox.Clear()));
 
                     status = SerialStatus.Open;
                 }
 
-                rsv = port.ReadExisting();
+                string rsv = port.ReadExisting();
 
                 if (rsv[rsv.Length - 1] == (char)0x17 || rsv[rsv.Length - 1] == (char)0x03)
                 {
@@ -136,40 +146,36 @@ namespace MedicalLibrary.Agent
                     rsv = rsv.TrimEnd((char)0x04);
                 }
 
-                rsv = rsv.TrimStart((char)0x02);
+                return rsv.TrimStart((char)0x02);
             }
             catch (Exception ex)
             {
-                rsv = ex.Message;
                 status = SerialStatus.Close;
 
-                if (writer != null)
-                {
-                    writer.Close();
-                }
+                return ex.Message;
             }
+        }
 
-            AddReceivedDataDelegate add = new AddReceivedDataDelegate(AddReceivedData);
-            RsvBox.Invoke(add, rsv);
-
-            if (status == SerialStatus.Close)
-            {
-                writer = new StreamWriter(new FileStream(file, FileMode.Create), Encoding.Default);
-                writer.Write(RsvBox.Text);
-                writer.Close();
-            }
+        void SaveFile()
+        {
+            File.WriteAllText(file, RsvBox.Text, Encoding.Default);
         }
 
         private void ConnectButton_Click(object sender, EventArgs e)
         {
-            this.PortConnect();
+            try
+            {
+                this.PortConnect();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("接続できませんでした。\n" + ex.Message, "Canon RKF");
+            }
         }
 
         private void FileButton_Click(object sender, EventArgs e)
         {
-            writer = new StreamWriter(new FileStream(file, FileMode.Create), Encoding.Default);
-            writer.Write(RsvBox.Text);
-            writer.Close();
+            SaveFile();
 
             MessageBox.Show("ファイル出力されました");
         }
@@ -178,22 +184,15 @@ namespace MedicalLibrary.Agent
         {
             if (MessageBox.Show("終了しますか？", "確認", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                if (port != null && port.IsOpen)
-                {
-                    port.Close();
-                }
-
-                timer1.Stop();
-
-                this.Dispose();
+                this.Close();
             }
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
-            if (port != null && port.IsOpen)
+            if (port != null)
             {
-                port.Close();
+                port.Dispose(); // Close も兼ねる
             }
 
             timer1.Stop();

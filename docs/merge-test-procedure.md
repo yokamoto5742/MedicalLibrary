@@ -1,4 +1,4 @@
-# InnoUketsukeLib 統合版 MedicalLibrary.dll 本番環境テスト手順
+# 統合版 MedicalLibrary.dll 本番環境テスト手順
 
 対象: InnoUketsukeLib.dll を統合した MedicalLibrary.dll（計画と変更内容は `docs/merge-plan-innouketsukelib.md`）
 配備先: `C:\Shinseikai\EyeData\`
@@ -121,13 +121,3 @@ copy /y SettingsCommon.xml.bak-merge-20260924   SettingsCommon.xml
 | 正しいパスワードでも全員ログインできない | `MedicalLibrary_Settings.xml` の `DBConnectionString3` で DB に接続できていない。統合版は例外が出るとメッセージを出さずにログイン失敗にする。T1 の後の患者表示も失敗するなら、接続の問題 |
 | 特定の職員だけログインできない | その職員の `M_USR.PASSWORD` が復号できない値になっている（旧 DLL では照合を飛ばしてログインできていた）。パスワードを再設定する |
 | `AGENT_PASSWORD` でログインしていた運用がある | 統合版では使えない。正規のパスワードでログインする |
-
-## 6. 記録
-
-| 項目 | 記入 |
-|---|---|
-| 実施日時 | |
-| 実施者 | |
-| 配備した DLL のサイズ | |
-| T1〜T13 の結果 | |
-| 備考 | |

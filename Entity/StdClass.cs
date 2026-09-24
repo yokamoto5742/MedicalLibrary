@@ -127,7 +127,10 @@ namespace MedicalLibrary.Entity
 
     public class StdDbClass
     {
-        public DB Db = DB.Db1;
+        /// <summary>
+        /// 使用する接続。既定は Db2（LibSettings.Init が初期化するのは Db2/Db3 のみ）。
+        /// </summary>
+        public DB Db = DB.Db2;
 
         /// <summary>
         /// 対象のテーブル名。

@@ -7,6 +7,12 @@
 
 ## [Unreleased]
 
+### 追加
+- `Entity/Intro.cs`（紹介状の取得）を復元した（EyeCenter の患者台帳で紹介状の宛先表示を復活させるため。2026-07-07 に未使用として削除していた）
+  - `Intro.GetList` のみ戻し、未使用の `GetListByPatsDepts` は戻していない
+  - `INNO` 定数による条件コンパイルをやめ、新システム（`PATIENTINTRODUCTION`）と旧システム（`INTRODUCTION`）を常に両方読む
+  - `PATIENTINTRODUCTION` の所有者は初回だけ `dba_tables` で調べて保持する（患者を開くたびに問い合わせない）
+
 ### 削除
 - 3アプリ（EyeCenter.exe / NidekARK1.exe / CanonRKF1.exe）と本DLL自身の IL から参照されないメンバーを、メンバー単位で削除（フェーズ5、`docs/dead_code_removal_guide.md` に準拠）
   - 未参照の public/private メソッド・プロパティ・フィールド 約250件（`TableData.CSVSave` / `ExcelSave`、`Env.DB_LINK`、`Launcher` の未使用起動メソッド、`WinAPI` の未使用 P/Invoke など）

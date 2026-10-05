@@ -119,6 +119,7 @@
     <Compile Include="Entity\BaseInfo.cs" />
     <Compile Include="Entity\PatContact.cs" />
     <Compile Include="Entity\InfectionData.cs" />
+    <Compile Include="Entity\Intro.cs" />
     <Compile Include="Entity\PatIn.cs" />
     <Compile Include="Entity\Staff.cs" />
     <Compile Include="Entity\StdKarte1.cs" />
